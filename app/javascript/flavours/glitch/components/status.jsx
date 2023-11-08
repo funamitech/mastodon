@@ -20,7 +20,7 @@ import Card from '../features/status/components/card';
 // to use the progress bar to show download progress
 import Bundle from '../features/ui/components/bundle';
 import { MediaGallery, Video, Audio } from '../features/ui/util/async-components';
-import { displayMedia } from '../initial_state';
+import { displayMedia, visibleReactions } from '../initial_state';
 
 import AttachmentList from './attachment_list';
 import { CollapseButton } from './collapse_button';
@@ -30,6 +30,7 @@ import StatusContent from './status_content';
 import StatusHeader from './status_header';
 import StatusIcons from './status_icons';
 import StatusPrepend from './status_prepend';
+import StatusReactions from './status_reactions';
 
 const domParser = new DOMParser();
 
@@ -72,6 +73,10 @@ export const defaultMediaVisibility = (status, settings) => {
 
 class Status extends ImmutablePureComponent {
 
+  static contextTypes = {
+    identity: PropTypes.object,
+  };
+
   static propTypes = {
     containerId: PropTypes.string,
     id: PropTypes.string,
@@ -88,6 +93,8 @@ class Status extends ImmutablePureComponent {
     onDelete: PropTypes.func,
     onDirect: PropTypes.func,
     onMention: PropTypes.func,
+    onReactionAdd: PropTypes.func,
+    onReactionRemove: PropTypes.func,
     onPin: PropTypes.func,
     onOpenMedia: PropTypes.func,
     onOpenVideo: PropTypes.func,
@@ -750,6 +757,7 @@ class Status extends ImmutablePureComponent {
     if (this.props.prepend && account) {
       const notifKind = {
         favourite: 'favourited',
+        reaction: 'reacted',
         reblog: 'boosted',
         reblogged_by: 'boosted',
         status: 'posted',
@@ -831,6 +839,15 @@ class Status extends ImmutablePureComponent {
               tagLinks={settings.get('tag_misleading_links')}
               rewriteMentions={settings.get('rewrite_mentions')}
               {...statusContentProps}
+            />
+
+            <StatusReactions
+              statusId={status.get('id')}
+              reactions={status.get('reactions')}
+              numVisible={visibleReactions}
+              addReaction={this.props.onReactionAdd}
+              removeReaction={this.props.onReactionRemove}
+              canReact={this.context.identity.signedIn}
             />
 
             {(!isCollapsed || !(muted || !settings.getIn(['collapsed', 'show_action_bar']))) && (
