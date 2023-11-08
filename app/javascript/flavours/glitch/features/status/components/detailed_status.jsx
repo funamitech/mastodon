@@ -13,10 +13,12 @@ import AttachmentList from 'flavours/glitch/components/attachment_list';
 import { Avatar } from 'flavours/glitch/components/avatar';
 import { DisplayName } from 'flavours/glitch/components/display_name';
 import EditedTimestamp from 'flavours/glitch/components/edited_timestamp';
+import { getHashtagBarForStatus } from 'flavours/glitch/components/hashtag_bar';
 import { Icon } from 'flavours/glitch/components/icon';
 import MediaGallery from 'flavours/glitch/components/media_gallery';
 import PictureInPicturePlaceholder from 'flavours/glitch/components/picture_in_picture_placeholder';
 import StatusContent from 'flavours/glitch/components/status_content';
+import StatusReactions from 'flavours/glitch/components/status_reactions';
 import VisibilityIcon from 'flavours/glitch/components/status_visibility_icon';
 import PollContainer from 'flavours/glitch/containers/poll_container';
 import Audio from 'flavours/glitch/features/audio';
@@ -28,6 +30,10 @@ import scheduleIdleTask from '../../ui/util/schedule_idle_task';
 import Card from './card';
 
 class DetailedStatus extends ImmutablePureComponent {
+
+  static contextTypes = {
+    identity: PropTypes.object,
+  };
 
   static propTypes = {
     status: ImmutablePropTypes.map,
@@ -47,6 +53,8 @@ class DetailedStatus extends ImmutablePureComponent {
       available: PropTypes.bool,
     }),
     onToggleMediaVisibility: PropTypes.func,
+    onReactionAdd: PropTypes.func.isRequired,
+    onReactionRemove: PropTypes.func.isRequired,
     intl: PropTypes.object.isRequired,
     ...WithRouterPropTypes,
   };
@@ -303,6 +311,9 @@ class DetailedStatus extends ImmutablePureComponent {
       );
     }
 
+    const {statusContentProps, hashtagBar} = getHashtagBarForStatus(status);
+    contentMedia.push(hashtagBar);
+
     return (
       <div style={outerStyle}>
         <div ref={this.setRef} className={classNames('detailed-status', `detailed-status-${status.get('visibility')}`, { compact })} data-status-by={status.getIn(['account', 'acct'])}>
@@ -325,6 +336,15 @@ class DetailedStatus extends ImmutablePureComponent {
             tagLinks={settings.get('tag_misleading_links')}
             rewriteMentions={settings.get('rewrite_mentions')}
             disabled
+            {...statusContentProps}
+          />
+
+          <StatusReactions
+            statusId={status.get('id')}
+            reactions={status.get('reactions')}
+            addReaction={this.props.onReactionAdd}
+            removeReaction={this.props.onReactionRemove}
+            canReact={this.context.identity.signedIn}
           />
 
           <div className='detailed-status__meta'>
