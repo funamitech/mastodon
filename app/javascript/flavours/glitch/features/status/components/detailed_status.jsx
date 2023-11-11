@@ -13,6 +13,7 @@ import AttachmentList from 'flavours/glitch/components/attachment_list';
 import { Avatar } from 'flavours/glitch/components/avatar';
 import { DisplayName } from 'flavours/glitch/components/display_name';
 import EditedTimestamp from 'flavours/glitch/components/edited_timestamp';
+import { getHashtagBarForStatus } from 'flavours/glitch/components/hashtag_bar';
 import { Icon } from 'flavours/glitch/components/icon';
 import MediaGallery from 'flavours/glitch/components/media_gallery';
 import PictureInPicturePlaceholder from 'flavours/glitch/components/picture_in_picture_placeholder';
@@ -31,7 +32,6 @@ import Card from './card';
 class DetailedStatus extends ImmutablePureComponent {
 
   static contextTypes = {
-    router: PropTypes.object,
     identity: PropTypes.object,
   };
 
@@ -311,6 +311,9 @@ class DetailedStatus extends ImmutablePureComponent {
       );
     }
 
+    const {statusContentProps, hashtagBar} = getHashtagBarForStatus(status);
+    contentMedia.push(hashtagBar);
+
     return (
       <div style={outerStyle}>
         <div ref={this.setRef} className={classNames('detailed-status', `detailed-status-${status.get('visibility')}`, { compact })} data-status-by={status.getIn(['account', 'acct'])}>
@@ -333,6 +336,15 @@ class DetailedStatus extends ImmutablePureComponent {
             tagLinks={settings.get('tag_misleading_links')}
             rewriteMentions={settings.get('rewrite_mentions')}
             disabled
+            {...statusContentProps}
+          />
+
+          <StatusReactions
+            statusId={status.get('id')}
+            reactions={status.get('reactions')}
+            addReaction={this.props.onReactionAdd}
+            removeReaction={this.props.onReactionRemove}
+            canReact={this.context.identity.signedIn}
           />
 
           <StatusReactions

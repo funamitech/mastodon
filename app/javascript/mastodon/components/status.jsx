@@ -32,6 +32,7 @@ import { RelativeTimestamp } from './relative_timestamp';
 import StatusActionBar from './status_action_bar';
 import StatusReactions from './status_reactions';
 import StatusContent from './status_content';
+import StatusReactions from './status_reactions';
 import { VisibilityIcon } from './visibility_icon';
 
 const domParser = new DOMParser();
@@ -80,7 +81,6 @@ const messages = defineMessages({
 class Status extends ImmutablePureComponent {
 
   static contextTypes = {
-    router: PropTypes.object,
     identity: PropTypes.object,
   };
 

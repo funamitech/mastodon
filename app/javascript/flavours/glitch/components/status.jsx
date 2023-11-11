@@ -70,7 +70,6 @@ export const defaultMediaVisibility = (status, settings) => {
 class Status extends ImmutablePureComponent {
 
   static contextTypes = {
-    router: PropTypes.object,
     identity: PropTypes.object,
   };
 
@@ -788,6 +787,9 @@ class Status extends ImmutablePureComponent {
       muted,
     }, 'focusable');
 
+    const {statusContentProps, hashtagBar} = getHashtagBarForStatus(status);
+    contentMedia.push(hashtagBar);
+
     return (
       <HotKeys handlers={handlers}>
         <div
@@ -837,6 +839,16 @@ class Status extends ImmutablePureComponent {
             disabled={!history}
             tagLinks={settings.get('tag_misleading_links')}
             rewriteMentions={settings.get('rewrite_mentions')}
+            {...statusContentProps}
+          />
+
+          <StatusReactions
+            statusId={status.get('id')}
+            reactions={status.get('reactions')}
+            numVisible={visibleReactions}
+            addReaction={this.props.onReactionAdd}
+            removeReaction={this.props.onReactionRemove}
+            canReact={this.context.identity.signedIn}
           />
 
           <StatusReactions

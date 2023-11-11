@@ -9,6 +9,7 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 import ImmutablePureComponent from 'react-immutable-pure-component';
 import { connect } from 'react-redux';
 
+import { ReactComponent as AddIcon } from '@material-symbols/svg-600/outlined/add.svg';
 import { ReactComponent as BookmarkIcon } from '@material-symbols/svg-600/outlined/bookmark-fill.svg';
 import { ReactComponent as BookmarkBorderIcon } from '@material-symbols/svg-600/outlined/bookmark.svg';
 import { ReactComponent as MoreHorizIcon } from '@material-symbols/svg-600/outlined/more_horiz.svg';
@@ -24,6 +25,7 @@ import EmojiPickerDropdown from '../features/compose/containers/emoji_picker_dro
 import { WithRouterPropTypes } from 'mastodon/utils/react_router';
 
 import DropdownMenuContainer from '../containers/dropdown_menu_container';
+import EmojiPickerDropdown from '../features/compose/containers/emoji_picker_dropdown_container';
 import { me, maxReactions } from '../initial_state';
 
 import { IconButton } from './icon_button';
@@ -146,8 +148,8 @@ class StatusActionBar extends ImmutablePureComponent {
   };
 
   handleEmojiPick = data => {
-      this.props.onReactionAdd(this.props.status.get('id'), data.native.replace(/:/g, ''), data.imageUrl);
-  }
+    this.props.onReactionAdd(this.props.status.get('id'), data.native.replace(/:/g, ''), data.imageUrl);
+  };
 
   handleReblogClick = e => {
     const { signedIn } = this.context.identity;
@@ -252,7 +254,7 @@ class StatusActionBar extends ImmutablePureComponent {
     this.props.onFilter();
   };
 
-  handleNoOp = () => {} // hack for reaction add button
+  handleNoOp = () => {}; // hack for reaction add button
 
   render () {
     const { status, relationship, intl, withDismiss, withCounters, scrollKey } = this.props;
@@ -396,6 +398,17 @@ class StatusActionBar extends ImmutablePureComponent {
     );
 
     const isReply = status.get('in_reply_to_account_id') === status.getIn(['account', 'id']);
+    const canReact = signedIn && status.get('reactions').filter(r => r.get('count') > 0 && r.get('me')).size < maxReactions;
+    const reactButton = (
+      <IconButton
+        className='status__action-bar-button'
+        onClick={this.handleNoOp} // EmojiPickerDropdown handles that
+        title={intl.formatMessage(messages.react)}
+        disabled={!canReact}
+        icon='plus'
+        iconComponent={AddIcon}
+      />
+    );
 
     return (
       <div className='status__action-bar'>

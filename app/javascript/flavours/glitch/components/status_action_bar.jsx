@@ -9,6 +9,7 @@ import ImmutablePropTypes from 'react-immutable-proptypes';
 import ImmutablePureComponent from 'react-immutable-pure-component';
 
 import DropdownMenuContainer from 'flavours/glitch/containers/dropdown_menu_container';
+import EmojiPickerDropdown from 'flavours/glitch/features/compose/containers/emoji_picker_dropdown_container';
 import { me, maxReactions } from 'flavours/glitch/initial_state';
 import { PERMISSION_MANAGE_USERS, PERMISSION_MANAGE_FEDERATION } from 'flavours/glitch/permissions';
 import { accountAdminLink, statusAdminLink } from 'flavours/glitch/utils/backend_links';
@@ -341,7 +342,7 @@ class StatusActionBar extends ImmutablePureComponent {
             ? <EmojiPickerDropdown className='status__action-bar-button' onPickEmoji={this.handleEmojiPick} button={reactButton} disabled={!canReact} />
             : reactButton
         }
-        <IconButton className='status__action-bar-button bookmark-icon' disabled={anonymousAccess} active={status.get('bookmarked')} title={intl.formatMessage(messages.bookmark)} icon='bookmark' onClick={this.handleBookmarkClick} />
+        <IconButton className='status__action-bar-button bookmark-icon' disabled={!signedIn} active={status.get('bookmarked')} title={intl.formatMessage(messages.bookmark)} icon='bookmark' onClick={this.handleBookmarkClick} />
 
         {filterButton}
 

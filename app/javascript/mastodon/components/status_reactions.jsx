@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import ImmutablePureComponent from 'react-immutable-pure-component';
 import PropTypes from 'prop-types';
 import ImmutablePropTypes from 'react-immutable-proptypes';
@@ -10,6 +11,25 @@ import { unicodeMapping } from '../features/emoji/emoji_unicode_mapping_light';
 import { AnimatedNumber } from './animated_number';
 import { assetHost } from '../utils/config';
 
+=======
+import PropTypes from 'prop-types';
+import React from 'react';
+
+import classNames from 'classnames';
+
+import ImmutablePropTypes from 'react-immutable-proptypes';
+import ImmutablePureComponent from 'react-immutable-pure-component';
+
+import TransitionMotion from 'react-motion/lib/TransitionMotion';
+import spring from 'react-motion/lib/spring';
+
+import { unicodeMapping } from '../features/emoji/emoji_unicode_mapping_light';
+import { autoPlayGif, reduceMotion } from '../initial_state';
+import { assetHost } from '../utils/config';
+
+import { AnimatedNumber } from './animated_number';
+
+>>>>>>> pr2462
 export default class StatusReactions extends ImmutablePureComponent {
 
   static propTypes = {

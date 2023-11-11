@@ -34,7 +34,6 @@ import Card from './card';
 class DetailedStatus extends ImmutablePureComponent {
 
   static contextTypes = {
-    router: PropTypes.object,
     identity: PropTypes.object,
   };
 
@@ -325,6 +324,14 @@ class DetailedStatus extends ImmutablePureComponent {
           />
 
           {expanded && hashtagBar}
+
+          <StatusReactions
+            statusId={status.get('id')}
+            reactions={status.get('reactions')}
+            addReaction={this.props.onReactionAdd}
+            removeReaction={this.props.onReactionRemove}
+            canReact={this.context.identity.signedIn}
+          />
 
           <div className='detailed-status__meta'>
             <a className='detailed-status__datetime' href={`/@${status.getIn(['account', 'acct'])}/${status.get('id')}`} target='_blank' rel='noopener noreferrer'>

@@ -9,6 +9,7 @@ import { withRouter } from 'react-router-dom';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import { connect } from 'react-redux';
 
+import { ReactComponent as AddIcon } from '@material-symbols/svg-600/outlined/add.svg';
 import { ReactComponent as BookmarkIcon } from '@material-symbols/svg-600/outlined/bookmark-fill.svg';
 import { ReactComponent as BookmarkBorderIcon } from '@material-symbols/svg-600/outlined/bookmark.svg';
 import { ReactComponent as MoreHorizIcon } from '@material-symbols/svg-600/outlined/more_horiz.svg';
@@ -23,8 +24,13 @@ import { WithRouterPropTypes } from 'mastodon/utils/react_router';
 
 import { IconButton } from '../../../components/icon_button';
 import DropdownMenuContainer from '../../../containers/dropdown_menu_container';
+<<<<<<< HEAD
 import EmojiPickerDropdown from '../../compose/containers/emoji_picker_dropdown_container';
 import { me, maxReactions } from '../../../initial_state';
+=======
+import { me, maxReactions } from '../../../initial_state';
+import EmojiPickerDropdown from '../../compose/containers/emoji_picker_dropdown_container';
+>>>>>>> pr2462
 
 const messages = defineMessages({
   delete: { id: 'status.delete', defaultMessage: 'Delete' },
@@ -111,7 +117,11 @@ class ActionBar extends PureComponent {
 
   handleEmojiPick = data => {
     this.props.onReactionAdd(this.props.status.get('id'), data.native.replace(/:/g, ''));
+<<<<<<< HEAD
   }
+=======
+  };
+>>>>>>> pr2462
 
   handleBookmarkClick = (e) => {
     this.props.onBookmark(this.props.status, e);
@@ -200,7 +210,11 @@ class ActionBar extends PureComponent {
     navigator.clipboard.writeText(url);
   };
 
+<<<<<<< HEAD
   handleNoOp = () => {} // hack for reaction add button
+=======
+  handleNoOp = () => {}; // hack for reaction add button
+>>>>>>> pr2462
 
   render () {
     const { status, relationship, intl } = this.props;
@@ -295,6 +309,10 @@ class ActionBar extends PureComponent {
         title={intl.formatMessage(messages.react)}
         disabled={!canReact}
         icon='plus'
+<<<<<<< HEAD
+=======
+        iconComponent={AddIcon}
+>>>>>>> pr2462
       />
     );
 
