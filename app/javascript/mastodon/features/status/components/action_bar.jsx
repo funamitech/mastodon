@@ -24,13 +24,8 @@ import { WithRouterPropTypes } from 'mastodon/utils/react_router';
 
 import { IconButton } from '../../../components/icon_button';
 import DropdownMenuContainer from '../../../containers/dropdown_menu_container';
-<<<<<<< HEAD
-import EmojiPickerDropdown from '../../compose/containers/emoji_picker_dropdown_container';
-import { me, maxReactions } from '../../../initial_state';
-=======
 import { me, maxReactions } from '../../../initial_state';
 import EmojiPickerDropdown from '../../compose/containers/emoji_picker_dropdown_container';
->>>>>>> pr2462
 
 const messages = defineMessages({
   delete: { id: 'status.delete', defaultMessage: 'Delete' },
