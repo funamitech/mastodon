@@ -201,11 +201,7 @@ class ActionBar extends PureComponent {
     navigator.clipboard.writeText(url);
   };
 
-<<<<<<< HEAD
-  handleNoOp = () => {} // hack for reaction add button
-=======
   handleNoOp = () => {}; // hack for reaction add button
->>>>>>> pr2462
 
   render () {
     const { status, relationship, intl } = this.props;
@@ -300,10 +296,7 @@ class ActionBar extends PureComponent {
         title={intl.formatMessage(messages.react)}
         disabled={!canReact}
         icon='plus'
-<<<<<<< HEAD
-=======
         iconComponent={AddIcon}
->>>>>>> pr2462
       />
     );
 
