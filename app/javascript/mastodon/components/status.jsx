@@ -30,7 +30,6 @@ import { DisplayName } from './display_name';
 import { getHashtagBarForStatus } from './hashtag_bar';
 import { RelativeTimestamp } from './relative_timestamp';
 import StatusActionBar from './status_action_bar';
-import StatusReactions from './status_reactions';
 import StatusContent from './status_content';
 import StatusReactions from './status_reactions';
 import { VisibilityIcon } from './visibility_icon';

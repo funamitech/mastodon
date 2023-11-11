@@ -59,7 +59,6 @@ const initialState = ImmutableMap({
       favourite: true,
       reaction: true,
       reblog: true,
-      reaction: true,
       mention: true,
       poll: true,
       status: true,

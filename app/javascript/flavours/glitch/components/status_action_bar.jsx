@@ -18,8 +18,6 @@ import { WithRouterPropTypes } from 'flavours/glitch/utils/react_router';
 import { IconButton } from './icon_button';
 import { RelativeTimestamp } from './relative_timestamp';
 
-import EmojiPickerDropdown from '../features/compose/containers/emoji_picker_dropdown_container';
-
 const messages = defineMessages({
   delete: { id: 'status.delete', defaultMessage: 'Delete' },
   redraft: { id: 'status.redraft', defaultMessage: 'Delete & re-draft' },

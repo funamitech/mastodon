@@ -14,7 +14,6 @@ import EmojiPickerDropdown from 'flavours/glitch/features/compose/containers/emo
 import { me, maxReactions } from 'flavours/glitch/initial_state';
 import { PERMISSION_MANAGE_USERS, PERMISSION_MANAGE_FEDERATION } from 'flavours/glitch/permissions';
 import { accountAdminLink, statusAdminLink } from 'flavours/glitch/utils/backend_links';
-import EmojiPickerDropdown from '../../compose/containers/emoji_picker_dropdown_container';
 import { WithRouterPropTypes } from 'flavours/glitch/utils/react_router';
 
 const messages = defineMessages({

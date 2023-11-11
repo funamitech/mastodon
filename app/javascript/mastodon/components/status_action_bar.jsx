@@ -21,7 +21,6 @@ import { ReactComponent as StarBorderIcon } from '@material-symbols/svg-600/outl
 import { ReactComponent as VisibilityIcon } from '@material-symbols/svg-600/outlined/visibility.svg';
 
 import { PERMISSION_MANAGE_USERS, PERMISSION_MANAGE_FEDERATION } from 'mastodon/permissions';
-import EmojiPickerDropdown from '../features/compose/containers/emoji_picker_dropdown_container';
 import { WithRouterPropTypes } from 'mastodon/utils/react_router';
 
 import DropdownMenuContainer from '../containers/dropdown_menu_container';

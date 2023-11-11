@@ -112,11 +112,7 @@ class ActionBar extends PureComponent {
 
   handleEmojiPick = data => {
     this.props.onReactionAdd(this.props.status.get('id'), data.native.replace(/:/g, ''));
-<<<<<<< HEAD
-  }
-=======
   };
->>>>>>> pr2462
 
   handleBookmarkClick = (e) => {
     this.props.onBookmark(this.props.status, e);
