@@ -56,7 +56,7 @@ import StatusContainer from 'flavours/glitch/containers/status_container';
 import BundleColumnError from 'flavours/glitch/features/ui/components/bundle_column_error';
 import Column from 'flavours/glitch/features/ui/components/column';
 import { boostModal, favouriteModal, deleteModal } from 'flavours/glitch/initial_state';
-import { makeCustomEmojiMap, makeGetStatus, makeGetPictureInPicture } from 'flavours/glitch/selectors';
+import { makeGetStatus, makeGetPictureInPicture } from 'flavours/glitch/selectors';
 import { autoUnfoldCW } from 'flavours/glitch/utils/content_warning';
 import { WithRouterPropTypes } from 'flavours/glitch/utils/react_router';
 
