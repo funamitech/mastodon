@@ -315,14 +315,6 @@ class DetailedStatus extends ImmutablePureComponent {
 
           {media}
 
-          <StatusReactions
-            statusId={status.get('id')}
-            reactions={status.get('reactions')}
-            addReaction={this.props.onReactionAdd}
-            removeReaction={this.props.onReactionRemove}
-            canReact={this.context.identity.signedIn}
-          />
-
           {expanded && hashtagBar}
 
           <StatusReactions
