@@ -59,8 +59,8 @@ pipeline {
                             stage('Build platform specific image') {
                                 steps {
                                     sh "docker build -t $DOCKER_IMAGE:$DOCKER_TAG-${TARGET} --platform linux/${TARGET} --build-arg \"GITHUB_REPOSITORY=${GITHUB_REPOSITORY}\" --build-arg \"SOURCE_BASE_URL=${SOURCE_BASE_URL}\" --build-arg \"SOURCE_TAG=${SOURCE_TAG}\" ."
-                                    sh "ls -l"
-                                    sh "docker build -t $DOCKER_IMAGE-streaming:$DOCKER_TAG-${TARGET} --platform linux/${TARGET} --build-arg \"GITHUB_REPOSITORY=${GITHUB_REPOSITORY}\" --build-arg \"SOURCE_BASE_URL=${SOURCE_BASE_URL}\" --build-arg \"SOURCE_TAG=${SOURCE_TAG}\" streaming/."
+                                    sh "git clean -f; git reset --hard"
+                                    sh "docker build --no-cache -t $DOCKER_IMAGE-streaming:$DOCKER_TAG-${TARGET} --platform linux/${TARGET} --build-arg \"GITHUB_REPOSITORY=${GITHUB_REPOSITORY}\" --build-arg \"SOURCE_BASE_URL=${SOURCE_BASE_URL}\" --build-arg \"SOURCE_TAG=${SOURCE_TAG}\" streaming/."
                                     script {
                                         if (env.DOCKER_LATEST == 'true') {
                                             sh "docker tag $DOCKER_IMAGE:$DOCKER_TAG-${TARGET} $DOCKER_IMAGE:latest-${TARGET}"
