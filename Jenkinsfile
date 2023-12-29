@@ -104,7 +104,7 @@ pipeline {
                         script {
                             if (env.DOCKER_LATEST == 'true') {
                                 sh "docker manifest push $DOCKER_IMAGE:latest"
-                                sh "docker manifest push $DOCKER_IMAGE-streaming:latest-streaming"
+                                sh "docker manifest push $DOCKER_IMAGE:latest-streaming"
 
                             }
                         }
