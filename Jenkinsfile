@@ -59,11 +59,11 @@ pipeline {
                             stage('Build platform specific image') {
                                 steps {
                                     sh "docker build -t $DOCKER_IMAGE:$DOCKER_TAG-${TARGET} --platform linux/${TARGET} --build-arg \"GITHUB_REPOSITORY=${GITHUB_REPOSITORY}\" --build-arg \"SOURCE_BASE_URL=${SOURCE_BASE_URL}\" --build-arg \"SOURCE_TAG=${SOURCE_TAG}\" ."
-                                    sh "docker build --no-cache -t $DOCKER_IMAGE-streaming:$DOCKER_TAG-${TARGET} --platform linux/${TARGET} --build-arg \"GITHUB_REPOSITORY=${GITHUB_REPOSITORY}\" --build-arg \"SOURCE_BASE_URL=${SOURCE_BASE_URL}\" --build-arg \"SOURCE_TAG=${SOURCE_TAG}\" -f ./streaming/Dockerfile ."
+                                    sh "docker build --no-cache -t $DOCKER_IMAGE:$DOCKER_TAG-streaming-${TARGET} --platform linux/${TARGET} --build-arg \"GITHUB_REPOSITORY=${GITHUB_REPOSITORY}\" --build-arg \"SOURCE_BASE_URL=${SOURCE_BASE_URL}\" --build-arg \"SOURCE_TAG=${SOURCE_TAG}\" -f ./streaming/Dockerfile ."
                                     script {
                                         if (env.DOCKER_LATEST == 'true') {
                                             sh "docker tag $DOCKER_IMAGE:$DOCKER_TAG-${TARGET} $DOCKER_IMAGE:latest-${TARGET}"
-                                            sh "docker tag $DOCKER_IMAGE-streaming:$DOCKER_TAG-${TARGET} $DOCKER_IMAGE:latest-${TARGET}"
+                                            sh "docker tag $DOCKER_IMAGE:$DOCKER_TAG-streaming-${TARGET} $DOCKER_IMAGE:latest-streaming-${TARGET}"
                                         }
                                     }
                                 }
@@ -71,11 +71,11 @@ pipeline {
                             stage('Push platform specific image') {
                                 steps {
                                     sh "docker push $DOCKER_IMAGE:$DOCKER_TAG-${TARGET}"
-                                    sh "docker push $DOCKER_IMAGE-streaming:$DOCKER_TAG-${TARGET}"
+                                    sh "docker push $DOCKER_IMAGE:$DOCKER_TAG-streaming-${TARGET}"
                                     script {
                                         if (env.DOCKER_LATEST == 'true') {
                                             sh "docker push $DOCKER_IMAGE:latest-${TARGET}"
-                                            sh "docker push $DOCKER_IMAGE-streaming:latest-${TARGET}"
+                                            sh "docker push $DOCKER_IMAGE:latest-streaming-${TARGET}"
 
                                         }
                                     }
@@ -87,11 +87,11 @@ pipeline {
                 stage('Docker manifest') {
                     steps {
                         sh "docker manifest create $DOCKER_IMAGE:$DOCKER_TAG --amend $DOCKER_IMAGE:$DOCKER_TAG-amd64"
-                        sh "docker manifest create $DOCKER_IMAGE-streaming:$DOCKER_TAG --amend $DOCKER_IMAGE:$DOCKER_TAG-amd64"
+                        sh "docker manifest create $DOCKER_IMAGE:$DOCKER_TAG-streaming --amend $DOCKER_IMAGE:$DOCKER_TAG-streaming-amd64"
                         script {
                             if (env.DOCKER_LATEST == 'true') {
                                 sh "docker manifest create $DOCKER_IMAGE:latest --amend $DOCKER_IMAGE:latest-amd64"
-                                sh "docker manifest create $DOCKER_IMAGE-streaming:latest --amend $DOCKER_IMAGE:latest-amd64"
+                                sh "docker manifest create $DOCKER_IMAGE:latest-streaming --amend $DOCKER_IMAGE:latest-streaming-amd64"
 
                             }
                         }
@@ -100,11 +100,11 @@ pipeline {
                 stage('Docker push') {
                     steps {
                         sh "docker manifest push $DOCKER_IMAGE:$DOCKER_TAG"
-                        sh "docker manifest push $DOCKER_IMAGE-streaming:$DOCKER_TAG"
+                        sh "docker manifest push $DOCKER_IMAGE:$DOCKER_TAG-streaming"
                         script {
                             if (env.DOCKER_LATEST == 'true') {
                                 sh "docker manifest push $DOCKER_IMAGE:latest"
-                                sh "docker manifest push $DOCKER_IMAGE-streaming:latest"
+                                sh "docker manifest push $DOCKER_IMAGE-streaming:latest-streaming"
 
                             }
                         }
