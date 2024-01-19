@@ -339,9 +339,11 @@ RSpec.describe Account do
 
       results = account.excluded_from_timeline_account_ids
       expect(results.size).to eq 3
-      expect(results).to include(block.target_account.id)
-      expect(results).to include(mute.target_account.id)
-      expect(results).to include(block_by.account.id)
+      expect(results).to include(
+        block.target_account.id,
+        mute.target_account.id,
+        block_by.account.id
+      )
     end
   end
 
@@ -954,6 +956,7 @@ RSpec.describe Account do
 
       it 'returns every usable non-suspended account' do
         expect(described_class.searchable).to contain_exactly(silenced_local, silenced_remote, local_account, remote_account)
+        expect(described_class.searchable).to_not include(suspended_local, suspended_remote, unconfirmed, unapproved)
       end
 
       it 'does not mess with previously-applied scopes' do
