@@ -736,7 +736,6 @@ class Status extends ImmutablePureComponent {
         <Card
           onOpenMedia={this.handleOpenMedia}
           card={status.get('card')}
-          compact
           sensitive={status.get('sensitive')}
         />,
       );
