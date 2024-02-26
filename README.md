@@ -1,4 +1,4 @@
-# Mastodon YRYR-Glitch
+# Mastodon Glitch-YRYR
 
 > Now with 100% more Yui Funami!
 
@@ -7,7 +7,8 @@ So here's the deal: assets are customized, you are on your own replacing our ass
 Added features over glitch-soc:
 - Nori tokenizer for better Korean search (You **MUST** use {Elastic,Open}Search with necessary plugins installed, otherwise search feature won't work *at all*)
 - YuruVerse assets (logos, etc)
-- Birdsite theme adapted to glitch-soc based forks
+- Birdsite theme adapted to glitch-soc based forks (unmaintained, please use mastodon-modern theme instead.)
+- Mastodon-modern theme included!
 - Pretendard font for better Korean glyphs
 - Emoji reactions! (compatible with Misskey of course)
 - And more things...?
