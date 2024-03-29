@@ -80,13 +80,7 @@ const messages = defineMessages({
 
 class Status extends ImmutablePureComponent {
 
-<<<<<<< HEAD
-  static contextTypes = {
-    identity: PropTypes.object,
-  };
-=======
   static contextType = SensitiveMediaContext;
->>>>>>> 3341db939cd077820ad598b0445d02ab2382eaf4
 
   static propTypes = {
     status: ImmutablePropTypes.map,

@@ -704,11 +704,8 @@
   "status.edited_x_times": "Edited {count, plural, one {{count} time} other {{count} times}}",
   "status.embed": "Embed",
   "status.favourite": "Favorite",
-<<<<<<< HEAD
   "status.react": "React",
-=======
   "status.favourites": "{count, plural, one {favorite} other {favorites}}",
->>>>>>> 3341db939cd077820ad598b0445d02ab2382eaf4
   "status.filter": "Filter this post",
   "status.filtered": "Filtered",
   "status.hide": "Hide post",
