@@ -49,6 +49,9 @@ class Notification < ApplicationRecord
     favourite: {
       filterable: true,
     }.freeze,
+    reaction: {
+      filterable: true,
+    }.freeze,
     poll: {
       filterable: false,
     }.freeze,
