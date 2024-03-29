@@ -39,14 +39,14 @@ fi:
         text: Voit valittaa varoituksesta vain kerran
       defaults:
         autofollow: Henkilöt, jotka rekisteröityvät kutsun kautta, seuraavat sinua automaattisesti
-        avatar: PNG, GIF tai JPG. Enintään %{size}. Skaalataan kokoon %{dimensions} px
+        avatar: WEBP, PNG, GIF tai JPG. Enintään %{size}. Skaalataan kokoon %{dimensions} px
         bot: Tämä tili suorittaa enimmäkseen automaattisia toimintoja eikä sitä ehkä valvota
         context: Ainakin yksi konteksti, jossa suodattimen pitäisi olla voimassa
         current_password: Turvallisuussyistä kirjoita nykyisen tilin salasana
         current_username: Vahvista kirjoittamalla nykyisen tilin käyttäjänimi
         digest: Lähetetään vain pitkän poissaolon jälkeen ja vain, jos olet saanut suoria viestejä poissaolosi aikana
         email: Sinulle lähetetään vahvistussähköposti
-        header: PNG, GIF tai JPG. Enintään %{size}. Skaalataan kokoon %{dimensions} px
+        header: WEBP, PNG, GIF tai JPG. Enintään %{size}. Skaalataan kokoon %{dimensions} px
         inbox_url: Kopioi URL-osoite haluamasi välittäjän etusivulta
         irreversible: Suodatetut julkaisut katoavat lopullisesti, vaikka suodatin poistettaisiin myöhemmin
         locale: Käyttöliittymän, sähköpostien ja puskuilmoitusten kieli
@@ -116,6 +116,7 @@ fi:
           sign_up_requires_approval: Uudet rekisteröitymiset edellyttävät hyväksyntääsi
         severity: Valitse, mitä tapahtuu tämän IP-osoitteen pyynnöille
       rule:
+        hint: Valinnainen. Anna lisätietoja säännöstä
         text: Kuvaile sääntöä tai edellytystä palvelimesi käyttäjille. Suosi tiivistä, yksinkertaista ilmaisua
       sessions:
         otp: 'Näppäile mobiilisovelluksessa näkyvä kaksivaiheisen todennuksen tunnusluku, tai käytä tarvittaessa palautuskoodia:'
@@ -192,7 +193,7 @@ fi:
         honeypot: "%{label} (älä täytä)"
         inbox_url: Välittäjän postilaatikon URL-osoite
         irreversible: Pudota piilottamisen sijaan
-        locale: Kieli
+        locale: Käyttöliittymän kieli
         max_uses: Käyttökertoja enintään
         new_password: Uusi salasana
         note: Elämäkerta
@@ -299,6 +300,7 @@ fi:
           patch: Ilmoita virhekorjauspäivityksistä
         trending_tag: Uusi trendi vaatii tarkistusta
       rule:
+        hint: Lisätietoja
         text: Sääntö
       settings:
         indexable: Sisällytä profiilisivu hakukoneisiin
