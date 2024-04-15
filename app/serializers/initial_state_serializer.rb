@@ -33,9 +33,8 @@ class InitialStateSerializer < ActiveModel::Serializer
   def meta
     store = default_meta_store
 
-    if object_account
-      store[:me]                = object_account.id.to_s
-      store[:unfollow_modal]    = object_account_user.setting_unfollow_modal
+    if object.current_account
+      store[:me]                = object.current_account.id.to_s
       store[:boost_modal]       = object_account_user.setting_boost_modal
       store[:favourite_modal]   = object_account_user.setting_favourite_modal
       store[:delete_modal]      = object_account_user.setting_delete_modal
