@@ -134,6 +134,14 @@ export default function statuses(state = initialState, action) {
     return state.get(action.status.get('id')) === undefined ? state : state.setIn([action.status.get('id'), 'bookmarked'], false);
   case UNBOOKMARK_FAIL:
     return state.get(action.status.get('id')) === undefined ? state : state.setIn([action.status.get('id'), 'bookmarked'], true);
+  case REACTION_UPDATE:
+    return updateReactionCount(state, action.reaction);
+  case REACTION_ADD_REQUEST:
+  case REACTION_REMOVE_FAIL:
+    return addReaction(state, action.id, action.name, action.url);
+  case REACTION_REMOVE_REQUEST:
+  case REACTION_ADD_FAIL:
+    return removeReaction(state, action.id, action.name);
   case STATUS_MUTE_SUCCESS:
     return state.setIn([action.id, 'muted'], true);
   case STATUS_UNMUTE_SUCCESS:

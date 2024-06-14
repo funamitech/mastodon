@@ -12,6 +12,7 @@ import { HotKeys } from 'react-hotkeys';
 import PictureInPicturePlaceholder from 'flavours/glitch/components/picture_in_picture_placeholder';
 import PollContainer from 'flavours/glitch/containers/poll_container';
 import NotificationOverlayContainer from 'flavours/glitch/features/notifications/containers/overlay_container';
+import { identityContextPropShape, withIdentity } from 'flavours/glitch/identity_context';
 import { autoUnfoldCW } from 'flavours/glitch/utils/content_warning';
 import { withOptionalRouter, WithOptionalRouterPropTypes } from 'flavours/glitch/utils/react_router';
 
@@ -78,6 +79,7 @@ class Status extends ImmutablePureComponent {
   static contextType = SensitiveMediaContext;
 
   static propTypes = {
+    identity: identityContextPropShape,
     containerId: PropTypes.string,
     id: PropTypes.string,
     status: ImmutablePropTypes.map,
@@ -545,6 +547,7 @@ class Status extends ImmutablePureComponent {
       nextInReplyToId,
       rootId,
       history,
+      identity,
       ...other
     } = this.props;
     const { isCollapsed } = this.state;
@@ -846,18 +849,14 @@ class Status extends ImmutablePureComponent {
               {...statusContentProps}
             />
 
-            <IdentityConsumer>
-              {identity => (
-                <StatusReactions
-                  statusId={status.get('id')}
-                  reactions={status.get('reactions')}
-                  numVisible={visibleReactions}
-                  addReaction={this.props.onReactionAdd}
-                  removeReaction={this.props.onReactionRemove}
-                  canReact={identity.signedIn}
-                />
-              )}
-            </IdentityConsumer>
+            <StatusReactions
+              statusId={status.get('id')}
+              reactions={status.get('reactions')}
+              numVisible={visibleReactions}
+              addReaction={this.props.onReactionAdd}
+              removeReaction={this.props.onReactionRemove}
+              canReact={this.props.identity.signedIn}
+            />
 
             {(!isCollapsed || !(muted || !settings.getIn(['collapsed', 'show_action_bar']))) && (
               <StatusActionBar
@@ -881,4 +880,4 @@ class Status extends ImmutablePureComponent {
 
 }
 
-export default withOptionalRouter(injectIntl(Status));
+export default withOptionalRouter(injectIntl((withIdentity(Status))));
