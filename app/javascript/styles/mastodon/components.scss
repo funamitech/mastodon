@@ -3911,6 +3911,10 @@ $ui-header-logo-wordmark-width: 99px;
   border: 1px solid var(--background-border-color);
   border-radius: 8px;
 
+  &.bottomless {
+    border-radius: 8px 8px 0 0;
+  }
+
   &__actions {
     bottom: 0;
     inset-inline-start: 0;
@@ -4380,10 +4384,6 @@ a.status-card {
     outline: $ui-button-focus-outline;
   }
 
-  .no-reduce-motion .icon {
-    transition: transform 0.15s ease-in-out;
-  }
-
   &.active {
     color: $primary-text-color;
 
@@ -4391,7 +4391,7 @@ a.status-card {
       color: $primary-text-color;
     }
 
-    .icon {
+    .icon-sliders {
       transform: rotate(60deg);
     }
   }
@@ -4400,6 +4400,10 @@ a.status-card {
     color: $dark-text-color;
     cursor: default;
   }
+}
+
+.no-reduce-motion .column-header__button .icon-sliders {
+  transition: transform 150ms ease-in-out;
 }
 
 .column-header__collapsible {
@@ -10239,6 +10243,45 @@ noscript {
       border-radius: 4px;
       border: 1px solid var(--background-border-color);
       padding: 5px;
+    }
+  }
+}
+
+.more-from-author {
+  font-size: 14px;
+  color: $darker-text-color;
+  background: var(--surface-background-color);
+  border: 1px solid var(--background-border-color);
+  border-top: 0;
+  border-radius: 0 0 8px 8px;
+  padding: 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  .logo {
+    height: 16px;
+    color: $darker-text-color;
+  }
+
+  & > span {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: 500;
+    color: $primary-text-color;
+    text-decoration: none;
+
+    &:hover,
+    &:focus,
+    &:active {
+      color: $highlight-text-color;
     }
   }
 }
