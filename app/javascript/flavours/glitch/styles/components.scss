@@ -10946,6 +10946,10 @@ noscript {
     color: $gold-star;
   }
 
+  &--reaction &__icon {
+    color: $blurple-300;
+  }
+
   &--reblog &__icon {
     color: $valid-value-color;
   }
@@ -11119,7 +11123,8 @@ noscript {
   $icon-margin: 48px; // 40px avatar + 8px gap
 
   .status__content,
-  .status__action-bar {
+  .status__action-bar,
+  .reactions-bar {
     margin-inline-start: $icon-margin;
     width: calc(100% - $icon-margin);
   }
