@@ -160,11 +160,8 @@
   "status.is_poll": "This toot is a poll",
   "status.local_only": "Only visible from your instance",
   "status.react": "React",
-<<<<<<< HEAD
   "status.show_filter_reason": "Show anyway",
   "status.show_less": "Show less",
   "status.show_more": "Show more",
-=======
->>>>>>> e3dbd2e6489b90f68b5a207c7561ebf7435f967c
   "status.uncollapse": "Uncollapse"
 }
