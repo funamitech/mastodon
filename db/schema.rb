@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_07_13_171909) do
+ActiveRecord::Schema[7.1].define(version: 2024_08_08_125420) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -692,12 +692,13 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_13_171909) do
 
   create_table "notification_policies", force: :cascade do |t|
     t.bigint "account_id", null: false
-    t.boolean "filter_not_following", default: false, null: false
-    t.boolean "filter_not_followers", default: false, null: false
-    t.boolean "filter_new_accounts", default: false, null: false
-    t.boolean "filter_private_mentions", default: true, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "for_not_following", default: 0, null: false
+    t.integer "for_not_followers", default: 0, null: false
+    t.integer "for_new_accounts", default: 0, null: false
+    t.integer "for_private_mentions", default: 1, null: false
+    t.integer "for_limited_accounts", default: 1, null: false
     t.index ["account_id"], name: "index_notification_policies_on_account_id", unique: true
   end
 
@@ -739,6 +740,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_07_13_171909) do
     t.string "scopes"
     t.bigint "application_id", null: false
     t.bigint "resource_owner_id", null: false
+    t.string "code_challenge"
+    t.string "code_challenge_method"
     t.index ["resource_owner_id"], name: "index_oauth_access_grants_on_resource_owner_id"
     t.index ["token"], name: "index_oauth_access_grants_on_token", unique: true
   end
