@@ -32,7 +32,7 @@ class StatusCacheHydrator
       payload[:bookmarked] = Bookmark.exists?(account_id: account_id, status_id: @status.id)
       payload[:pinned]     = StatusPin.exists?(account_id: account_id, status_id: @status.id) if @status.account_id == account_id
       payload[:filtered]   = mapped_applied_custom_filter(account_id, @status)
-      payload[:reactions]  = serialized_reactions(account_id)
+      payload[:reactions]  = serialized_reactions(account_id, @status)
 
       if payload[:poll]
         payload[:poll][:voted] = @status.account_id == account_id
@@ -58,7 +58,11 @@ class StatusCacheHydrator
       payload[:reblog][:bookmarked] = Bookmark.exists?(account_id: account_id, status_id: @status.reblog_of_id)
       payload[:reblog][:pinned]     = StatusPin.exists?(account_id: account_id, status_id: @status.reblog_of_id) if @status.reblog.account_id == account_id
       payload[:reblog][:filtered]   = payload[:filtered]
+<<<<<<< HEAD
       payload[:reblog][:reactions]  = serialized_reactions(account_id)
+=======
+      payload[:reblog][:reactions]  = serialized_reactions(account_id, @status.reblog)
+>>>>>>> e3dbd2e6489b90f68b5a207c7561ebf7435f967c
 
       if payload[:reblog][:poll]
         if @status.reblog.account_id == account_id
@@ -90,8 +94,13 @@ class StatusCacheHydrator
     ).as_json
   end
 
+<<<<<<< HEAD
   def serialized_reactions(account_id)
     reactions = @status.reactions(account_id)
+=======
+  def serialized_reactions(account_id, status)
+    reactions = status.reactions(account_id)
+>>>>>>> e3dbd2e6489b90f68b5a207c7561ebf7435f967c
     ActiveModelSerializers::SerializableResource.new(
       reactions,
       each_serializer: REST::ReactionSerializer,
