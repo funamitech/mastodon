@@ -45,8 +45,6 @@ import {
   toggleReblog,
   pin,
   unpin,
-  addReaction,
-  removeReaction,
 } from '../../actions/interactions';
 import { openModal } from '../../actions/modal';
 import { initMuteModal } from '../../actions/mutes';
