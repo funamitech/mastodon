@@ -19,11 +19,11 @@ module ThemeHelper
 
     if theme == 'system'
       ''.html_safe.tap do |tags|
-        tags << tag.meta(name: 'theme-color', content: Themes::THEME_COLORS[:dark], media: '(prefers-color-scheme: dark)')
-        tags << tag.meta(name: 'theme-color', content: Themes::THEME_COLORS[:light], media: '(prefers-color-scheme: light)')
+        tags << tag.meta(name: 'theme-color', content: '#787878', media: '(prefers-color-scheme: dark)')
+        tags << tag.meta(name: 'theme-color', content: '#787878', media: '(prefers-color-scheme: light)')
       end
     else
-      tag.meta name: 'theme-color', content: theme_color_for(theme)
+      tag.meta name: 'theme-color', content: '#787878'
     end
   end
 
