@@ -7,7 +7,6 @@ So here's the deal: assets are customized, you are on your own replacing our ass
 Added features over glitch-soc:
 - Nori tokenizer for better Korean search (You **MUST** use {Elastic,Open}Search with necessary plugins installed, otherwise search feature won't work *at all*)
 - YuruVerse assets (logos, etc)
-- Birdsite theme adapted to glitch-soc based forks (unmaintained, please use mastodon-modern theme instead.)
 - Mastodon-modern theme included!
 - Pretendard font for better Korean glyphs
 - Emoji reactions! (compatible with Misskey of course)
@@ -16,7 +15,7 @@ Added features over glitch-soc:
 We also recommend applying wide custom emoji CSS for better experience.
 
 # Thanks to...
-- Freeplay for [mastodon-modern](https://codeberg.org/Freeplay/Mastodon-Modern/src/branch/main) theme
+- Freeplay for [mastodon-modern](https://git.gay/Freeplay/Mastodon-Modern) theme
 
 
 - You can view documentation for this project at [glitch-soc.github.io/docs/](https://glitch-soc.github.io/docs/).
