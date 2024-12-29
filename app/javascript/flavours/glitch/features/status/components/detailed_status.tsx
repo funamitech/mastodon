@@ -164,6 +164,8 @@ export const DetailedStatus: React.FC<{
   let media = contentMedia;
   let mediaIcons: string[] = contentMediaIcons;
 
+  const { signedIn } = useIdentity();
+
   if (mediaOutsideCW) {
     media = extraMedia;
     mediaIcons = extraMediaIcons;
