@@ -140,5 +140,5 @@
   "status.is_poll": "This toot is a poll",
   "status.local_only": "Only visible from your instance",
   "status.react": "React",
-  "status.show_filter_reason": "Show anyway",
+  "status.show_filter_reason": "Show anyway"
 }
