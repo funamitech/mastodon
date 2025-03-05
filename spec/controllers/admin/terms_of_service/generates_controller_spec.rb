@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe Admin::TermsOfService::GeneratesController do
   render_views
 
-  let(:user) { Fabricate(:user, role: UserRole.find_by(name: 'Admin')) }
+  let(:user) { Fabricate(:admin_user) }
 
   before do
     sign_in user, scope: :user
@@ -33,6 +33,7 @@ RSpec.describe Admin::TermsOfService::GeneratesController do
             dmca_email: 'dmca@host.example',
             domain: 'host.example',
             jurisdiction: 'Europe',
+            choice_of_law: 'New York',
           },
         }
       end

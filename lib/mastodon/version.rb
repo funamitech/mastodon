@@ -17,11 +17,11 @@ module Mastodon
     end
 
     def default_prerelease
-      'alpha.1'
+      'alpha.3'
     end
 
     def prerelease
-      ENV['MASTODON_VERSION_PRERELEASE'].presence || default_prerelease
+      version_configuration[:prerelease].presence || default_prerelease
     end
 
     def build_metadata
@@ -45,21 +45,25 @@ module Mastodon
 
     def api_versions
       {
-        mastodon: 2,
+        mastodon: 3,
       }
     end
 
     def repository
+<<<<<<< HEAD
       ENV.fetch('GITHUB_REPOSITORY', 'funamitech/mastodon')
+=======
+      source_configuration[:repository]
+>>>>>>> d431e119e445f681b6f47f05c566688be97ade58
     end
 
     def source_base_url
-      ENV.fetch('SOURCE_BASE_URL', "https://github.com/#{repository}")
+      source_configuration[:base_url] || "https://github.com/#{repository}"
     end
 
     # specify git tag or commit hash here
     def source_tag
-      ENV.fetch('SOURCE_TAG', nil)
+      source_configuration[:tag]
     end
 
     def source_url
@@ -76,6 +80,18 @@ module Mastodon
 
     def user_agent
       @user_agent ||= "Mastodon/#{Version} (#{HTTP::Request::USER_AGENT}; +http#{Rails.configuration.x.use_https ? 's' : ''}://#{Rails.configuration.x.web_domain}/)"
+    end
+
+    def version_configuration
+      mastodon_configuration.version
+    end
+
+    def source_configuration
+      mastodon_configuration.source
+    end
+
+    def mastodon_configuration
+      Rails.configuration.x.mastodon
     end
   end
 end
