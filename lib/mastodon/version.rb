@@ -50,11 +50,7 @@ module Mastodon
     end
 
     def repository
-<<<<<<< HEAD
-      ENV.fetch('GITHUB_REPOSITORY', 'funamitech/mastodon')
-=======
       source_configuration[:repository]
->>>>>>> d431e119e445f681b6f47f05c566688be97ade58
     end
 
     def source_base_url
