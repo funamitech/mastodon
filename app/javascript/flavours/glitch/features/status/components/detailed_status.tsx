@@ -22,6 +22,7 @@ import { MentionsPlaceholder } from 'flavours/glitch/components/mentions_placeho
 import { Permalink } from 'flavours/glitch/components/permalink';
 import PictureInPicturePlaceholder from 'flavours/glitch/components/picture_in_picture_placeholder';
 import { VisibilityIcon } from 'flavours/glitch/components/visibility_icon';
+import { useIdentity } from 'flavours/glitch/identity_context';
 import { useAppSelector } from 'flavours/glitch/store';
 
 import { Avatar } from '../../../components/avatar';
@@ -81,6 +82,7 @@ export const DetailedStatus: React.FC<{
   const properStatus = status?.get('reblog') ?? status;
   const [height, setHeight] = useState(0);
   const nodeRef = useRef<HTMLDivElement>();
+  const { signedIn } = useIdentity();
 
   const rewriteMentions = useAppSelector(
     (state) => state.local_settings.get('rewrite_mentions', false) as boolean,
