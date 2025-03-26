@@ -15,6 +15,7 @@ import { AnimatedNumber } from 'flavours/glitch/components/animated_number';
 import AttachmentList from 'flavours/glitch/components/attachment_list';
 import { ContentWarning } from 'flavours/glitch/components/content_warning';
 import EditedTimestamp from 'flavours/glitch/components/edited_timestamp';
+import { FilterWarning } from 'flavours/glitch/components/filter_warning';
 import type { StatusLike } from 'flavours/glitch/components/hashtag_bar';
 import { getHashtagBarForStatus } from 'flavours/glitch/components/hashtag_bar';
 import { IconLogo } from 'flavours/glitch/components/logo';
@@ -81,6 +82,7 @@ export const DetailedStatus: React.FC<{
 }) => {
   const properStatus = status?.get('reblog') ?? status;
   const [height, setHeight] = useState(0);
+  const [showDespiteFilter, setShowDespiteFilter] = useState(false);
   const nodeRef = useRef<HTMLDivElement>();
   const { signedIn } = useIdentity();
 
@@ -109,6 +111,10 @@ export const DetailedStatus: React.FC<{
     },
     [onOpenVideo, status],
   );
+
+  const handleFilterToggle = useCallback(() => {
+    setShowDespiteFilter(!showDespiteFilter);
+  }, [showDespiteFilter, setShowDespiteFilter]);
 
   const handleExpandedToggle = useCallback(() => {
     if (onToggleHidden) onToggleHidden(status);
@@ -328,7 +334,11 @@ export const DetailedStatus: React.FC<{
     status as StatusLike,
   );
 
-  expanded ||= status.get('spoiler_text').length === 0;
+  const matchedFilters = status.get('matched_filters');
+
+  expanded =
+    (!matchedFilters || showDespiteFilter) &&
+    (expanded || status.get('spoiler_text').length === 0);
 
   return (
     <div style={outerStyle}>
@@ -362,16 +372,25 @@ export const DetailedStatus: React.FC<{
           )}
         </Permalink>
 
-        {status.get('spoiler_text').length > 0 && (
-          <ContentWarning
-            text={
-              status.getIn(['translation', 'spoilerHtml']) ||
-              status.get('spoilerHtml')
-            }
-            expanded={expanded}
-            onClick={handleExpandedToggle}
+        {matchedFilters && (
+          <FilterWarning
+            title={matchedFilters.join(', ')}
+            expanded={showDespiteFilter}
+            onClick={handleFilterToggle}
           />
         )}
+
+        {status.get('spoiler_text').length > 0 &&
+          (!matchedFilters || showDespiteFilter) && (
+            <ContentWarning
+              text={
+                status.getIn(['translation', 'spoilerHtml']) ||
+                status.get('spoilerHtml')
+              }
+              expanded={expanded}
+              onClick={handleExpandedToggle}
+            />
+          )}
 
         {expanded && (
           <>
