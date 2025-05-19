@@ -75,6 +75,7 @@ pt-PT:
       filters:
         action: Escolha qual a ação a executar quando uma publicação corresponde ao filtro
         actions:
+          blur: Esconder multimédia com um aviso à frente, sem esconder o texto
           hide: Ocultar completamente o conteúdo filtrado, comportando-se como se não existisse
           warn: Ocultar o conteúdo filtrado por trás de um aviso mencionando o título do filtro
       form_admin_settings:
@@ -147,7 +148,6 @@ pt-PT:
         min_age: Não deve ter menos do que a idade mínima exigida pela legislação da sua jurisdição.
       user:
         chosen_languages: Quando selecionado, só serão mostradas nas cronologias públicas as publicações nos idiomas escolhidos
-        date_of_birth: Temos de ter a certeza de que tens pelo menos %{age} para usar o Mastodon. Não vamos guardar esta informação.
         role: A função controla as permissões que o utilizador tem.
       user_role:
         color: Cor a ser utilizada para a função em toda a interface de utilizador, como RGB no formato hexadecimal
@@ -260,6 +260,7 @@ pt-PT:
         name: Etiqueta
       filters:
         actions:
+          blur: Esconder multimédia com um aviso
           hide: Ocultar por completo
           warn: Ocultar com um aviso
       form_admin_settings:
