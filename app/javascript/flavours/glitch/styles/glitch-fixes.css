@@ -37,26 +37,26 @@ body.app-body.flavour-glitch > #mastodon .compose-form__submit {
 body.app-body.flavour-glitch > #mastodon .compose-form__submit button {
   padding: 10px 20px;
 }
-body.app-body.flavour-glitch > #mastodon .status__content .status__content--collapsed {
+body.app-body.flavour-glitch > #mastodon .collapsed .status__content {
   height: auto !important;
   overflow: visible;
   mask: unset !important;
 }
-body.app-body.flavour-glitch > #mastodon .status__content .status__content--collapsed .status__content__text {
+body.app-body.flavour-glitch > #mastodon .collapsed .status__content .status__content__text {
   mask: linear-gradient(to bottom, #000 50px, transparent) !important;
   -webkit-mask: linear-gradient(to bottom, #000 50px, transparent) !important;
   max-height: 100px;
 }
-body.app-body.flavour-glitch > #mastodon .status__content .status__content--collapsed p:not(:last-child) {
+body.app-body.flavour-glitch > #mastodon .collapsed .status__content p:not(:last-child) {
   margin-bottom: 0.4em;
 }
-body.app-body.flavour-glitch > #mastodon .status__content .status__content--collapsed br {
+body.app-body.flavour-glitch > #mastodon .collapsed .status__content br {
   display: block;
 }
-body.app-body.flavour-glitch > #mastodon .status__content .status__content--collapsed::after {
+body.app-body.flavour-glitch > #mastodon .collapsed .status__content::after {
   content: unset;
 }
-body.app-body.flavour-glitch > #mastodon .muted .status__content--collapsed .status__content__text ~ * {
+body.app-body.flavour-glitch > #mastodon .collapsed.muted .status__content__text ~ * {
   display: none;
 }
 body.app-body.flavour-glitch > #mastodon .focusable[tabindex]:not(.notification-ungrouped) .full-width {
