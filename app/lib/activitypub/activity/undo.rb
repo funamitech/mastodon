@@ -115,8 +115,6 @@ class ActivityPub::Activity::Undo < ActivityPub::Activity
     elsif @object['content'].present? || @object['_misskey_reaction'].present?
       undo_emoji_react
     else
-      return unless status.account.local?
-
       delete_later!(object_uri)
     end
   end
