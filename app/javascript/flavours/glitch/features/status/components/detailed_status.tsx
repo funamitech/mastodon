@@ -29,6 +29,7 @@ import { PictureInPicturePlaceholder } from 'flavours/glitch/components/picture_
 import StatusContent from 'flavours/glitch/components/status_content';
 import StatusReactions from 'flavours/glitch/components/status_reactions';
 import { QuotedStatus } from 'flavours/glitch/components/status_quoted';
+import StatusReactions from 'flavours/glitch/components/status_reactions';
 import { VisibilityIcon } from 'flavours/glitch/components/visibility_icon';
 import { Audio } from 'flavours/glitch/features/audio';
 import scheduleIdleTask from 'flavours/glitch/features/ui/util/schedule_idle_task';
