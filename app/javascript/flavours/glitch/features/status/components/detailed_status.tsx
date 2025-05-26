@@ -27,7 +27,6 @@ import { MentionsPlaceholder } from 'flavours/glitch/components/mentions_placeho
 import { Permalink } from 'flavours/glitch/components/permalink';
 import { PictureInPicturePlaceholder } from 'flavours/glitch/components/picture_in_picture_placeholder';
 import StatusContent from 'flavours/glitch/components/status_content';
-import StatusReactions from 'flavours/glitch/components/status_reactions';
 import { QuotedStatus } from 'flavours/glitch/components/status_quoted';
 import StatusReactions from 'flavours/glitch/components/status_reactions';
 import { VisibilityIcon } from 'flavours/glitch/components/visibility_icon';
