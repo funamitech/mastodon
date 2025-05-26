@@ -1,5 +1,5 @@
-@use 'glitch-fixes.css';
-@use 'contrast';
+@import 'glitch-fixes.css';
+@import 'contrast/diff';
 
 :root {
   --tl-width: 720px;

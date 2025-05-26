@@ -1,5 +1,5 @@
-@use 'glitch-fixes.css';
-@use 'mastodon-light';
+@import 'glitch-fixes.css';
+@import 'mastodon-light/diff';
 
 :root {
   --tl-width: 720px;

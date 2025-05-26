@@ -1,5 +1,5 @@
-@use 'glitch-fixes.css';
-@use 'index';
+@import 'glitch-fixes.css';
+@import 'index';
 
 :root {
   --tl-width: 720px;
