@@ -48,7 +48,7 @@ class Quote < ApplicationRecord
   end
 
   def acceptable?
-    accepted? || legacy?
+    accepted? || !legacy?
   end
 
   def schedule_refresh_if_stale!
