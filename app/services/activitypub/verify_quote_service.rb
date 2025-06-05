@@ -13,7 +13,7 @@ class ActivityPub::VerifyQuoteService < BaseService
     return if fast_track_approval! || quote.approval_uri.blank?
 
     @json = fetch_approval_object(quote.approval_uri, prefetched_body: prefetched_approval)
-    return quote.accept! if @json.nil?
+    return quote.reject! if @json.nil?
 
     return if non_matching_uri_hosts?(quote.approval_uri, value_or_id(@json['attributedTo']))
     return unless matching_type? && matching_quote_uri?
