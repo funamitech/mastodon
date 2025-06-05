@@ -9,11 +9,13 @@ class ActivityPub::VerifyQuoteService < BaseService
     @quote = quote
     @fetching_error = nil
 
+    return quote.accept! if @quote.legacy?
+
     fetch_quoted_post_if_needed!(fetchable_quoted_uri, prefetched_body: prefetched_quoted_object)
     return if fast_track_approval! || quote.approval_uri.blank?
 
     @json = fetch_approval_object(quote.approval_uri, prefetched_body: prefetched_approval)
-    return quote.accept! if @json.nil?
+    return quote.reject! if @json.nil?
 
     return if non_matching_uri_hosts?(quote.approval_uri, value_or_id(@json['attributedTo']))
     return unless matching_type? && matching_quote_uri?
