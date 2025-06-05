@@ -40,9 +40,7 @@ class Quote < ApplicationRecord
   end
 
   def reject!
-    if legacy?
-      return
-    elsif accepted?
+    if accepted?
       update!(state: :revoked)
     elsif !revoked?
       update!(state: :rejected)
