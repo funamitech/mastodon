@@ -82,6 +82,9 @@ AUTHORS.md
 # Process a few selected JS files
 !lint-staged.config.js
 
+# Ignore config YAML files that include ERB/ruby code prettier does not understand
+/config/email.yml
+
 # Ignore glitch-soc emoji map file
 /app/javascript/flavours/glitch/features/emoji/emoji_map.json
 /app/javascript/flavours/glitch/features/emoji/emoji_data.json
@@ -95,6 +98,3 @@ app/javascript/flavours/glitch/styles/reset.scss
 
 # Ignore win95 theme
 app/javascript/styles/win95.scss
-
-# Ignore Birdsite theme
-app/javascript/styles/birdsite/*.scss

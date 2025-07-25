@@ -578,6 +578,8 @@ pt-BR:
         all: Todos
         limited: Limitados
         title: Moderação
+      moderation_notes:
+        title: Notas de Moderação
       private_comment: Comentário privado
       public_comment: Comentário público
       purge: Limpar
@@ -2068,7 +2070,6 @@ pt-BR:
       post_action: Escrever
       post_step: Diga olá para o mundo com texto, fotos, vídeos ou enquetes.
       post_title: Crie sua primeira publicação
-      share_action: Compartilhar
       share_step: Deixe seus amigos saberem como te encontrar no Mastodon.
       share_title: Compartilhe seu perfil do Mastodon
       sign_in_action: Entrar

@@ -578,6 +578,13 @@ nn:
         all: Alle
         limited: Avgrensa
         title: Moderasjon
+      moderation_notes:
+        create: Legg til modereringsnotat
+        created_msg: Moderatormerknad for nettstaden er laga!
+        description_html: Sjå og skriv merknader til andre moderatorar og til framtidig bruk
+        destroyed_msg: Moderatormerknaden for nettstaden er sletta!
+        placeholder: Informasjon om denne nettstaden, kva du har gjort, eller andre opplysingar som kan hjelpa deg å moderera denne nettstaden i framtida.
+        title: Moderasjonsmerknader
       private_comment: Privat kommentar
       public_comment: Offentleg kommentar
       purge: Reinse
@@ -2068,7 +2075,6 @@ nn:
       post_action: Skriv
       post_step: Sei hei til verda med tekst, bilete, filmar eller meiningsmålingar.
       post_title: Skriv ditt fyrste innlegg
-      share_action: Del
       share_step: Fortel venene dine korleis dei finn deg på Mastodon.
       share_title: Del Mastodon-profilen din
       sign_in_action: Logg inn

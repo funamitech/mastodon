@@ -53,7 +53,7 @@ gem 'fastimage'
 gem 'hiredis', '~> 0.6'
 gem 'hiredis-client'
 gem 'htmlentities', '~> 4.3'
-gem 'http', '~> 5.2.0'
+gem 'http', '~> 5.3.0'
 gem 'http_accept_language', '~> 2.1'
 gem 'httplog', '~> 1.7.0', require: false
 gem 'i18n'
@@ -62,7 +62,7 @@ gem 'inline_svg'
 gem 'irb', '~> 1.8'
 gem 'kaminari', '~> 1.2'
 gem 'link_header', '~> 0.0'
-gem 'linzer', '~> 0.7.2'
+gem 'linzer', '~> 0.7.7'
 gem 'mario-redis-lock', '~> 1.2', require: 'redis_lock'
 gem 'mime-types', '~> 3.7.0', require: 'mime/types/columnar'
 gem 'mutex_m'
@@ -111,7 +111,7 @@ group :opentelemetry do
   gem 'opentelemetry-instrumentation-concurrent_ruby', '~> 0.22.0', require: false
   gem 'opentelemetry-instrumentation-excon', '~> 0.23.0', require: false
   gem 'opentelemetry-instrumentation-faraday', '~> 0.27.0', require: false
-  gem 'opentelemetry-instrumentation-http', '~> 0.24.0', require: false
+  gem 'opentelemetry-instrumentation-http', '~> 0.25.0', require: false
   gem 'opentelemetry-instrumentation-http_client', '~> 0.23.0', require: false
   gem 'opentelemetry-instrumentation-net_http', '~> 0.23.0', require: false
   gem 'opentelemetry-instrumentation-pg', '~> 0.30.0', require: false
@@ -137,7 +137,7 @@ group :test do
 
   # Browser integration testing
   gem 'capybara', '~> 3.39'
-  gem 'selenium-webdriver'
+  gem 'capybara-playwright-driver'
 
   # Used to reset the database between system tests
   gem 'database_cleaner-active_record'
