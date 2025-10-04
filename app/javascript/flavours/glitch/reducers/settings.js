@@ -38,6 +38,7 @@ const initialState = ImmutableMap({
       favourite: false,
       reaction: false,
       reblog: false,
+      quote: false,
       mention: false,
       poll: false,
       status: false,
@@ -63,6 +64,7 @@ const initialState = ImmutableMap({
       reaction: true,
       reblog: true,
       reaction: true,
+      quote: true,
       mention: true,
       poll: true,
       status: true,
@@ -78,6 +80,7 @@ const initialState = ImmutableMap({
       reaction: true,
       reblog: true,
       reaction: true,
+      quote: true,
       mention: true,
       poll: true,
       status: true,
@@ -126,6 +129,8 @@ const initialState = ImmutableMap({
     'explore/links': false,
     'explore/statuses': false,
     'explore/tags': false,
+    'notifications/remove_quote_hint': false,
+    'quote/quiet_post_hint': false,
   }),
 });
 

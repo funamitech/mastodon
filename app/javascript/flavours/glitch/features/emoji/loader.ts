@@ -1,9 +1,6 @@
 import { flattenEmojiData } from 'emojibase';
 import type { CompactEmoji, FlatCompactEmoji } from 'emojibase';
 
-import type { ApiCustomEmojiJSON } from '@/flavours/glitch/api_types/custom_emoji';
-import { isDevelopment } from '@/flavours/glitch/utils/environment';
-
 import {
   putEmojiData,
   putCustomEmojiData,
@@ -11,7 +8,10 @@ import {
   putLatestEtag,
 } from './database';
 import { toSupportedLocale, toSupportedLocaleOrCustom } from './locale';
-import type { LocaleOrCustom } from './types';
+import type { CustomEmojiData, LocaleOrCustom } from './types';
+import { emojiLogger } from './utils';
+
+const log = emojiLogger('loader');
 
 export async function importEmojiData(localeString: string) {
   const locale = toSupportedLocale(localeString);
@@ -20,14 +20,16 @@ export async function importEmojiData(localeString: string) {
     return;
   }
   const flattenedEmojis: FlatCompactEmoji[] = flattenEmojiData(emojis);
+  log('loaded %d for %s locale', flattenedEmojis.length, locale);
   await putEmojiData(flattenedEmojis, locale);
 }
 
 export async function importCustomEmojiData() {
-  const emojis = await fetchAndCheckEtag<ApiCustomEmojiJSON[]>('custom');
+  const emojis = await fetchAndCheckEtag<CustomEmojiData[]>('custom');
   if (!emojis) {
     return;
   }
+  log('loaded %d custom emojis', emojis.length);
   await putCustomEmojiData(emojis);
 }
 
@@ -41,7 +43,9 @@ async function fetchAndCheckEtag<ResultType extends object[]>(
   if (locale === 'custom') {
     url.pathname = '/api/v1/custom_emojis';
   } else {
-    url.pathname = `/packs${isDevelopment() ? '-dev' : ''}/emoji/${locale}.json`;
+    // This doesn't use isDevelopment() as that module loads initial state
+    // which breaks workers, as they cannot access the DOM.
+    url.pathname = `/packs${import.meta.env.DEV ? '-dev' : ''}/emoji/${locale}.json`;
   }
 
   const oldEtag = await loadLatestEtag(locale);

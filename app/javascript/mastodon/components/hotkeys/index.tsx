@@ -7,11 +7,7 @@ import { normalizeKey, isKeyboardEvent } from './utils';
  * the hotkey with a higher priority is selected. All others
  * are ignored.
  */
-const hotkeyPriority = {
-  singleKey: 0,
-  combo: 1,
-  sequence: 2,
-} as const;
+const hotkeyPriority = { singleKey: 0, combo: 1, sequence: 2 } as const;
 
 /**
  * This type of function receives a keyboard event and an array of
@@ -40,7 +36,11 @@ type KeyMatcher = (
  */
 function just(keyName: string): KeyMatcher {
   return (event) => ({
-    isMatch: normalizeKey(event.key) === keyName,
+    isMatch:
+      normalizeKey(event.key) === keyName &&
+      !event.altKey &&
+      !event.ctrlKey &&
+      !event.metaKey,
     priority: hotkeyPriority.singleKey,
   });
 }
@@ -101,14 +101,16 @@ const hotkeyMatcherMap = {
   new: just('n'),
   forceNew: optionPlus('n'),
   focusColumn: any('1', '2', '3', '4', '5', '6', '7', '8', '9'),
+  focusLoadMore: just('l'),
   reply: just('r'),
   favourite: just('f'),
   boost: just('b'),
+  quote: just('q'),
   mention: just('m'),
   open: any('enter', 'o'),
   openProfile: just('p'),
-  moveDown: any('down', 'j'),
-  moveUp: any('up', 'k'),
+  moveDown: just('j'),
+  moveUp: just('k'),
   toggleHidden: just('x'),
   toggleSensitive: just('h'),
   toggleComposeSpoilers: optionPlus('x'),

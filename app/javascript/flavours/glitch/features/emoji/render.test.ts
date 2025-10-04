@@ -1,102 +1,103 @@
-import {
-  EMOJI_MODE_NATIVE,
-  EMOJI_MODE_NATIVE_WITH_FLAGS,
-  EMOJI_MODE_TWEMOJI,
-} from './constants';
-import { emojifyElement, tokenizeText } from './render';
-import type { CustomEmojiData, UnicodeEmojiData } from './types';
+import { customEmojiFactory, unicodeEmojiFactory } from '@/testing/factories';
 
-vitest.mock('./database', () => ({
-  searchCustomEmojisByShortcodes: vitest.fn(
-    () =>
-      [
-        {
-          shortcode: 'custom',
-          static_url: 'emoji/static',
-          url: 'emoji/custom',
-          category: 'test',
-          visible_in_picker: true,
-        },
-      ] satisfies CustomEmojiData[],
-  ),
-  searchEmojisByHexcodes: vitest.fn(
-    () =>
-      [
-        {
+import { EMOJI_MODE_TWEMOJI } from './constants';
+import * as db from './database';
+import {
+  emojifyElement,
+  emojifyText,
+  testCacheClear,
+  tokenizeText,
+} from './render';
+import type { EmojiAppState } from './types';
+
+function mockDatabase() {
+  return {
+    searchCustomEmojisByShortcodes: vi
+      .spyOn(db, 'searchCustomEmojisByShortcodes')
+      .mockResolvedValue([customEmojiFactory()]),
+    searchEmojisByHexcodes: vi
+      .spyOn(db, 'searchEmojisByHexcodes')
+      .mockResolvedValue([
+        unicodeEmojiFactory({
           hexcode: '1F60A',
-          group: 0,
           label: 'smiling face with smiling eyes',
-          order: 0,
-          tags: ['smile', 'happy'],
           unicode: '😊',
-        },
-        {
+        }),
+        unicodeEmojiFactory({
           hexcode: '1F1EA-1F1FA',
-          group: 0,
           label: 'flag-eu',
-          order: 0,
-          tags: ['flag', 'european union'],
           unicode: '🇪🇺',
-        },
-      ] satisfies UnicodeEmojiData[],
-  ),
-  findMissingLocales: vitest.fn(() => []),
-}));
+        }),
+      ]),
+  };
+}
+
+const expectedSmileImage =
+  '<img draggable="false" class="emojione" alt="😊" title="smiling face with smiling eyes" src="/emoji/1f60a.svg">';
+const expectedFlagImage =
+  '<img draggable="false" class="emojione" alt="🇪🇺" title="flag-eu" src="/emoji/1f1ea-1f1fa.svg">';
+
+function testAppState(state: Partial<EmojiAppState> = {}) {
+  return {
+    locales: ['en'],
+    mode: EMOJI_MODE_TWEMOJI,
+    currentLocale: 'en',
+    darkTheme: false,
+    ...state,
+  } satisfies EmojiAppState;
+}
 
 describe('emojifyElement', () => {
-  const testElement = document.createElement('div');
-  testElement.innerHTML = '<p>Hello 😊🇪🇺!</p><p>:custom:</p>';
-
-  const expectedSmileImage =
-    '<img draggable="false" class="emojione" alt="😊" title="smiling face with smiling eyes" src="/emoji/1f60a.svg">';
-  const expectedFlagImage =
-    '<img draggable="false" class="emojione" alt="🇪🇺" title="flag-eu" src="/emoji/1f1ea-1f1fa.svg">';
-  const expectedCustomEmojiImage =
-    '<img draggable="false" class="emojione custom-emoji" alt=":custom:" title=":custom:" src="emoji/static" data-original="emoji/custom" data-static="emoji/static">';
-
-  function cloneTestElement() {
-    return testElement.cloneNode(true) as HTMLElement;
+  function testElement(text = '<p>Hello 😊🇪🇺!</p><p>:custom:</p>') {
+    const testElement = document.createElement('div');
+    testElement.innerHTML = text;
+    return testElement;
   }
 
-  test('emojifies custom emoji in native mode', async () => {
-    const emojifiedElement = await emojifyElement(cloneTestElement(), {
-      locales: ['en'],
-      mode: EMOJI_MODE_NATIVE,
-      currentLocale: 'en',
-    });
-    expect(emojifiedElement.innerHTML).toBe(
-      `<p>Hello 😊🇪🇺!</p><p>${expectedCustomEmojiImage}</p>`,
-    );
+  afterEach(() => {
+    testCacheClear();
+    vi.restoreAllMocks();
   });
 
-  test('emojifies flag emoji in native-with-flags mode', async () => {
-    const emojifiedElement = await emojifyElement(cloneTestElement(), {
-      locales: ['en'],
-      mode: EMOJI_MODE_NATIVE_WITH_FLAGS,
-      currentLocale: 'en',
-    });
-    expect(emojifiedElement.innerHTML).toBe(
-      `<p>Hello 😊${expectedFlagImage}!</p><p>${expectedCustomEmojiImage}</p>`,
+  test('caches element rendering results', async () => {
+    const { searchCustomEmojisByShortcodes, searchEmojisByHexcodes } =
+      mockDatabase();
+    await emojifyElement(testElement(), testAppState());
+    await emojifyElement(testElement(), testAppState());
+    await emojifyElement(testElement(), testAppState());
+    expect(searchEmojisByHexcodes).toHaveBeenCalledExactlyOnceWith(
+      ['1F1EA-1F1FA', '1F60A'],
+      'en',
     );
+    expect(searchCustomEmojisByShortcodes).toHaveBeenCalledExactlyOnceWith([
+      ':custom:',
+    ]);
   });
 
-  test('emojifies everything in twemoji mode', async () => {
-    const emojifiedElement = await emojifyElement(cloneTestElement(), {
-      locales: ['en'],
-      mode: EMOJI_MODE_TWEMOJI,
-      currentLocale: 'en',
-    });
-    expect(emojifiedElement.innerHTML).toBe(
-      `<p>Hello ${expectedSmileImage}${expectedFlagImage}!</p><p>${expectedCustomEmojiImage}</p>`,
+  test('returns null when no emoji are found', async () => {
+    mockDatabase();
+    const actual = await emojifyElement(
+      testElement('<p>here is just text :)</p>'),
+      testAppState(),
     );
+    expect(actual).toBeNull();
+  });
+});
+
+describe('emojifyText', () => {
+  test('returns original input when no emoji are in string', async () => {
+    const actual = await emojifyText('nothing here', testAppState());
+    expect(actual).toBe('nothing here');
+  });
+
+  test('renders Unicode emojis to twemojis', async () => {
+    mockDatabase();
+    const actual = await emojifyText('Hello 😊🇪🇺!', testAppState());
+    expect(actual).toBe(`Hello ${expectedSmileImage}${expectedFlagImage}!`);
   });
 });
 
 describe('tokenizeText', () => {
-  test('returns empty array for string with only whitespace', () => {
-    expect(tokenizeText('   \n')).toEqual([]);
-  });
-
   test('returns an array of text to be a single token', () => {
     expect(tokenizeText('Hello')).toEqual(['Hello']);
   });
@@ -122,7 +123,7 @@ describe('tokenizeText', () => {
       'Hello ',
       {
         type: 'custom',
-        code: 'smile',
+        code: ':smile:',
       },
       '!!',
     ]);
@@ -133,7 +134,7 @@ describe('tokenizeText', () => {
       'Hello ',
       {
         type: 'custom',
-        code: 'smile_123',
+        code: ':smile_123:',
       },
       '!!',
     ]);
@@ -149,7 +150,7 @@ describe('tokenizeText', () => {
       ' ',
       {
         type: 'custom',
-        code: 'smile',
+        code: ':smile:',
       },
       '!!',
     ]);
