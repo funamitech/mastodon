@@ -21,6 +21,7 @@ import { accountAdminLink, statusAdminLink } from 'flavours/glitch/utils/backend
 import { IconButton } from '../../../components/icon_button';
 import { Dropdown } from 'flavours/glitch/components/dropdown_menu';
 import { me, maxReactions } from '../../../initial_state';
+import EmojiPickerDropdown from '../../compose/containers/emoji_picker_dropdown_container';
 import { BoostButton } from '@/flavours/glitch/components/status/boost_button';
 import EmojiPickerDropdown from '../../compose/containers/emoji_picker_dropdown_container';
 
@@ -255,6 +256,8 @@ class ActionBar extends PureComponent {
       replyIcon = 'reply-all';
       replyIconComponent = ReplyAllIcon;
     }
+
+    const canReact = signedIn && status.get('reactions').filter(r => r.get('count') > 0 && r.get('me')).size < maxReactions;
 
     const bookmarkTitle = intl.formatMessage(status.get('bookmarked') ? messages.removeBookmark : messages.bookmark);
     const favouriteTitle = intl.formatMessage(status.get('favourited') ? messages.removeFavourite : messages.favourite);

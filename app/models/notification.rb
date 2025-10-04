@@ -220,7 +220,7 @@ class Notification < ApplicationRecord
     case activity_type
     when 'Status'
       self.from_account_id = type == :quoted_update ? activity&.quote&.quoted_account_id : activity&.account_id
-    when 'Follow', 'Favourite', 'FollowRequest', 'Poll', 'Report', 'Quote'
+    when 'Follow', 'Favourite', 'StatusReaction', 'FollowRequest', 'Poll', 'Report', 'Quote'
       self.from_account_id = activity&.account_id
     when 'Mention'
       self.from_account_id = activity&.status&.account_id

@@ -23,7 +23,7 @@ import { accountAdminLink, statusAdminLink } from 'flavours/glitch/utils/backend
 import { WithRouterPropTypes } from 'flavours/glitch/utils/react_router';
 
 import { Dropdown } from 'flavours/glitch/components/dropdown_menu';
-import EmojiPickerDropdown from '../features/compose/containers/emoji_picker_dropdown_container';
+import EmojiPickerDropdown from '../../features/compose/containers/emoji_picker_dropdown_container';
 import { me, maxReactions } from '../../initial_state';
 
 import { IconButton } from '../icon_button';
@@ -82,6 +82,7 @@ class StatusActionBar extends ImmutablePureComponent {
     contextType: PropTypes.string,
     onReply: PropTypes.func,
     onFavourite: PropTypes.func,
+    onReactionAdd: PropTypes.func,
     onDelete: PropTypes.func,
     onRevokeQuote: PropTypes.func,
     onQuotePolicyChange: PropTypes.func,
@@ -141,6 +142,10 @@ class StatusActionBar extends ImmutablePureComponent {
     } else {
       this.props.onInteractionModal(this.props.status);
     }
+  };
+
+  handleEmojiPick = data => {
+    this.props.onReactionAdd(this.props.status.get('id'), data.native.replace(/:/g, ''), data.imageUrl);
   };
 
   handleBookmarkClick = (e) => {
