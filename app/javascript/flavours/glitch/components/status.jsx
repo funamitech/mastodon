@@ -747,7 +747,7 @@ class Status extends ImmutablePureComponent {
               </header>
             )}
 
-            {status.get('spoiler_text').length > 0 && <ContentWarning text={status.getIn(['translation', 'spoilerHtml']) || status.get('spoilerHtml')} expanded={expanded} onClick={this.handleExpandedToggle} icons={mediaIcons} />}
+            <ContentWarning status={status} expanded={expanded} onClick={this.handleExpandedToggle} icons={mediaIcons} />
 
             {expanded && (
               <>
@@ -758,8 +758,6 @@ class Status extends ImmutablePureComponent {
                   collapsible
                   media={media}
                   onCollapsedToggle={this.handleCollapsedToggle}
-                  tagLinks={settings.get('tag_misleading_links')}
-                  rewriteMentions={settings.get('rewrite_mentions')}
                   {...statusContentProps}
                 />
 

@@ -101,8 +101,19 @@ class REST::InstanceSerializer < ActiveModel::Serializer
         enabled: TranslationService.configured?,
       },
 
-      reactions: {
-        max_reactions: StatusReactionValidator::LIMIT,
+      timelines_access: {
+        live_feeds: {
+          local: Setting.local_live_feed_access,
+          remote: Setting.remote_live_feed_access,
+        },
+        hashtag_feeds: {
+          local: Setting.local_topic_feed_access,
+          remote: Setting.remote_topic_feed_access,
+        },
+        trending_link_feeds: {
+          local: Setting.local_topic_feed_access,
+          remote: Setting.remote_topic_feed_access,
+        },
       },
 
       limited_federation: limited_federation?,

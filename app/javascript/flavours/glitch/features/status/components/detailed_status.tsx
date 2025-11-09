@@ -86,13 +86,6 @@ export const DetailedStatus: React.FC<{
   const nodeRef = useRef<HTMLDivElement>();
   const { signedIn } = useIdentity();
 
-  const rewriteMentions = useAppSelector(
-    (state) => state.local_settings.get('rewrite_mentions', false) as boolean,
-  );
-  const tagMisleadingLinks = useAppSelector(
-    (state) =>
-      state.local_settings.get('tag_misleading_links', false) as boolean,
-  );
   const letterboxMedia = useAppSelector(
     (state) =>
       state.local_settings.getIn(['media', 'letterbox'], false) as boolean,
@@ -436,25 +429,19 @@ export const DetailedStatus: React.FC<{
           />
         )}
 
-        {status.get('spoiler_text').length > 0 &&
-          (!matchedFilters || showDespiteFilter) && (
-            <ContentWarning
-              text={
-                status.getIn(['translation', 'spoilerHtml']) ||
-                status.get('spoilerHtml')
-              }
-              expanded={expanded}
-              onClick={handleExpandedToggle}
-            />
-          )}
+        {(!matchedFilters || showDespiteFilter) && (
+          <ContentWarning
+            status={status}
+            expanded={expanded}
+            onClick={handleExpandedToggle}
+          />
+        )}
 
         {expanded && (
           <>
             <StatusContent
               status={status}
               onTranslate={handleTranslate}
-              tagLinks={tagMisleadingLinks}
-              rewriteMentions={rewriteMentions}
               {...(statusContentProps as any)}
             />
 
