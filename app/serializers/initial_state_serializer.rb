@@ -51,6 +51,7 @@ class InitialStateSerializer < ActiveModel::Serializer
       store[:use_pending_items] = object_account_user.setting_use_pending_items
       store[:default_content_type] = object_account_user.setting_default_content_type
       store[:show_trends]       = Setting.trends && object_account_user.setting_trends
+      store[:visible_reactions] = object_account_user.setting_visible_reactions
       store[:emoji_style]       = object_account_user.settings['web.emoji_style']
     else
       store[:auto_play_gif] = Setting.auto_play_gif
