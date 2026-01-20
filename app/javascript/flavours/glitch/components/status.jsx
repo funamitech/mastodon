@@ -474,6 +474,8 @@ class Status extends ImmutablePureComponent {
       history,
       showActions = true,
       isQuotedPost = false,
+      identity,
+      isQuotedPost,
       ...other
     } = this.props;
     let attachments = null;
@@ -773,6 +775,16 @@ class Status extends ImmutablePureComponent {
             {!expanded && <MentionsPlaceholder status={status} />}
 
             {(showActions && !isQuotedPost) &&
+            <StatusReactions
+              statusId={status.get('id')}
+              reactions={status.get('reactions')}
+              numVisible={visibleReactions}
+              addReaction={this.props.onReactionAdd}
+              removeReaction={this.props.onReactionRemove}
+              canReact={this.props.identity.signedIn}
+            />
+
+            {!isQuotedPost &&
               <StatusActionBar
                 status={status}
                 account={status.get('account')}

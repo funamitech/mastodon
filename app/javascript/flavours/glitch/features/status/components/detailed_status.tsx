@@ -59,6 +59,8 @@ export const DetailedStatus: React.FC<{
   pictureInPicture: any;
   onToggleHidden?: (status: any) => void;
   onToggleMediaVisibility?: () => void;
+  onReactionAdd?: (status: any, name: string, url: string) => void;
+  onReactionRemove?: (status: any, name: string) => void;
   ancestors?: number;
   multiColumn?: boolean;
   expanded: boolean;
@@ -76,6 +78,8 @@ export const DetailedStatus: React.FC<{
   pictureInPicture,
   onToggleMediaVisibility,
   onToggleHidden,
+  onReactionAdd,
+  onReactionRemove,
   ancestors = 0,
   multiColumn = false,
   expanded,
@@ -501,7 +505,7 @@ export const DetailedStatus: React.FC<{
         {/* This is a glitch-soc addition to have a placeholder */}
         {!expanded && <MentionsPlaceholder status={status} />}
 
-        {visibleReactions && visibleReactions > 0 && (
+        {!!visibleReactions && (
           <StatusReactions
             statusId={status.get('id')}
             reactions={status.get('reactions')}
