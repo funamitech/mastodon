@@ -475,7 +475,6 @@ class Status extends ImmutablePureComponent {
       showActions = true,
       isQuotedPost = false,
       identity,
-      isQuotedPost,
       ...other
     } = this.props;
     let attachments = null;
@@ -783,6 +782,7 @@ class Status extends ImmutablePureComponent {
               removeReaction={this.props.onReactionRemove}
               canReact={this.props.identity.signedIn}
             />
+            }
 
             {!isQuotedPost &&
               <StatusActionBar

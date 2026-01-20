@@ -15,7 +15,6 @@ import { NotificationFollowRequest } from './notification_follow_request';
 import { NotificationMention } from './notification_mention';
 import { NotificationModerationWarning } from './notification_moderation_warning';
 import { NotificationPoll } from './notification_poll';
-import { NotificationReaction } from './notification_reaction';
 import { NotificationQuote } from './notification_quote';
 import { NotificationQuotedUpdate } from './notification_quoted_update';
 import { NotificationReaction } from './notification_reaction';
