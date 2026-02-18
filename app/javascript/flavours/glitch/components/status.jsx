@@ -31,6 +31,7 @@ import StatusActionBar from './status_action_bar';
 import StatusContent from './status_content';
 import StatusIcons from './status_icons';
 import StatusPrepend from './status_prepend';
+import StatusReactions from './status_reactions';
 
 const domParser = new DOMParser();
 
@@ -481,6 +482,7 @@ class Status extends ImmutablePureComponent {
       onOpenMedia,
       notification,
       history,
+      identity,
       ...other
     } = this.props;
     let attachments = null;
@@ -764,6 +766,15 @@ class Status extends ImmutablePureComponent {
 
             {/* This is a glitch-soc addition to have a placeholder */}
             {!expanded && <MentionsPlaceholder status={status} />}
+
+            <StatusReactions
+              statusId={status.get('id')}
+              reactions={status.get('reactions')}
+              numVisible={visibleReactions}
+              addReaction={this.props.onReactionAdd}
+              removeReaction={this.props.onReactionRemove}
+              canReact={this.props.identity.signedIn}
+            />
 
             {(showActions && !isQuotedPost) &&
             <StatusReactions
