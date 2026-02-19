@@ -776,17 +776,6 @@ class Status extends ImmutablePureComponent {
               canReact={this.props.identity.signedIn}
             />
 
-            {(showActions && !isQuotedPost) &&
-            <StatusReactions
-              statusId={status.get('id')}
-              reactions={status.get('reactions')}
-              numVisible={visibleReactions}
-              addReaction={this.props.onReactionAdd}
-              removeReaction={this.props.onReactionRemove}
-              canReact={this.props.identity.signedIn}
-            />
-            }
-
             {!isQuotedPost &&
               <StatusActionBar
                 status={status}
