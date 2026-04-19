@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 
-import { defineMessages, injectIntl } from 'react-intl';
+import { defineMessages } from 'react-intl';
 
 import classNames from 'classnames';
 import { Helmet } from 'react-helmet';
@@ -15,6 +15,7 @@ import VisibilityIcon from '@/material-icons/400-24px/visibility.svg?react';
 import VisibilityOffIcon from '@/material-icons/400-24px/visibility_off.svg?react';
 import { Hotkeys }  from 'mastodon/components/hotkeys';
 import { Icon }  from 'mastodon/components/icon';
+import { injectIntl } from '@/mastodon/components/intl';
 import { LoadingIndicator } from 'mastodon/components/loading_indicator';
 import { ScrollContainer } from 'mastodon/containers/scroll_container';
 import BundleColumnError from 'mastodon/features/ui/components/bundle_column_error';
@@ -158,22 +159,9 @@ class Status extends ImmutablePureComponent {
     newRepliesIds: [],
   };
 
-  UNSAFE_componentWillMount () {
+  componentDidMount() {
     this.props.dispatch(fetchStatus(this.props.params.statusId, { forceFetch: true }));
-  }
-
-  componentDidMount () {
     attachFullscreenListener(this.onFullScreenChange);
-  }
-
-  UNSAFE_componentWillReceiveProps (nextProps) {
-    if (nextProps.params.statusId !== this.props.params.statusId && nextProps.params.statusId) {
-      this.props.dispatch(fetchStatus(nextProps.params.statusId, { forceFetch: true }));
-    }
-
-    if (nextProps.status && nextProps.status.get('id') !== this.state.loadedStatusId) {
-      this.setState({ showMedia: defaultMediaVisibility(nextProps.status), loadedStatusId: nextProps.status.get('id') });
-    }
   }
 
   handleToggleMediaVisibility = () => {
@@ -190,6 +178,7 @@ class Status extends ImmutablePureComponent {
       dispatch(openModal({
         modalType: 'INTERACTION',
         modalProps: {
+          intent: 'favourite',
           accountId: status.getIn(['account', 'id']),
           url: status.get('uri'),
         },
@@ -232,6 +221,7 @@ class Status extends ImmutablePureComponent {
       dispatch(openModal({
         modalType: 'INTERACTION',
         modalProps: {
+          intent: 'reply',
           accountId: status.getIn(['account', 'id']),
           url: status.get('uri'),
         },
@@ -249,6 +239,7 @@ class Status extends ImmutablePureComponent {
       dispatch(openModal({
         modalType: 'INTERACTION',
         modalProps: {
+          intent: 'reblog',
           accountId: status.getIn(['account', 'id']),
           url: status.get('uri'),
         },
@@ -268,7 +259,12 @@ class Status extends ImmutablePureComponent {
     const { dispatch, history } = this.props;
 
     const handleDeleteSuccess = () => {
-      history.push('/');
+      history.push('/', {
+        // Preventing the default "scroll to right" on
+        // location change in advanced UI to avoid conflict
+        // with the composer being focused
+        preventMultiColumnAutoScroll: true
+      });
     };
 
     if (!deleteModal) {
@@ -498,8 +494,8 @@ class Status extends ImmutablePureComponent {
     this.statusNode = c;
   };
 
-  componentDidUpdate (prevProps) {
-    const { status, descendantsIds } = this.props;
+  componentDidUpdate(prevProps) {
+    const { status, descendantsIds, params } = this.props;
 
     const isSameStatus = status && (prevProps.status?.get('id') === status.get('id'));
 
@@ -510,6 +506,14 @@ class Status extends ImmutablePureComponent {
       if (newRepliesIds.length) {
         this.setState({newRepliesIds});
       }
+    }
+
+    if (params.statusId && prevProps.params.statusId !== params.statusId) {
+      this.props.dispatch(fetchStatus(params.statusId, { forceFetch: true }));
+    }
+
+    if (status && status.get('id') !== this.state.loadedStatusId) {
+      this.setState({ showMedia: defaultMediaVisibility(this.props.status), loadedStatusId: status.get('id') });
     }
   }
 

@@ -1,96 +1,155 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useId, useMemo, useState } from 'react';
 
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { useHistory, useLocation } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 
-import CancelIcon from '@/material-icons/400-24px/cancel.svg?react';
-import CheckIcon from '@/material-icons/400-24px/check.svg?react';
+import type { ApiMutedAccountJSON } from 'mastodon/api_types/accounts';
 import type { ApiCollectionJSON } from 'mastodon/api_types/collections';
-import { Account } from 'mastodon/components/account';
+import { AccountListItem } from 'mastodon/components/account_list_item';
 import { Avatar } from 'mastodon/components/avatar';
 import { Button } from 'mastodon/components/button';
-import { Callout } from 'mastodon/components/callout';
 import { DisplayName } from 'mastodon/components/display_name';
+import { useAccountHandle } from 'mastodon/components/display_name/default';
 import { EmptyState } from 'mastodon/components/empty_state';
 import { FormStack, ComboboxField } from 'mastodon/components/form_fields';
-import { Icon } from 'mastodon/components/icon';
-import { IconButton } from 'mastodon/components/icon_button';
-import ScrollableList from 'mastodon/components/scrollable_list';
-import { useSearchAccounts } from 'mastodon/features/lists/use_search_accounts';
+import {
+  ListItemContent,
+  ListItemWrapper,
+} from 'mastodon/components/list_item';
+import {
+  Article,
+  ItemList,
+  Scrollable,
+} from 'mastodon/components/scrollable_list/components';
+import { useAccount } from 'mastodon/hooks/useAccount';
+import { useSearchAccounts } from 'mastodon/hooks/useSearchAccounts';
+import { domain } from 'mastodon/initial_state';
 import {
   addCollectionItem,
+  getCollectionItemIds,
   removeCollectionItem,
+  updateCollectionEditorField,
 } from 'mastodon/reducers/slices/collections';
 import { useAppDispatch, useAppSelector } from 'mastodon/store';
 
-import type { TempCollectionState } from './state';
-import { getCollectionEditorState } from './state';
 import classes from './styles.module.scss';
-import { WizardStepHeader } from './wizard_step_header';
+import { WizardStepTitle } from './wizard_step_title';
 
-const MIN_ACCOUNT_COUNT = 1;
 const MAX_ACCOUNT_COUNT = 25;
 
 const AddedAccountItem: React.FC<{
   accountId: string;
-  isRemovable: boolean;
   onRemove: (id: string) => void;
-}> = ({ accountId, isRemovable, onRemove }) => {
-  const intl = useIntl();
-
+}> = ({ accountId, onRemove }) => {
   const handleRemoveAccount = useCallback(() => {
     onRemove(accountId);
   }, [accountId, onRemove]);
 
-  return (
-    <Account minimal key={accountId} id={accountId}>
-      {isRemovable && (
-        <IconButton
-          title={intl.formatMessage({
-            id: 'collections.remove_account',
-            defaultMessage: 'Remove this account',
-          })}
-          icon='remove'
-          iconComponent={CancelIcon}
-          onClick={handleRemoveAccount}
+  const renderButton = useCallback(
+    () => (
+      <Button compact secondary onClick={handleRemoveAccount}>
+        <FormattedMessage
+          id='collections.remove_account'
+          defaultMessage='Remove'
         />
-      )}
-    </Account>
+      </Button>
+    ),
+    [handleRemoveAccount],
   );
+
+  return <AccountListItem accountId={accountId} renderButton={renderButton} />;
 };
 
-interface SuggestionItem {
-  id: string;
-  isSelected: boolean;
-}
-
-const SuggestedAccountItem: React.FC<SuggestionItem> = ({ id, isSelected }) => {
-  const account = useAppSelector((state) => state.accounts.get(id));
+const SuggestedAccountItem: React.FC<{ id: string }> = ({ id }) => {
+  const account = useAccount(id);
+  const handle = useAccountHandle(account, domain);
 
   if (!account) return null;
 
   return (
-    <>
-      <Avatar account={account} />
-      <DisplayName account={account} />
-      {isSelected && (
-        <Icon
-          id='checked'
-          icon={CheckIcon}
-          className={classes.selectedSuggestionIcon}
-        />
-      )}
-    </>
+    <ListItemWrapper
+      className={classes.suggestion}
+      icon={<Avatar account={account} size={40} />}
+    >
+      <ListItemContent subtitle={handle}>
+        <DisplayName account={account} variant='simple' />
+      </ListItemContent>
+    </ListItemWrapper>
   );
 };
 
-const renderAccountItem = (item: SuggestionItem) => (
-  <SuggestedAccountItem id={item.id} isSelected={item.isSelected} />
+const renderAccountItem = (account: ApiMutedAccountJSON) => (
+  <SuggestedAccountItem id={account.id} />
 );
 
-const getItemId = (item: SuggestionItem) => item.id;
-const getIsItemSelected = (item: SuggestionItem) => item.isSelected;
+type GroupKey = 'available' | 'mustFollow' | 'disabled';
+
+function groupSuggestions(accounts: ApiMutedAccountJSON[]) {
+  const { available, disabled } = Object.groupBy(accounts, (account) => {
+    if (getIsItemDisabled(account)) {
+      return 'disabled';
+    }
+    // if (account.locked && !relationship?.following) {
+    //   return 'mustFollow';
+    // }
+    return 'available';
+  });
+
+  // Returning a new object ensures a fixed property order
+  return { available, disabled };
+}
+
+const renderGroupTitle = (groupKey: GroupKey, titleId: string) => {
+  if (groupKey === 'available') {
+    return null;
+  }
+
+  let title: React.ReactElement;
+  let description: React.ReactElement;
+
+  if (groupKey === 'mustFollow') {
+    title = (
+      <FormattedMessage
+        id='collections.suggestions.must_follow'
+        defaultMessage='Must follow first'
+      />
+    );
+    description = (
+      <FormattedMessage
+        id='collections.suggestions.must_follow_desc'
+        defaultMessage='These accounts review all follow requests. Followers can add them to collections.'
+      />
+    );
+  } else {
+    title = (
+      <FormattedMessage
+        id='collections.suggestions.can_not_add'
+        defaultMessage='Can’t be added'
+      />
+    );
+    description = (
+      <FormattedMessage
+        id='collections.suggestions.can_not_add_desc'
+        defaultMessage='These accounts may have opted out of discovery, or they might be on a server that doesn’t support collections.'
+      />
+    );
+  }
+
+  return (
+    <ListItemWrapper className={classes.suggestionGroup}>
+      <ListItemContent id={titleId} subtitle={description}>
+        {title}
+      </ListItemContent>
+    </ListItemWrapper>
+  );
+};
+
+const getItemId = (account: ApiMutedAccountJSON) => account.id;
+
+// Disable accounts who can't be added to a collection
+const getIsItemDisabled = (account: ApiMutedAccountJSON) =>
+  !['automatic', 'manual'].includes(account.feature_approval.current_user);
 
 export const CollectionAccounts: React.FC<{
   collection?: ApiCollectionJSON | null;
@@ -98,43 +157,37 @@ export const CollectionAccounts: React.FC<{
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const history = useHistory();
-  const location = useLocation<TempCollectionState>();
-  const { id, initialItemIds } = getCollectionEditorState(
-    collection,
-    location.state,
-  );
-  const isEditMode = !!id;
-  const collectionItems = collection?.items;
 
-  const [searchValue, setSearchValue] = useState('');
-  // This state is only used when creating a new collection.
-  // In edit mode, the collection will be updated instantly
-  const [addedAccountIds, setAccountIds] = useState(initialItemIds);
+  const { id, items: collectionItems } = collection ?? {};
+  const isEditMode = !!id;
+
+  const addedAccountIds = useAppSelector(
+    (state) => state.collections.editor.accountIds,
+  );
+
+  // In edit mode, we're bypassing state and just return collection items directly,
+  // since they're edited "live", saving after each addition/deletion
   const accountIds = useMemo(
     () =>
-      isEditMode
-        ? (collectionItems
-            ?.map((item) => item.account_id)
-            .filter((id): id is string => !!id) ?? [])
-        : addedAccountIds,
+      isEditMode ? getCollectionItemIds(collectionItems) : addedAccountIds,
     [isEditMode, collectionItems, addedAccountIds],
   );
 
+  const [searchValue, setSearchValue] = useState('');
+
+  const hasAccounts = accountIds.length > 0;
   const hasMaxAccounts = accountIds.length === MAX_ACCOUNT_COUNT;
-  const hasMinAccounts = accountIds.length === MIN_ACCOUNT_COUNT;
-  const hasTooFewAccounts = accountIds.length < MIN_ACCOUNT_COUNT;
-  const canSubmit = !hasTooFewAccounts;
 
   const {
-    accountIds: suggestedAccountIds,
+    accounts: suggestedAccounts,
     isLoading: isLoadingSuggestions,
     searchAccounts,
-  } = useSearchAccounts();
-
-  const suggestedItems = suggestedAccountIds.map((id) => ({
-    id,
-    isSelected: accountIds.includes(id),
-  }));
+    resetAccounts,
+  } = useSearchAccounts({
+    withRelationships: true,
+    // Don't suggest accounts that were already added
+    filterResults: (account) => !accountIds.includes(account.id),
+  });
 
   const handleSearchValueChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -153,13 +206,29 @@ export const CollectionAccounts: React.FC<{
     [],
   );
 
-  const toggleAccountItem = useCallback((item: SuggestionItem) => {
-    setAccountIds((ids) =>
-      ids.includes(item.id)
-        ? ids.filter((id) => id !== item.id)
-        : [...ids, item.id],
-    );
-  }, []);
+  const removeAccountItem = useCallback(
+    (accountId: string) => {
+      dispatch(
+        updateCollectionEditorField({
+          field: 'accountIds',
+          value: accountIds.filter((id) => id !== accountId),
+        }),
+      );
+    },
+    [accountIds, dispatch],
+  );
+
+  const addAccountItem = useCallback(
+    (item: ApiMutedAccountJSON) => {
+      dispatch(
+        updateCollectionEditorField({
+          field: 'accountIds',
+          value: [...accountIds, item.id],
+        }),
+      );
+    },
+    [accountIds, dispatch],
+  );
 
   const instantRemoveAccountItem = useCallback(
     (accountId: string) => {
@@ -183,19 +252,15 @@ export const CollectionAccounts: React.FC<{
     [collectionItems, dispatch, id, intl],
   );
 
-  const instantToggleAccountItem = useCallback(
-    (item: SuggestionItem) => {
-      if (accountIds.includes(item.id)) {
-        instantRemoveAccountItem(item.id);
-      } else {
-        if (id) {
-          void dispatch(
-            addCollectionItem({ collectionId: id, accountId: item.id }),
-          );
-        }
+  const instantAddAccountItem = useCallback(
+    (item: ApiMutedAccountJSON) => {
+      if (id) {
+        void dispatch(
+          addCollectionItem({ collectionId: id, accountId: item.id }),
+        );
       }
     },
-    [accountIds, dispatch, id, instantRemoveAccountItem],
+    [dispatch, id],
   );
 
   const handleRemoveAccountItem = useCallback(
@@ -203,19 +268,29 @@ export const CollectionAccounts: React.FC<{
       if (isEditMode) {
         instantRemoveAccountItem(accountId);
       } else {
-        setAccountIds((ids) => ids.filter((id) => id !== accountId));
+        removeAccountItem(accountId);
       }
     },
-    [isEditMode, instantRemoveAccountItem],
+    [isEditMode, instantRemoveAccountItem, removeAccountItem],
+  );
+
+  const handleSelectItem = useCallback(
+    (item: ApiMutedAccountJSON) => {
+      if (isEditMode) {
+        instantAddAccountItem(item);
+      } else {
+        addAccountItem(item);
+      }
+
+      setSearchValue('');
+      resetAccounts();
+    },
+    [addAccountItem, instantAddAccountItem, isEditMode, resetAccounts],
   );
 
   const handleSubmit = useCallback(
     (e: React.FormEvent) => {
       e.preventDefault();
-
-      if (!canSubmit) {
-        return;
-      }
 
       if (!id) {
         history.push(`/collections/new/details`, {
@@ -223,139 +298,120 @@ export const CollectionAccounts: React.FC<{
         });
       }
     },
-    [canSubmit, id, history, accountIds],
+    [id, history, accountIds],
   );
+
+  const inputId = useId();
+  const AccountsHeadingElement = id ? 'h2' : 'h3';
 
   return (
     <form onSubmit={handleSubmit} className={classes.form}>
       <FormStack className={classes.formFieldStack}>
-        {!id && (
-          <WizardStepHeader
-            step={1}
-            title={
-              <FormattedMessage
-                id='collections.create.accounts_title'
-                defaultMessage='Who will you feature in this collection?'
-              />
-            }
-            description={
-              <FormattedMessage
-                id='collections.create.accounts_subtitle'
-                defaultMessage='Only accounts you follow who have opted into discovery can be added.'
-              />
+        <header className={classes.header}>
+          {!id && (
+            <WizardStepTitle
+              step={1}
+              title={
+                <FormattedMessage
+                  id='collections.create.accounts_title'
+                  defaultMessage='Who will you feature in this collection?'
+                />
+              }
+            />
+          )}
+          <ComboboxField
+            id={inputId}
+            label={intl.formatMessage({
+              id: 'collections.search_accounts_label',
+              defaultMessage: 'Search for an account to add',
+            })}
+            value={hasMaxAccounts ? '' : searchValue}
+            onChange={handleSearchValueChange}
+            onKeyDown={handleSearchKeyDown}
+            disabled={hasMaxAccounts}
+            isLoading={isLoadingSuggestions}
+            items={groupSuggestions(suggestedAccounts)}
+            getItemId={getItemId}
+            getIsItemDisabled={getIsItemDisabled}
+            renderItem={renderAccountItem}
+            renderGroupTitle={renderGroupTitle}
+            onSelectItem={handleSelectItem}
+            status={
+              hasMaxAccounts
+                ? {
+                    variant: 'warning',
+                    message: intl.formatMessage({
+                      id: 'collections.search_accounts_max_reached',
+                      defaultMessage:
+                        'You have added the maximum number of accounts',
+                    }),
+                  }
+                : null
             }
           />
-        )}
-        <ComboboxField
-          label={
-            <FormattedMessage
-              id='collections.search_accounts_label'
-              defaultMessage='Search for accounts to add…'
-            />
-          }
-          hint={
-            hasMaxAccounts ? (
-              <FormattedMessage
-                id='collections.search_accounts_max_reached'
-                defaultMessage='You have added the maximum number of accounts'
-              />
-            ) : undefined
-          }
-          value={hasMaxAccounts ? '' : searchValue}
-          onChange={handleSearchValueChange}
-          onKeyDown={handleSearchKeyDown}
-          disabled={hasMaxAccounts}
-          isLoading={isLoadingSuggestions}
-          items={suggestedItems}
-          getItemId={getItemId}
-          getIsItemSelected={getIsItemSelected}
-          renderItem={renderAccountItem}
-          onSelectItem={
-            isEditMode ? instantToggleAccountItem : toggleAccountItem
-          }
-        />
+        </header>
 
-        {hasMinAccounts && (
-          <Callout>
-            <FormattedMessage
-              id='collections.hints.can_not_remove_more_accounts'
-              defaultMessage='Collections must contain at least {count, plural, one {# account} other {# accounts}}. Removing more accounts is not possible.'
-              values={{ count: MIN_ACCOUNT_COUNT }}
-            />
-          </Callout>
-        )}
-
-        <div className={classes.scrollableWrapper}>
-          <ScrollableList
-            scrollKey='collection-items'
-            className={classes.scrollableInner}
-            emptyMessage={
-              <EmptyState
-                title={
-                  <FormattedMessage
-                    id='collections.accounts.empty_title'
-                    defaultMessage='This collection is empty'
-                  />
-                }
-                message={
-                  <FormattedMessage
-                    id='collections.accounts.empty_description'
-                    defaultMessage='Add up to {count} accounts you follow'
-                    values={{
-                      count: MAX_ACCOUNT_COUNT,
-                    }}
-                  />
-                }
-              />
-            }
-            // TODO: Re-add `bindToDocument={!multiColumn}`
-          >
-            {accountIds.map((accountId) => (
-              <AddedAccountItem
-                key={accountId}
-                accountId={accountId}
-                isRemovable={!isEditMode || !hasMinAccounts}
-                onRemove={handleRemoveAccountItem}
-              />
-            ))}
-          </ScrollableList>
-        </div>
-      </FormStack>
-      {!isEditMode && (
-        <div className={classes.stickyFooter}>
-          {hasTooFewAccounts ? (
-            <Callout icon={false} className={classes.submitDisabledCallout}>
-              <FormattedMessage
-                id='collections.hints.add_more_accounts'
-                defaultMessage='Add at least {count, plural, one {# account} other {# accounts}} to continue'
-                values={{ count: MIN_ACCOUNT_COUNT }}
-              />
-            </Callout>
-          ) : (
-            <div className={classes.actionWrapper}>
+        <div>
+          {hasAccounts && (
+            <AccountsHeadingElement className={classes.listHeading}>
               <FormattedMessage
                 id='collections.hints.accounts_counter'
-                defaultMessage='{count} / {max} accounts'
+                defaultMessage='{count}/{max} accounts'
                 values={{ count: accountIds.length, max: MAX_ACCOUNT_COUNT }}
-              >
-                {(text) => (
-                  <div className={classes.itemCountReadout}>{text}</div>
-                )}
-              </FormattedMessage>
-              {canSubmit && (
-                <Button type='submit'>
-                  {id ? (
-                    <FormattedMessage id='lists.save' defaultMessage='Save' />
-                  ) : (
-                    <FormattedMessage
-                      id='collections.continue'
-                      defaultMessage='Continue'
-                    />
-                  )}
-                </Button>
-              )}
-            </div>
+              />
+            </AccountsHeadingElement>
           )}
+
+          <Scrollable className={classes.scrollableWrapper}>
+            <ItemList
+              emptyMessage={
+                <EmptyState
+                  title={
+                    <FormattedMessage
+                      id='collections.accounts.empty_editor_title'
+                      defaultMessage='No one is in this collection yet'
+                    />
+                  }
+                  message={
+                    <FormattedMessage
+                      id='collections.accounts.empty_description'
+                      defaultMessage='Add up to {count} accounts'
+                      values={{
+                        count: MAX_ACCOUNT_COUNT,
+                      }}
+                    />
+                  }
+                />
+              }
+            >
+              {accountIds.map((accountId, index) => (
+                <Article
+                  key={accountId}
+                  aria-posinset={index}
+                  aria-setsize={accountIds.length}
+                >
+                  <AddedAccountItem
+                    accountId={accountId}
+                    onRemove={handleRemoveAccountItem}
+                  />
+                </Article>
+              ))}
+            </ItemList>
+          </Scrollable>
+        </div>
+      </FormStack>
+      {!isEditMode && hasAccounts && (
+        <div className={classes.stickyFooter}>
+          <Button type='submit'>
+            {id ? (
+              <FormattedMessage id='lists.save' defaultMessage='Save' />
+            ) : (
+              <FormattedMessage
+                id='collections.continue'
+                defaultMessage='Continue'
+              />
+            )}
+          </Button>
         </div>
       )}
     </form>
