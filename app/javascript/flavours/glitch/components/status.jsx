@@ -777,7 +777,7 @@ class Status extends ImmutablePureComponent {
               canReact={this.props.identity.signedIn}
             />
 
-            {!isQuotedPost &&
+            {(showActions && !isQuotedPost) &&
               <StatusActionBar
                 status={status}
                 account={status.get('account')}
