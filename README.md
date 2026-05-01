@@ -1,16 +1,27 @@
-# Mastodon Glitch Edition
+# Mastodon Glitch-YRYR
 
-[![Ruby Testing](https://github.com/glitch-soc/mastodon/actions/workflows/test-ruby.yml/badge.svg)](https://github.com/glitch-soc/mastodon/actions/workflows/test-ruby.yml)
-[![Crowdin](https://badges.crowdin.net/glitch-soc/localized.svg)][glitch-crowdin]
+> Now with 100% more Yui Funami!
 
-[glitch-crowdin]: https://crowdin.com/project/glitch-soc
+So here's the deal: assets are customized, you are on your own replacing our assets with yours (or vanilla ones)
 
-So here's the deal: we all work on this code, and anyone who uses that does so absolutely at their own risk. can you dig it?
+Added features over glitch-soc:
+- Nori tokenizer for better Korean search (You **MUST** use {Elastic,Open}Search with necessary plugins installed, otherwise search feature won't work *at all*)
+- YuruVerse assets (logos, etc)
+- Mastodon-modern theme included!
+- Pretendard font for better Korean glyphs
+- Emoji reactions! (compatible with Misskey of course)
+- And more things...?
+
+We also recommend applying wide custom emoji CSS for better experience.
+
+# Thanks to...
+- Freeplay for [mastodon-modern](https://git.gay/Freeplay/Mastodon-Modern) theme
+
 
 - You can view documentation for this project at [glitch-soc.github.io/docs/](https://glitch-soc.github.io/docs/).
 - And contributing guidelines are available [here](CONTRIBUTING.md) and [here](https://glitch-soc.github.io/docs/contributing/).
 
-Mastodon Glitch Edition is a fork of [Mastodon](https://github.com/mastodon/mastodon). Upstream's README file is reproduced below.
+Mastodon Glitch-YRYR is a fork of Mastodon Glitch Edition which is a fork of [Mastodon](https://github.com/mastodon/mastodon). Up-Upstream's README file is reproduced below.
 
 ---
 
