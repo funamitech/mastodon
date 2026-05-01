@@ -27,13 +27,11 @@ module ThemeHelper
     case color_scheme
     when 'auto'
       ''.html_safe.tap do |tags|
-        tags << tag.meta(name: 'theme-color', content: Themes::THEME_COLORS[:dark], media: '(prefers-color-scheme: dark)')
-        tags << tag.meta(name: 'theme-color', content: Themes::THEME_COLORS[:light], media: '(prefers-color-scheme: light)')
+        tags << tag.meta(name: 'theme-color', content: '#787878', media: '(prefers-color-scheme: dark)')
+        tags << tag.meta(name: 'theme-color', content: '#787878', media: '(prefers-color-scheme: light)')
       end
-    when 'light'
-      tag.meta name: 'theme-color', content: Themes::THEME_COLORS[:light]
-    when 'dark'
-      tag.meta name: 'theme-color', content: Themes::THEME_COLORS[:dark]
+    else
+      tag.meta name: 'theme-color', content: '#787878'
     end
   end
 
