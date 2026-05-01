@@ -25,7 +25,7 @@ module Mastodon
     end
 
     def build_metadata
-      version_configuration[:metadata]
+      'YRYRneoA'
     end
 
     def to_a
