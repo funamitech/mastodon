@@ -173,7 +173,7 @@ class About extends PureComponent {
           <LinkFooter context='about' />
 
           <div className='about__footer'>
-            <p><FormattedMessage id='about.fork_disclaimer' defaultMessage='Glitch-soc is free open source software forked from Mastodon.' /></p>
+            <p><FormattedMessage id='about.fork_disclaimer' defaultMessage='Glitch-YRYR is free open source software forked from Mastodon.' /></p>
             <p><FormattedMessage id='about.disclaimer' defaultMessage='Mastodon is free, open-source software, and a trademark of Mastodon GmbH.' /></p>
           </div>
         </div>
