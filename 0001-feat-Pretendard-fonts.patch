@@ -1,0 +1,40 @@
+From b35d2574cc504154537d67b3546c4ebe9faba8e8 Mon Sep 17 00:00:00 2001
+From: Noa Himesaka <himesaka@noa.codes>
+Date: Fri, 1 May 2026 18:24:06 +0900
+Subject: [PATCH] feat: Pretendard fonts
+
+---
+ app/javascript/styles/application.scss         | 4 ++++
+ app/javascript/styles/mastodon/_variables.scss | 2 +-
+ 2 files changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/app/javascript/styles/application.scss b/app/javascript/styles/application.scss
+index aca615414f..59e903fd88 100644
+--- a/app/javascript/styles/application.scss
++++ b/app/javascript/styles/application.scss
+@@ -2,6 +2,10 @@
+ @use 'mastodon/mixins';
+ @use 'fonts/roboto';
+ @use 'fonts/roboto-mono';
++@use 'https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css'
++@use 'https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-jp.min.css'
++@use 'https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css'
++@use 'https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-jp.min.css'
+ 
+ @use 'mastodon/reset';
+ @use 'mastodon/theme';
+diff --git a/app/javascript/styles/mastodon/_variables.scss b/app/javascript/styles/mastodon/_variables.scss
+index 7a947891d5..97f6920d06 100644
+--- a/app/javascript/styles/mastodon/_variables.scss
++++ b/app/javascript/styles/mastodon/_variables.scss
+@@ -20,6 +20,6 @@ $mobile-menu-breakpoint: 760px;
+ $mobile-breakpoint: 630px;
+ $no-columns-breakpoint: 600px;
+ 
+-$font-sans-serif: 'mastodon-font-sans-serif' !default;
++$font-sans-serif: 'Pretendard Variable', 'Pretendard JP Variable', 'Pretendard', 'Pretendard JP', 'mastodon-font-sans-serif' !default;
+ $font-display: 'mastodon-font-display' !default;
+ $font-monospace: 'mastodon-font-monospace' !default;
+-- 
+2.54.0
+

@@ -1,0 +1,936 @@
+From 36cfcdad009d46ff5d41fdeaa0580860e4d5a60e Mon Sep 17 00:00:00 2001
+From: Noa Himesaka <himesaka@noa.codes>
+Date: Fri, 1 May 2026 18:09:58 +0900
+Subject: [PATCH] feat: YuruToot-specific texts
+
+---
+ .../flavours/glitch/features/about/index.jsx  |   2 +-
+ .../flavours/glitch/locales/cs.json           |   2 +-
+ .../flavours/glitch/locales/de.json           |   2 +-
+ .../flavours/glitch/locales/el.json           |   2 +-
+ .../flavours/glitch/locales/en.json           |   2 +-
+ .../flavours/glitch/locales/eo.json           |   2 +-
+ .../flavours/glitch/locales/es-AR.json        |   2 +-
+ .../flavours/glitch/locales/es-MX.json        |   2 +-
+ .../flavours/glitch/locales/es.json           |   2 +-
+ .../flavours/glitch/locales/fr-CA.json        |   2 +-
+ .../flavours/glitch/locales/fr.json           |   2 +-
+ .../flavours/glitch/locales/gl.json           |   2 +-
+ .../flavours/glitch/locales/id.json           |   4 +-
+ .../flavours/glitch/locales/ja.json           |   2 +-
+ .../flavours/glitch/locales/ko.json           |   2 +-
+ .../flavours/glitch/locales/lt.json           |   2 +-
+ .../flavours/glitch/locales/nn.json           |   2 +-
+ .../flavours/glitch/locales/no.json           |   2 +-
+ .../flavours/glitch/locales/pl.json           |   2 +-
+ .../flavours/glitch/locales/pt-BR.json        |   2 +-
+ .../flavours/glitch/locales/pt-PT.json        |   2 +-
+ .../flavours/glitch/locales/ru.json           |   2 +-
+ .../flavours/glitch/locales/sco.json          |   2 +-
+ .../flavours/glitch/locales/sv.json           |   2 +-
+ .../flavours/glitch/locales/szl.json          |   2 +-
+ .../flavours/glitch/locales/tai.json          |   2 +-
+ .../flavours/glitch/locales/uk.json           |   2 +-
+ .../flavours/glitch/locales/zgh.json          |   2 +-
+ .../flavours/glitch/locales/zh-CN.json        |   2 +-
+ .../flavours/glitch/locales/zh-TW.json        |   2 +-
+ app/javascript/mastodon/locales/en.json       | 158 +++++++++---------
+ app/javascript/mastodon/locales/ko.json       |   8 +-
+ lib/mastodon/version.rb                       |   2 +-
+ 33 files changed, 115 insertions(+), 115 deletions(-)
+
+diff --git a/app/javascript/flavours/glitch/features/about/index.jsx b/app/javascript/flavours/glitch/features/about/index.jsx
+index 60a2d68f2f..6f381d4ebf 100644
+--- a/app/javascript/flavours/glitch/features/about/index.jsx
++++ b/app/javascript/flavours/glitch/features/about/index.jsx
+@@ -167,7 +167,7 @@ class About extends PureComponent {
+           <LinkFooter />
+ 
+           <div className='about__footer'>
+-            <p><FormattedMessage id='about.fork_disclaimer' defaultMessage='Glitch-soc is free open source software forked from Mastodon.' /></p>
++            <p><FormattedMessage id='about.fork_disclaimer' defaultMessage='Glitch-YRYR is free open source software forked from Mastodon.' /></p>
+             <p><FormattedMessage id='about.disclaimer' defaultMessage='Mastodon is free, open-source software, and a trademark of Mastodon gGmbH.' /></p>
+           </div>
+         </div>
+diff --git a/app/javascript/flavours/glitch/locales/cs.json b/app/javascript/flavours/glitch/locales/cs.json
+index 3f439ae7f6..89978f823e 100644
+--- a/app/javascript/flavours/glitch/locales/cs.json
++++ b/app/javascript/flavours/glitch/locales/cs.json
+@@ -1,5 +1,5 @@
+ {
+-  "about.fork_disclaimer": "Glitch-soc je svobodný software s otevřeným zdrojovým kódem založený na Mastodonu.",
++  "about.fork_disclaimer": "Glitch-YRYR je svobodný software s otevřeným zdrojovým kódem založený na Mastodonu.",
+   "account.disclaimer_full": "Níže uvedené informace mohou popisovat uživatelský profil neúplně.",
+   "account.follows": "Sleduje",
+   "account.suspended_disclaimer_full": "Tento uživatel byl pozastaven moderátorem.",
+diff --git a/app/javascript/flavours/glitch/locales/de.json b/app/javascript/flavours/glitch/locales/de.json
+index 9e1cff99de..c960fb6e3b 100644
+--- a/app/javascript/flavours/glitch/locales/de.json
++++ b/app/javascript/flavours/glitch/locales/de.json
+@@ -1,5 +1,5 @@
+ {
+-  "about.fork_disclaimer": "Glitch-soc ist freie, quelloffene Software geforkt von Mastodon.",
++  "about.fork_disclaimer": "Glitch-YRYR ist freie, quelloffene Software geforkt von Mastodon.",
+   "account.disclaimer_full": "Die folgenden Informationen könnten das Profil des Nutzers unvollständig wiedergeben.",
+   "account.follows": "Folgt",
+   "account.suspended_disclaimer_full": "Dieser Nutzer wurde durch einen Moderator gesperrt.",
+diff --git a/app/javascript/flavours/glitch/locales/el.json b/app/javascript/flavours/glitch/locales/el.json
+index 2e46effe59..9063264547 100644
+--- a/app/javascript/flavours/glitch/locales/el.json
++++ b/app/javascript/flavours/glitch/locales/el.json
+@@ -1,5 +1,5 @@
+ {
+-  "about.fork_disclaimer": "Το Glitch-soc είναι ελεύθερο λογισμικό ανοιχτού κώδικα που είναι αντιγραφή από το Mastodon.",
++  "about.fork_disclaimer": "Το Glitch-YRYR είναι ελεύθερο λογισμικό ανοιχτού κώδικα που είναι αντιγραφή από το Mastodon.",
+   "account.disclaimer_full": "Οι παρακάτω πληροφορίες μπορεί να αντικατοπτρίζουν το προφίλ του χρήστη ελλιπώς.",
+   "account.follows": "Ακολουθεί",
+   "account.suspended_disclaimer_full": "Αυτός ο χρήστης έχει ανασταλεί από έναν συντονιστή.",
+diff --git a/app/javascript/flavours/glitch/locales/en.json b/app/javascript/flavours/glitch/locales/en.json
+index 6b1054d82d..434f968752 100644
+--- a/app/javascript/flavours/glitch/locales/en.json
++++ b/app/javascript/flavours/glitch/locales/en.json
+@@ -1,5 +1,5 @@
+ {
+-  "about.fork_disclaimer": "Glitch-soc is free open source software forked from Mastodon.",
++  "about.fork_disclaimer": "Glitch-YRYR is free open source software forked from Mastodon.",
+   "account.disclaimer_full": "Information below may reflect the user's profile incompletely.",
+   "account.follows": "Follows",
+   "account.suspended_disclaimer_full": "This user has been suspended by a moderator.",
+diff --git a/app/javascript/flavours/glitch/locales/eo.json b/app/javascript/flavours/glitch/locales/eo.json
+index 50a46a1b7c..5275088c0f 100644
+--- a/app/javascript/flavours/glitch/locales/eo.json
++++ b/app/javascript/flavours/glitch/locales/eo.json
+@@ -1,5 +1,5 @@
+ {
+-  "about.fork_disclaimer": "Glitch-soc estas libera malfermitkoda programo forkigita el Mastodon.",
++  "about.fork_disclaimer": "Glitch-YRYR estas libera malfermitkoda programo forkigita el Mastodon.",
+   "account.disclaimer_full": "Subaj informoj povas nekomplete prezenti la profilon de la uzanto.",
+   "account.follows": "Sekvatoj",
+   "account.suspended_disclaimer_full": "Ĉi tiu uzanto estis suspendita de moderiganto.",
+diff --git a/app/javascript/flavours/glitch/locales/es-AR.json b/app/javascript/flavours/glitch/locales/es-AR.json
+index 93240159ba..7935d5bbd8 100644
+--- a/app/javascript/flavours/glitch/locales/es-AR.json
++++ b/app/javascript/flavours/glitch/locales/es-AR.json
+@@ -1,5 +1,5 @@
+ {
+-  "about.fork_disclaimer": "Glitch-soc es software gratuito, de código abierto, bifurcado de Mastodon.",
++  "about.fork_disclaimer": "Glitch-YRYR es software gratuito, de código abierto, bifurcado de Mastodon.",
+   "account.disclaimer_full": "La información aquí presentada puede reflejar de manera incompleta el perfil del usuario.",
+   "account.follows": "Sigue",
+   "account.suspended_disclaimer_full": "Este usuario ha sido suspendido por un moderador.",
+diff --git a/app/javascript/flavours/glitch/locales/es-MX.json b/app/javascript/flavours/glitch/locales/es-MX.json
+index 4522e69a04..cc13d01f71 100644
+--- a/app/javascript/flavours/glitch/locales/es-MX.json
++++ b/app/javascript/flavours/glitch/locales/es-MX.json
+@@ -1,5 +1,5 @@
+ {
+-  "about.fork_disclaimer": "Glitch-soc es software gratuito, de código abierto, bifurcado de Mastodon.",
++  "about.fork_disclaimer": "Glitch-YRYR es software gratuito, de código abierto, bifurcado de Mastodon.",
+   "account.disclaimer_full": "La información aquí presentada puede reflejar de manera incompleta el perfil del usuario.",
+   "account.follows": "Seguir",
+   "account.suspended_disclaimer_full": "Este usuario ha sido suspendido por un moderador.",
+diff --git a/app/javascript/flavours/glitch/locales/es.json b/app/javascript/flavours/glitch/locales/es.json
+index 274f0e4e2c..41021acf11 100644
+--- a/app/javascript/flavours/glitch/locales/es.json
++++ b/app/javascript/flavours/glitch/locales/es.json
+@@ -1,5 +1,5 @@
+ {
+-  "about.fork_disclaimer": "Glitch-soc es software gratuito, de código abierto, bifurcado de Mastodon.",
++  "about.fork_disclaimer": "Glitch-YRYR es software gratuito, de código abierto, bifurcado de Mastodon.",
+   "account.disclaimer_full": "La información que figura a continuación puede reflejar el perfil de la cuenta de forma incompleta.",
+   "account.follows": "Sigue",
+   "account.suspended_disclaimer_full": "Este usuario ha sido suspendido por un moderador.",
+diff --git a/app/javascript/flavours/glitch/locales/fr-CA.json b/app/javascript/flavours/glitch/locales/fr-CA.json
+index f3c7a5707a..9e19663368 100644
+--- a/app/javascript/flavours/glitch/locales/fr-CA.json
++++ b/app/javascript/flavours/glitch/locales/fr-CA.json
+@@ -1,5 +1,5 @@
+ {
+-  "about.fork_disclaimer": "Glitch-soc est un logiciel gratuit et open source, fork de Mastodon.",
++  "about.fork_disclaimer": "Glitch-YRYR est un logiciel gratuit et open source, fork de Mastodon.",
+   "account.disclaimer_full": "Les informations ci-dessous peuvent être incomplètes.",
+   "account.follows": "Abonnements",
+   "account.suspended_disclaimer_full": "Cet utilisateur a été suspendu par un modérateur.",
+diff --git a/app/javascript/flavours/glitch/locales/fr.json b/app/javascript/flavours/glitch/locales/fr.json
+index 658b2ffaae..c75ac716a0 100644
+--- a/app/javascript/flavours/glitch/locales/fr.json
++++ b/app/javascript/flavours/glitch/locales/fr.json
+@@ -1,5 +1,5 @@
+ {
+-  "about.fork_disclaimer": "Glitch-soc est un logiciel gratuit et open source, fork de Mastodon.",
++  "about.fork_disclaimer": "Glitch-YRYR est un logiciel gratuit et open source, fork de Mastodon.",
+   "account.disclaimer_full": "Les informations ci-dessous peuvent être incomplètes.",
+   "account.follows": "Abonnements",
+   "account.suspended_disclaimer_full": "Ce compte a été suspendu par un modérateur.",
+diff --git a/app/javascript/flavours/glitch/locales/gl.json b/app/javascript/flavours/glitch/locales/gl.json
+index 46db5e39fb..bdfc526710 100644
+--- a/app/javascript/flavours/glitch/locales/gl.json
++++ b/app/javascript/flavours/glitch/locales/gl.json
+@@ -1,5 +1,5 @@
+ {
+-  "about.fork_disclaimer": "Glitch-soc é software libre de código aberto derivado de Mastodon.",
++  "about.fork_disclaimer": "Glitch-YRYR é software libre de código aberto derivado de Mastodon.",
+   "account.disclaimer_full": "A información inferior sobre a usuaria podería estar incompleta.",
+   "account.follows": "Segue",
+   "account.suspended_disclaimer_full": "Usuaria suspendida pola moderación.",
+diff --git a/app/javascript/flavours/glitch/locales/id.json b/app/javascript/flavours/glitch/locales/id.json
+index abd39e8b56..62cc5cd3ff 100644
+--- a/app/javascript/flavours/glitch/locales/id.json
++++ b/app/javascript/flavours/glitch/locales/id.json
+@@ -1,5 +1,5 @@
+ {
+-  "about.fork_disclaimer": "Glitch-soc adalah perangkat lunak sumber terbuka yang merupakan fork dari Mastodon.",
++  "about.fork_disclaimer": "Glitch-YRYR adalah perangkat lunak sumber terbuka yang merupakan fork dari Mastodon.",
+   "account.disclaimer_full": "Informasi di bawah ini mungkin tidak mencerminkan profil pengguna secara lengkap.",
+   "account.follows": "Mengikuti",
+   "account.suspended_disclaimer_full": "Pengguna ini telah ditangguhkan oleh moderator.",
+@@ -19,7 +19,7 @@
+   "compose.content-type.plain_meta": "Tulis tanpa pemformatan lanjutan",
+   "confirmation_modal.do_not_ask_again": "Jangan minta konfirmasi lagi",
+   "confirmations.deprecated_settings.confirm": "Gunakan preferensi Mastodon",
+-  "confirmations.deprecated_settings.message": "Beberapa {app_settings} khusus perangkat Glitch-soc yang Anda gunakan telah digantikan oleh {preferences} Mastodon dan akan diganti:",
++  "confirmations.deprecated_settings.message": "Beberapa {app_settings} khusus perangkat Glitch-YRYR yang Anda gunakan telah digantikan oleh {preferences} Mastodon dan akan diganti:",
+   "direct.group_by_conversations": "Grupkan berdasarkan percakapan",
+   "federation.federated.long": "Izinkan postingan ini menjangkau server lain",
+   "federation.federated.short": "Difederasi",
+diff --git a/app/javascript/flavours/glitch/locales/ja.json b/app/javascript/flavours/glitch/locales/ja.json
+index 6ca2c8413c..03f34d413e 100644
+--- a/app/javascript/flavours/glitch/locales/ja.json
++++ b/app/javascript/flavours/glitch/locales/ja.json
+@@ -1,5 +1,5 @@
+ {
+-  "about.fork_disclaimer": "Glitch-socはMastodonからフォークされたフリーなオープンソースソフトウェアです。",
++  "about.fork_disclaimer": "ゆるゆりGlitchはMastodonからフォークされたフリーなオープンソースソフトウェアです。",
+   "account.disclaimer_full": "このユーザー情報は不正確な可能性があります。",
+   "account.follows": "フォロー",
+   "account.suspended_disclaimer_full": "このユーザーはモデレータにより停止されました。",
+diff --git a/app/javascript/flavours/glitch/locales/ko.json b/app/javascript/flavours/glitch/locales/ko.json
+index d38fc4ac35..944c72ce0c 100644
+--- a/app/javascript/flavours/glitch/locales/ko.json
++++ b/app/javascript/flavours/glitch/locales/ko.json
+@@ -1,5 +1,5 @@
+ {
+-  "about.fork_disclaimer": "글리치는 마스토돈에서 포크한 자유 오픈소스 소프트웨어입니다.",
++  "about.fork_disclaimer": "유루유리 글리치는 마스토돈에서 포크한 자유 오픈소스 소프트웨어입니다.",
+   "account.disclaimer_full": "아래에 있는 정보들은 사용자의 프로필을 완벽하게 나타내지 못하고 있을 수도 있습니다.",
+   "account.follows": "팔로우",
+   "account.suspended_disclaimer_full": "이 사용자는 중재자에 의해 정지되었습니다.",
+diff --git a/app/javascript/flavours/glitch/locales/lt.json b/app/javascript/flavours/glitch/locales/lt.json
+index 41ac638b9a..0e06afd1ff 100644
+--- a/app/javascript/flavours/glitch/locales/lt.json
++++ b/app/javascript/flavours/glitch/locales/lt.json
+@@ -1,5 +1,5 @@
+ {
+-  "about.fork_disclaimer": "„Glitch-soc“ – tai nemokama atvirojo kodo programinė įranga, atšakota iš „Mastodon“.",
++  "about.fork_disclaimer": "„Glitch-YRYR“ – tai nemokama atvirojo kodo programinė įranga, atšakota iš „Mastodon“.",
+   "account.disclaimer_full": "Žemiau pateikta informacija gali nevisiškai atitikti naudotojo profilį.",
+   "account.follows": "Sekimai",
+   "account.suspended_disclaimer_full": "Šį naudotoją pristabdė prižiūrėtojas.",
+diff --git a/app/javascript/flavours/glitch/locales/nn.json b/app/javascript/flavours/glitch/locales/nn.json
+index 957eda1cf3..98d1e3924e 100644
+--- a/app/javascript/flavours/glitch/locales/nn.json
++++ b/app/javascript/flavours/glitch/locales/nn.json
+@@ -1,5 +1,5 @@
+ {
+-  "about.fork_disclaimer": "Glitch-soc er fri programvare med åpen kildekode, forgrenet fra Mastodon.",
++  "about.fork_disclaimer": "Glitch-YRYR er fri programvare med åpen kildekode, forgrenet fra Mastodon.",
+   "compose.content-type.html": "HTML",
+   "compose.content-type.html_meta": "Formater innleggene dine med HTML",
+   "compose.content-type.markdown": "Markdown",
+diff --git a/app/javascript/flavours/glitch/locales/no.json b/app/javascript/flavours/glitch/locales/no.json
+index a0558ea148..b988048fc6 100644
+--- a/app/javascript/flavours/glitch/locales/no.json
++++ b/app/javascript/flavours/glitch/locales/no.json
+@@ -1,5 +1,5 @@
+ {
+-  "about.fork_disclaimer": "Glitch-soc er fri programvare med åpen kildekode, forgrenet fra Mastodon.",
++  "about.fork_disclaimer": "Glitch-YRYR er fri programvare med åpen kildekode, forgrenet fra Mastodon.",
+   "compose.content-type.html": "HTML",
+   "compose.content-type.html_meta": "Formater innleggene dine med HTML",
+   "compose.content-type.markdown": "Markdown",
+diff --git a/app/javascript/flavours/glitch/locales/pl.json b/app/javascript/flavours/glitch/locales/pl.json
+index a96867758d..0cfc3850b2 100644
+--- a/app/javascript/flavours/glitch/locales/pl.json
++++ b/app/javascript/flavours/glitch/locales/pl.json
+@@ -1,5 +1,5 @@
+ {
+-  "about.fork_disclaimer": "Glitch-soc jest wolnym i otwartym oprogramowaniem wywodzącym się z Mastodonu.",
++  "about.fork_disclaimer": "Glitch-YRYR jest wolnym i otwartym oprogramowaniem wywodzącym się z Mastodonu.",
+   "account.disclaimer_full": "Poniższe informacje mogą niekompletnie odzwierciedlać profil tego użytkownika.",
+   "account.follows": "Obserwuje",
+   "account.suspended_disclaimer_full": "Użytkownik został zawieszony przez moderatora.",
+diff --git a/app/javascript/flavours/glitch/locales/pt-BR.json b/app/javascript/flavours/glitch/locales/pt-BR.json
+index 27d1e7daf7..567b7cd04f 100644
+--- a/app/javascript/flavours/glitch/locales/pt-BR.json
++++ b/app/javascript/flavours/glitch/locales/pt-BR.json
+@@ -1,5 +1,5 @@
+ {
+-  "about.fork_disclaimer": "O Glitch-soc é um software gratuito de código aberto bifurcado a partir do Mastodon.",
++  "about.fork_disclaimer": "O Glitch-YRYR é um software gratuito de código aberto bifurcado a partir do Mastodon.",
+   "account.disclaimer_full": "As informações abaixo podem refletir o perfil do usuário de forma incompleta.",
+   "account.follows": "Segue",
+   "account.suspended_disclaimer_full": "Este usuário foi suspenso por um moderador.",
+diff --git a/app/javascript/flavours/glitch/locales/pt-PT.json b/app/javascript/flavours/glitch/locales/pt-PT.json
+index 5357ffc64b..49bb8c6149 100644
+--- a/app/javascript/flavours/glitch/locales/pt-PT.json
++++ b/app/javascript/flavours/glitch/locales/pt-PT.json
+@@ -1,5 +1,5 @@
+ {
+-  "about.fork_disclaimer": "O Glitch-soc é um software livre de código aberto, derivado (fork) do Mastodon.",
++  "about.fork_disclaimer": "O Glitch-YRYR é um software livre de código aberto, derivado (fork) do Mastodon.",
+   "account.disclaimer_full": "As informações abaixo podem não refletir completamente o perfil do utilizador.",
+   "account.follows": "A seguir",
+   "account.suspended_disclaimer_full": "Este utilizador foi suspenso por um elemento da moderação.",
+diff --git a/app/javascript/flavours/glitch/locales/ru.json b/app/javascript/flavours/glitch/locales/ru.json
+index 694ee09a4d..ee7c24c1e9 100644
+--- a/app/javascript/flavours/glitch/locales/ru.json
++++ b/app/javascript/flavours/glitch/locales/ru.json
+@@ -1,5 +1,5 @@
+ {
+-  "about.fork_disclaimer": "Glitch-soc — это свободное программное обеспечение с открытым исходным кодом, ответвлённое от Mastodon.",
++  "about.fork_disclaimer": "Glitch-YRYR — это свободное программное обеспечение с открытым исходным кодом, ответвлённое от Mastodon.",
+   "account.disclaimer_full": "Приведённые ниже сведения могут не полностью соответствовать профилю пользователя.",
+   "account.follows": "Подписки",
+   "account.suspended_disclaimer_full": "Этот пользователь был заблокирован модератором.",
+diff --git a/app/javascript/flavours/glitch/locales/sco.json b/app/javascript/flavours/glitch/locales/sco.json
+index 8cd9d0fc5c..e3ac8541cf 100644
+--- a/app/javascript/flavours/glitch/locales/sco.json
++++ b/app/javascript/flavours/glitch/locales/sco.json
+@@ -1,5 +1,5 @@
+ {
+-  "about.fork_disclaimer": "Glitch-soc is free open source software forked fae Mastodon.",
++  "about.fork_disclaimer": "Glitch-YRYR is free open source software forked fae Mastodon.",
+   "account.disclaimer_full": "Information below may reflect the user's profile incompletely",
+   "account.follows": "Follows",
+   "account.suspended_disclaimer_full": "This user has been suspendit by a moderator.",
+diff --git a/app/javascript/flavours/glitch/locales/sv.json b/app/javascript/flavours/glitch/locales/sv.json
+index 1f4c354484..2c0e59e48e 100644
+--- a/app/javascript/flavours/glitch/locales/sv.json
++++ b/app/javascript/flavours/glitch/locales/sv.json
+@@ -1,5 +1,5 @@
+ {
+-  "about.fork_disclaimer": "Glitch-soc är fri och öppna-källkod mjukvara som förgrenas från Mastodon.",
++  "about.fork_disclaimer": "Glitch-YRYR är fri och öppna-källkod mjukvara som förgrenas från Mastodon.",
+   "account.disclaimer_full": "Informationen nedan kan vara ofullständig för användarens profil.",
+   "account.follows": "Följer",
+   "account.suspended_disclaimer_full": "Denna användare har stängts av av en moderator.",
+diff --git a/app/javascript/flavours/glitch/locales/szl.json b/app/javascript/flavours/glitch/locales/szl.json
+index bc033e4928..41b9c8a2e3 100644
+--- a/app/javascript/flavours/glitch/locales/szl.json
++++ b/app/javascript/flavours/glitch/locales/szl.json
+@@ -1,5 +1,5 @@
+ {
+-  "about.fork_disclaimer": "Glitch-soc is free open source software forked from Mastodon.",
++  "about.fork_disclaimer": "Glitch-YRYR is free open source software forked from Mastodon.",
+   "account.add_account_note": "Add note for @{name}",
+   "account.disclaimer_full": "Information below may reflect the user's profile incompletely.",
+   "account.follows": "Follows",
+diff --git a/app/javascript/flavours/glitch/locales/tai.json b/app/javascript/flavours/glitch/locales/tai.json
+index bc033e4928..41b9c8a2e3 100644
+--- a/app/javascript/flavours/glitch/locales/tai.json
++++ b/app/javascript/flavours/glitch/locales/tai.json
+@@ -1,5 +1,5 @@
+ {
+-  "about.fork_disclaimer": "Glitch-soc is free open source software forked from Mastodon.",
++  "about.fork_disclaimer": "Glitch-YRYR is free open source software forked from Mastodon.",
+   "account.add_account_note": "Add note for @{name}",
+   "account.disclaimer_full": "Information below may reflect the user's profile incompletely.",
+   "account.follows": "Follows",
+diff --git a/app/javascript/flavours/glitch/locales/uk.json b/app/javascript/flavours/glitch/locales/uk.json
+index 9e38ff5f90..96ce4b8bb9 100644
+--- a/app/javascript/flavours/glitch/locales/uk.json
++++ b/app/javascript/flavours/glitch/locales/uk.json
+@@ -1,5 +1,5 @@
+ {
+-  "about.fork_disclaimer": "Glitch-soc - це вільне програмне забезпечення з відкритим вихідним кодом, форк від Mastodon.",
++  "about.fork_disclaimer": "Glitch-YRYR - це вільне програмне забезпечення з відкритим вихідним кодом, форк від Mastodon.",
+   "account.disclaimer_full": "Наведена нижче інформація може не повністю відображати профіль користувача.",
+   "account.follows": "Підписки",
+   "account.suspended_disclaimer_full": "Цей користувач був призупинений модератором.",
+diff --git a/app/javascript/flavours/glitch/locales/zgh.json b/app/javascript/flavours/glitch/locales/zgh.json
+index bc033e4928..41b9c8a2e3 100644
+--- a/app/javascript/flavours/glitch/locales/zgh.json
++++ b/app/javascript/flavours/glitch/locales/zgh.json
+@@ -1,5 +1,5 @@
+ {
+-  "about.fork_disclaimer": "Glitch-soc is free open source software forked from Mastodon.",
++  "about.fork_disclaimer": "Glitch-YRYR is free open source software forked from Mastodon.",
+   "account.add_account_note": "Add note for @{name}",
+   "account.disclaimer_full": "Information below may reflect the user's profile incompletely.",
+   "account.follows": "Follows",
+diff --git a/app/javascript/flavours/glitch/locales/zh-CN.json b/app/javascript/flavours/glitch/locales/zh-CN.json
+index 40ef7f32cc..a17913955b 100644
+--- a/app/javascript/flavours/glitch/locales/zh-CN.json
++++ b/app/javascript/flavours/glitch/locales/zh-CN.json
+@@ -1,5 +1,5 @@
+ {
+-  "about.fork_disclaimer": "Glitch-soc是从Mastodon派生的自由开源软件。",
++  "about.fork_disclaimer": "Glitch-YRYR是从Mastodon派生的自由开源软件。",
+   "account.disclaimer_full": "以下信息可能无法完整反映该用户的个人资料。",
+   "account.follows": "正在关注",
+   "account.suspended_disclaimer_full": "该用户已被管理员封禁。",
+diff --git a/app/javascript/flavours/glitch/locales/zh-TW.json b/app/javascript/flavours/glitch/locales/zh-TW.json
+index 54269912db..9df224a81c 100644
+--- a/app/javascript/flavours/glitch/locales/zh-TW.json
++++ b/app/javascript/flavours/glitch/locales/zh-TW.json
+@@ -1,5 +1,5 @@
+ {
+-  "about.fork_disclaimer": "Glitch-soc 是從 Mastodon 分支出來的自由開源軟體。",
++  "about.fork_disclaimer": "Glitch-YRYR 是從 Mastodon 分支出來的自由開源軟體。",
+   "account.disclaimer_full": "下面的資訊可能不完全反映使用者的個人資料。",
+   "account.follows": "跟隨",
+   "account.suspended_disclaimer_full": "使用者已被管理者停權。",
+diff --git a/app/javascript/mastodon/locales/en.json b/app/javascript/mastodon/locales/en.json
+index d72d8b986b..4011e4d50b 100644
+--- a/app/javascript/mastodon/locales/en.json
++++ b/app/javascript/mastodon/locales/en.json
+@@ -32,12 +32,12 @@
+   "account.cancel_follow_request": "Cancel follow",
+   "account.copy": "Copy link to profile",
+   "account.direct": "Privately mention @{name}",
+-  "account.disable_notifications": "Stop notifying me when @{name} posts",
++  "account.disable_notifications": "Stop notifying me when @{name} toots",
+   "account.domain_blocking": "Blocking domain",
+   "account.edit_note": "Edit personal note",
+   "account.edit_profile": "Edit profile",
+   "account.edit_profile_short": "Edit",
+-  "account.enable_notifications": "Notify me when @{name} posts",
++  "account.enable_notifications": "Notify me when @{name} toots",
+   "account.endorse": "Feature on profile",
+   "account.familiar_followers_many": "Followed by {name1}, {name2}, and {othersCount, plural, one {one other you know} other {# others you know}}",
+   "account.familiar_followers_one": "Followed by {name1}",
+@@ -49,9 +49,9 @@
+   "account.field_overflow": "Show full content",
+   "account.filters.all": "All activity",
+   "account.filters.boosts_toggle": "Show boosts",
+-  "account.filters.posts_boosts": "Posts and boosts",
+-  "account.filters.posts_only": "Posts",
+-  "account.filters.posts_replies": "Posts and replies",
++  "account.filters.posts_boosts": "Toots and boosts",
++  "account.filters.posts_only": "Toots",
++  "account.filters.posts_replies": "Toots and replies",
+   "account.filters.replies_toggle": "Show replies",
+   "account.follow": "Follow",
+   "account.follow_back": "Follow back",
+@@ -114,8 +114,8 @@
+   "account.muting": "Muting",
+   "account.mutual": "You follow each other",
+   "account.name.copy": "Copy handle",
+-  "account.name.help.domain": "{domain} is the server that hosts the user’s profile and posts.",
+-  "account.name.help.domain_self": "{domain} is your server that hosts your profile and posts.",
++  "account.name.help.domain": "{domain} is the server that hosts the user’s profile and toots.",
++  "account.name.help.domain_self": "{domain} is your server that hosts your profile and toots.",
+   "account.name.help.footer": "Just like you can send emails to people using different email providers, you can interact with people on other Mastodon servers, and with anyone on other Mastodon-compatible social apps.",
+   "account.name.help.header": "A handle is like an email address",
+   "account.name.help.username": "{username} is this account’s username on their server. Someone on another server might have the same username.",
+@@ -131,16 +131,16 @@
+   "account.note.edit_button": "Edit",
+   "account.note.title": "Personal note (visible only to you)",
+   "account.open_original_page": "Open original page",
+-  "account.posts": "Posts",
++  "account.posts": "Toots",
+   "account.remove_from_followers": "Remove {name} from followers",
+   "account.report": "Report @{name}",
+   "account.requested_follow": "{name} has requested to follow you",
+   "account.requests_to_follow_you": "Requests to follow you",
+   "account.share": "Share @{name}'s profile",
+   "account.show_reblogs": "Show boosts from @{name}",
+-  "account.statuses_counter": "{count, plural, one {{counter} post} other {{counter} posts}}",
++  "account.statuses_counter": "{count, plural, one {{counter} toot} other {{counter} toots}}",
+   "account.timeline.pinned": "Pinned",
+-  "account.timeline.pinned.view_all": "View all pinned posts",
++  "account.timeline.pinned.view_all": "View all pinned toots",
+   "account.unblock": "Unblock @{name}",
+   "account.unblock_domain": "Unblock domain {domain}",
+   "account.unblock_domain_short": "Unblock",
+@@ -223,9 +223,9 @@
+   "account_edit.profile_tab.hint.title": "Displays still vary",
+   "account_edit.profile_tab.show_featured.description": "‘Featured’ is an optional tab where you can showcase other accounts.",
+   "account_edit.profile_tab.show_featured.title": "Show ‘Featured’ tab",
+-  "account_edit.profile_tab.show_media.description": "‘Media’ is an optional tab that shows your posts containing images or videos.",
++  "account_edit.profile_tab.show_media.description": "‘Media’ is an optional tab that shows your toots containing images or videos.",
+   "account_edit.profile_tab.show_media.title": "Show ‘Media’ tab",
+-  "account_edit.profile_tab.show_media_replies.description": "When enabled, Media tab shows both your posts and replies to other people’s posts.",
++  "account_edit.profile_tab.show_media_replies.description": "When enabled, Media tab shows both your toots and replies to other people’s toots.",
+   "account_edit.profile_tab.show_media_replies.title": "Include replies on ‘Media’ tab",
+   "account_edit.profile_tab.subtitle": "Customize the tabs on your profile and what they display.",
+   "account_edit.profile_tab.title": "Profile tab settings",
+@@ -255,7 +255,7 @@
+   "account_edit_tags.max_tags_reached": "You have reached the maximum number of featured hashtags.",
+   "account_edit_tags.search_placeholder": "Enter a hashtag…",
+   "account_edit_tags.suggestions": "Suggestions:",
+-  "account_edit_tags.tag_status_count": "{count, plural, one {# post} other {# posts}}",
++  "account_edit_tags.tag_status_count": "{count, plural, one {# toot} other {# toots}}",
+   "account_list.total": "{total, plural, one {# account} other {# accounts}}",
+   "account_note.placeholder": "Click to add note",
+   "admin.dashboard.daily_retention": "User retention rate by day after sign-up",
+@@ -289,21 +289,21 @@
+   "annual_report.shared_page.donate": "Donate",
+   "annual_report.shared_page.footer": "Generated with {heart} by the Mastodon team",
+   "annual_report.shared_page.footer_server_info": "{username} uses {domain}, one of many communities powered by Mastodon.",
+-  "annual_report.summary.archetype.booster.desc_public": "{name} stayed on the hunt for posts to boost, amplifying other creators with perfect aim.",
+-  "annual_report.summary.archetype.booster.desc_self": "You stayed on the hunt for posts to boost, amplifying other creators with perfect aim.",
++  "annual_report.summary.archetype.booster.desc_public": "{name} stayed on the hunt for toots to boost, amplifying other creators with perfect aim.",
++  "annual_report.summary.archetype.booster.desc_self": "You stayed on the hunt for toots to boost, amplifying other creators with perfect aim.",
+   "annual_report.summary.archetype.booster.name": "The Archer",
+   "annual_report.summary.archetype.die_drei_fragezeichen": "???",
+   "annual_report.summary.archetype.lurker.desc_public": "We know {name} was out there, somewhere, enjoying Mastodon in their own quiet way.",
+   "annual_report.summary.archetype.lurker.desc_self": "We know you were out there, somewhere, enjoying Mastodon in your own quiet way.",
+   "annual_report.summary.archetype.lurker.name": "The Stoic",
+-  "annual_report.summary.archetype.oracle.desc_public": "{name} created new posts more than replies, keeping Mastodon fresh and future-facing.",
+-  "annual_report.summary.archetype.oracle.desc_self": "You created new posts more than replies, keeping Mastodon fresh and future-facing.",
++  "annual_report.summary.archetype.oracle.desc_public": "{name} created new toots more than replies, keeping Mastodon fresh and future-facing.",
++  "annual_report.summary.archetype.oracle.desc_self": "You created new toots more than replies, keeping Mastodon fresh and future-facing.",
+   "annual_report.summary.archetype.oracle.name": "The Oracle",
+   "annual_report.summary.archetype.pollster.desc_public": "{name} created more polls than other post types, cultivating curiosity on Mastodon.",
+   "annual_report.summary.archetype.pollster.desc_self": "You created more polls than other post types, cultivating curiosity on Mastodon.",
+   "annual_report.summary.archetype.pollster.name": "The Wonderer",
+-  "annual_report.summary.archetype.replier.desc_public": "{name} frequently replied to other people’s posts, pollinating Mastodon with new discussions.",
+-  "annual_report.summary.archetype.replier.desc_self": "You frequently replied to other people’s posts, pollinating Mastodon with new discussions.",
++  "annual_report.summary.archetype.replier.desc_public": "{name} frequently replied to other people’s toots, pollinating Mastodon with new discussions.",
++  "annual_report.summary.archetype.replier.desc_self": "You frequently replied to other people’s toots, pollinating Mastodon with new discussions.",
+   "annual_report.summary.archetype.replier.name": "The Butterfly",
+   "annual_report.summary.archetype.reveal": "Reveal my archetype",
+   "annual_report.summary.archetype.reveal_description": "Thanks for being part of Mastodon! Time to find out which archetype you embodied in {year}.",
+@@ -318,9 +318,9 @@
+   "annual_report.summary.highlighted_post.title": "Most popular post",
+   "annual_report.summary.most_used_app.most_used_app": "most used app",
+   "annual_report.summary.most_used_hashtag.most_used_hashtag": "most used hashtag",
+-  "annual_report.summary.most_used_hashtag.used_count": "You included this hashtag in {count, plural, one {one post} other {# posts}}.",
+-  "annual_report.summary.most_used_hashtag.used_count_public": "{name} included this hashtag in {count, plural, one {one post} other {# posts}}.",
+-  "annual_report.summary.new_posts.new_posts": "new posts",
++  "annual_report.summary.most_used_hashtag.used_count": "You included this hashtag in {count, plural, one {one toot} other {# toots}}.",
++  "annual_report.summary.most_used_hashtag.used_count_public": "{name} included this hashtag in {count, plural, one {one toot} other {# toots}}.",
++  "annual_report.summary.new_posts.new_posts": "new toots",
+   "annual_report.summary.percentile.text": "<topLabel>That puts you in the top</topLabel><percentage></percentage><bottomLabel>of {domain} users.</bottomLabel>",
+   "annual_report.summary.percentile.we_wont_tell_bernie": "We won't tell Bernie.",
+   "annual_report.summary.share_elsewhere": "Share elsewhere",
+@@ -328,14 +328,14 @@
+   "annual_report.summary.share_on_mastodon": "Share on Mastodon",
+   "attachments_list.unprocessed": "(unprocessed)",
+   "audio.hide": "Hide audio",
+-  "block_modal.remote_users_caveat": "We will ask the server {domain} to respect your decision. However, compliance is not guaranteed since some servers may handle blocks differently. Public posts may still be visible to non-logged-in users.",
++  "block_modal.remote_users_caveat": "We will ask the server {domain} to respect your decision. However, compliance is not guaranteed since some servers may handle blocks differently. Public toots may still be visible to non-logged-in users.",
+   "block_modal.show_less": "Show less",
+   "block_modal.show_more": "Show more",
+   "block_modal.they_cant_mention": "They can't mention or follow you.",
+-  "block_modal.they_cant_see_posts": "They can't see your posts and you won't see theirs.",
++  "block_modal.they_cant_see_posts": "They can't see your toots and you won't see theirs.",
+   "block_modal.they_will_know": "They can see that they're blocked.",
+   "block_modal.title": "Block user?",
+-  "block_modal.you_wont_see_mentions": "You won't see posts that mention them.",
++  "block_modal.you_wont_see_mentions": "You won't see toots that mention them.",
+   "boost_modal.combo": "You can press {combo} to skip this next time",
+   "boost_modal.reblog": "Boost post?",
+   "boost_modal.undo_reblog": "Unboost post?",
+@@ -457,7 +457,7 @@
+   "column.my_collections": "My collections",
+   "column.notifications": "Notifications",
+   "column.other_collections": "Collections by {name}",
+-  "column.pins": "Pinned posts",
++  "column.pins": "Pinned toots",
+   "column.public": "Federated timeline",
+   "column_back_button.label": "Back",
+   "column_header.hide_settings": "Hide settings",
+@@ -478,13 +478,13 @@
+   "compose.error.blank_post": "Post can't be blank.",
+   "compose.language.change": "Change language",
+   "compose.language.search": "Search languages...",
+-  "compose.published.body": "Post published.",
++  "compose.published.body": "Toot published.",
+   "compose.published.open": "Open",
+   "compose.saved.body": "Post saved.",
+   "compose_form.direct_message_warning_learn_more": "Learn more",
+-  "compose_form.encryption_warning": "Posts on Mastodon are not end-to-end encrypted. Do not share any sensitive information over Mastodon.",
+-  "compose_form.hashtag_warning": "This post won't be listed under any hashtag as it is not public. Only public posts can be searched by hashtag.",
+-  "compose_form.lock_disclaimer": "Your account is not {locked}. Anyone can follow you to view your follower-only posts.",
++  "compose_form.encryption_warning": "Toots on Mastodon are not end-to-end encrypted. Do not share any sensitive information over Mastodon.",
++  "compose_form.hashtag_warning": "This post won't be listed under any hashtag as it is not public. Only public toots can be searched by hashtag.",
++  "compose_form.lock_disclaimer": "Your account is not {locked}. Anyone can follow you to view your follower-only toots.",
+   "compose_form.lock_disclaimer.lock": "locked",
+   "compose_form.placeholder": "What's on your mind?",
+   "compose_form.poll.duration": "Poll duration",
+@@ -494,7 +494,7 @@
+   "compose_form.poll.switch_to_multiple": "Change poll to allow multiple choices",
+   "compose_form.poll.switch_to_single": "Change poll to allow for a single choice",
+   "compose_form.poll.type": "Style",
+-  "compose_form.publish": "Post",
++  "compose_form.publish": "Toot",
+   "compose_form.reply": "Reply",
+   "compose_form.save_changes": "Update",
+   "compose_form.spoiler.marked": "Remove content warning",
+@@ -536,14 +536,14 @@
+   "confirmations.missing_alt_text.title": "Add alt text?",
+   "confirmations.mute.confirm": "Mute",
+   "confirmations.private_quote_notify.cancel": "Back to editing",
+-  "confirmations.private_quote_notify.confirm": "Publish post",
++  "confirmations.private_quote_notify.confirm": "Publish toot",
+   "confirmations.private_quote_notify.do_not_show_again": "Don't show me this message again",
+   "confirmations.private_quote_notify.message": "The person you are quoting and other mentions will be notified and will be able to view your post, even if they're not following you.",
+   "confirmations.private_quote_notify.title": "Share with followers and mentioned users?",
+   "confirmations.quiet_post_quote_info.dismiss": "Don't remind me again",
+   "confirmations.quiet_post_quote_info.got_it": "Got it",
+   "confirmations.quiet_post_quote_info.message": "When quoting a quiet public post, your post will be hidden from trending timelines.",
+-  "confirmations.quiet_post_quote_info.title": "Quoting quiet public posts",
++  "confirmations.quiet_post_quote_info.title": "Quoting quiet public toots",
+   "confirmations.redraft.confirm": "Delete & redraft",
+   "confirmations.redraft.message": "Are you sure you want to delete this post and re-draft it? Favorites and boosts will be lost, and replies to the original post will be orphaned.",
+   "confirmations.redraft.title": "Delete & redraft post?",
+@@ -580,35 +580,35 @@
+   "directory.recently_active": "Recently active",
+   "disabled_account_banner.account_settings": "Account settings",
+   "disabled_account_banner.text": "Your account {disabledAccount} is currently disabled.",
+-  "dismissable_banner.community_timeline": "These are the most recent public posts from people whose accounts are hosted by {domain}.",
++  "dismissable_banner.community_timeline": "These are the most recent public toots from people whose accounts are hosted by {domain}.",
+   "dismissable_banner.dismiss": "Dismiss",
+-  "dismissable_banner.public_timeline": "These are the most recent public posts from people on the fediverse that people on {domain} follow.",
++  "dismissable_banner.public_timeline": "These are the most recent public toots from people on the fediverse that people on {domain} follow.",
+   "domain_block_modal.block": "Block server",
+   "domain_block_modal.block_account_instead": "Block @{name} instead",
+-  "domain_block_modal.they_can_interact_with_old_posts": "People from this server can interact with your old posts.",
++  "domain_block_modal.they_can_interact_with_old_posts": "People from this server can interact with your old toots.",
+   "domain_block_modal.they_cant_follow": "Nobody from this server can follow you.",
+   "domain_block_modal.they_wont_know": "They won't know they've been blocked.",
+   "domain_block_modal.title": "Block domain?",
+   "domain_block_modal.you_will_lose_num_followers": "You will lose {followersCount, plural, one {{followersCountDisplay} follower} other {{followersCountDisplay} followers}} and {followingCount, plural, one {{followingCountDisplay} person you follow} other {{followingCountDisplay} people you follow}}.",
+   "domain_block_modal.you_will_lose_relationships": "You will lose all followers and people you follow from this server.",
+-  "domain_block_modal.you_wont_see_posts": "You won't see posts or notifications from users on this server.",
++  "domain_block_modal.you_wont_see_posts": "You won't see toots or notifications from users on this server.",
+   "domain_pill.activitypub_lets_connect": "It lets you connect and interact with people not just on Mastodon, but across different social apps too.",
+   "domain_pill.activitypub_like_language": "ActivityPub is like the language Mastodon speaks with other social networks.",
+   "domain_pill.server": "Server",
+   "domain_pill.their_handle": "Their handle:",
+-  "domain_pill.their_server": "Their digital home, where all of their posts live.",
++  "domain_pill.their_server": "Their digital home, where all of their toots live.",
+   "domain_pill.their_username": "Their unique identifier on their server. It’s possible to find users with the same username on different servers.",
+   "domain_pill.username": "Username",
+   "domain_pill.whats_in_a_handle": "What's in a handle?",
+   "domain_pill.who_they_are": "Since handles say who someone is and where they are, you can interact with people across the social web of <button>ActivityPub-powered platforms</button>.",
+   "domain_pill.who_you_are": "Because your handle says who you are and where you are, people can interact with you across the social web of <button>ActivityPub-powered platforms</button>.",
+   "domain_pill.your_handle": "Your handle:",
+-  "domain_pill.your_server": "Your digital home, where all of your posts live. Don’t like this one? Transfer servers at any time and bring your followers, too.",
++  "domain_pill.your_server": "Your digital home, where all of your toots live. Don’t like this one? Transfer servers at any time and bring your followers, too.",
+   "domain_pill.your_username": "Your unique identifier on this server. It’s possible to find users with the same username on different servers.",
+   "dropdown.empty": "Select an option",
+   "email_subscriptions.email": "Email",
+   "email_subscriptions.form.action": "Subscribe",
+-  "email_subscriptions.form.bottom": "Get posts in your inbox without creating a Mastodon account. Unsubscribe at any time. For more information, refer to the <a>Privacy Policy</a>.",
++  "email_subscriptions.form.bottom": "Get toots in your inbox without creating a Mastodon account. Unsubscribe at any time. For more information, refer to the <a>Privacy Policy</a>.",
+   "email_subscriptions.form.title": "Sign up for email updates from {name}",
+   "email_subscriptions.submitted.lead": "Check your inbox for an email to finish signing up for email updates.",
+   "email_subscriptions.submitted.title": "One more step",
+@@ -641,22 +641,22 @@
+   "empty_column.account_featured_unknown.other": "This account hasn’t featured anything yet.",
+   "empty_column.account_hides_collections": "This user has chosen to not make this information available",
+   "empty_column.account_suspended": "Account suspended",
+-  "empty_column.account_timeline": "No posts here!",
++  "empty_column.account_timeline": "No toots here!",
+   "empty_column.account_unavailable": "Profile unavailable",
+   "empty_column.blocks": "You haven't blocked any users yet.",
+-  "empty_column.bookmarked_statuses": "You don't have any bookmarked posts yet. When you bookmark one, it will show up here.",
++  "empty_column.bookmarked_statuses": "You don't have any bookmarked toots yet. When you bookmark one, it will show up here.",
+   "empty_column.community": "The local timeline is empty. Write something publicly to get the ball rolling!",
+   "empty_column.direct": "You don't have any private mentions yet. When you send or receive one, it will show up here.",
+   "empty_column.disabled_feed": "This feed has been disabled by your server administrators.",
+   "empty_column.domain_blocks": "There are no blocked domains yet.",
+   "empty_column.explore_statuses": "Nothing is trending right now. Check back later!",
+-  "empty_column.favourited_statuses": "You don't have any favorite posts yet. When you favorite one, it will show up here.",
++  "empty_column.favourited_statuses": "You don't have any favorite toots yet. When you favorite one, it will show up here.",
+   "empty_column.favourites": "No one has favorited this post yet. When someone does, they will show up here.",
+   "empty_column.follow_requests": "You don't have any follow requests yet. When you receive one, it will show up here.",
+   "empty_column.followed_tags": "You have not followed any hashtags yet. When you do, they will show up here.",
+   "empty_column.hashtag": "There is nothing in this hashtag yet.",
+   "empty_column.home": "Your home timeline is empty! Follow more people to fill it up.",
+-  "empty_column.list": "There is nothing in this list yet. When members of this list publish new posts, they will appear here.",
++  "empty_column.list": "There is nothing in this list yet. When members of this list publish new toots, they will appear here.",
+   "empty_column.mutes": "You haven't muted any users yet.",
+   "empty_column.notification_requests": "All clear! There is nothing here. When you receive new notifications, they will appear here according to your settings.",
+   "empty_column.notifications": "You don't have any notifications yet. When other people interact with you, you will see it here.",
+@@ -672,10 +672,10 @@
+   "explore.suggested_follows": "People",
+   "explore.title": "Trending",
+   "explore.trending_links": "News",
+-  "explore.trending_statuses": "Posts",
++  "explore.trending_statuses": "Toots",
+   "explore.trending_tags": "Hashtags",
+   "featured_carousel.current": "<sr>Post</sr> {current, number} / {max, number}",
+-  "featured_carousel.header": "{count, plural, one {Pinned Post} other {Pinned Posts}}",
++  "featured_carousel.header": "{count, plural, one {Pinned Toot} other {Pinned Toots}}",
+   "featured_carousel.slide": "Post {current, number} of {max, number}",
+   "featured_tags.more_items": "+{count}",
+   "featured_tags.suggestions": "Lately you’ve posted about {items}. Add these as featured hashtags?",
+@@ -743,8 +743,8 @@
+   "generic.saved": "Saved",
+   "getting_started.heading": "Getting started",
+   "hashtag.admin_moderation": "Open moderation interface for #{name}",
+-  "hashtag.browse": "Browse posts in #{hashtag}",
+-  "hashtag.browse_from_account": "Browse posts from @{name} in #{hashtag}",
++  "hashtag.browse": "Browse toots in #{hashtag}",
++  "hashtag.browse_from_account": "Browse toots from @{name} in #{hashtag}",
+   "hashtag.column_header.tag_mode.all": "and {additional}",
+   "hashtag.column_header.tag_mode.any": "or {additional}",
+   "hashtag.column_header.tag_mode.none": "without {additional}",
+@@ -755,8 +755,8 @@
+   "hashtag.column_settings.tag_mode.none": "None of these",
+   "hashtag.column_settings.tag_toggle": "Include additional tags for this column",
+   "hashtag.counter_by_accounts": "{count, plural, one {{counter} participant} other {{counter} participants}}",
+-  "hashtag.counter_by_uses": "{count, plural, one {{counter} post} other {{counter} posts}}",
+-  "hashtag.counter_by_uses_today": "{count, plural, one {{counter} post} other {{counter} posts}} today",
++  "hashtag.counter_by_uses": "{count, plural, one {{counter} post} other {{counter} toots}}",
++  "hashtag.counter_by_uses_today": "{count, plural, one {{counter} post} other {{counter} toots}} today",
+   "hashtag.feature": "Feature on profile",
+   "hashtag.follow": "Follow hashtag",
+   "hashtag.mute": "Mute #{hashtag}",
+@@ -765,10 +765,10 @@
+   "hashtags.and_other": "…and {count, plural, other {# more}}",
+   "hints.profiles.followers_may_be_missing": "Followers for this profile may be missing.",
+   "hints.profiles.follows_may_be_missing": "Follows for this profile may be missing.",
+-  "hints.profiles.posts_may_be_missing": "Some posts from this profile may be missing.",
++  "hints.profiles.posts_may_be_missing": "Some toots from this profile may be missing.",
+   "hints.profiles.see_more_followers": "See more followers on {domain}",
+   "hints.profiles.see_more_follows": "See more follows on {domain}",
+-  "hints.profiles.see_more_posts": "See more posts on {domain}",
++  "hints.profiles.see_more_posts": "See more toots on {domain}",
+   "home.column_settings.show_quotes": "Show quotes",
+   "home.column_settings.show_reblogs": "Show boosts",
+   "home.column_settings.show_replies": "Show replies",
+@@ -824,7 +824,7 @@
+   "keyboard_shortcuts.my_profile": "Open your profile",
+   "keyboard_shortcuts.notifications": "Open notifications column",
+   "keyboard_shortcuts.open_media": "Open media",
+-  "keyboard_shortcuts.pinned": "Open pinned posts list",
++  "keyboard_shortcuts.pinned": "Open pinned toots list",
+   "keyboard_shortcuts.profile": "Open author's profile",
+   "keyboard_shortcuts.quote": "Quote post",
+   "keyboard_shortcuts.reply": "Reply to post",
+@@ -850,7 +850,7 @@
+   "limited_account_hint.title": "This profile has been hidden by the moderators of {domain}.",
+   "link_preview.author": "By {name}",
+   "link_preview.more_from_author": "More from {name}",
+-  "link_preview.shares": "{count, plural, one {{counter} post} other {{counter} posts}}",
++  "link_preview.shares": "{count, plural, one {{counter} toot} other {{counter} toots}}",
+   "lists.add_member": "Add",
+   "lists.add_to_list": "Add to list",
+   "lists.add_to_lists": "Add {name} to lists",
+@@ -861,7 +861,7 @@
+   "lists.done": "Done",
+   "lists.edit": "Edit list",
+   "lists.exclusive": "Hide members in Home",
+-  "lists.exclusive_hint": "If someone is on this list, hide them in your Home feed to avoid seeing their posts twice.",
++  "lists.exclusive_hint": "If someone is on this list, hide them in your Home feed to avoid seeing their toots twice.",
+   "lists.find_users_to_add": "Find users to add",
+   "lists.list_members_count": "{count, plural, one {# member} other {# members}}",
+   "lists.list_name": "List name",
+@@ -887,8 +887,8 @@
+   "mute_modal.they_can_mention_and_follow": "They can mention and follow you, but you won't see them.",
+   "mute_modal.they_wont_know": "They won't know they've been muted.",
+   "mute_modal.title": "Mute user?",
+-  "mute_modal.you_wont_see_mentions": "You won't see posts that mention them.",
+-  "mute_modal.you_wont_see_posts": "They can still see your posts, but you won't see theirs.",
++  "mute_modal.you_wont_see_mentions": "You won't see toots that mention them.",
++  "mute_modal.you_wont_see_posts": "They can still see your toots, but you won't see theirs.",
+   "navigation_bar.about": "About",
+   "navigation_bar.account_settings": "Password and security",
+   "navigation_bar.administration": "Administration",
+@@ -912,7 +912,7 @@
+   "navigation_bar.moderation": "Moderation",
+   "navigation_bar.more": "More",
+   "navigation_bar.mutes": "Muted users",
+-  "navigation_bar.opened_in_classic_interface": "Posts, accounts, and other specific pages are opened by default in the classic web interface.",
++  "navigation_bar.opened_in_classic_interface": "Toots, accounts, and other specific pages are opened by default in the classic web interface.",
+   "navigation_bar.preferences": "Preferences",
+   "navigation_bar.privacy_and_reach": "Privacy and reach",
+   "navigation_bar.search": "Search",
+@@ -924,8 +924,8 @@
+   "not_signed_in_indicator.not_signed_in": "You need to login to access this resource.",
+   "notification.added_to_collection": "{name} added you to a collection",
+   "notification.admin.report": "{name} reported {target}",
+-  "notification.admin.report_account": "{name} reported {count, plural, one {one post} other {# posts}} from {target} for {category}",
+-  "notification.admin.report_account_other": "{name} reported {count, plural, one {one post} other {# posts}} from {target}",
++  "notification.admin.report_account": "{name} reported {count, plural, one {one toot} other {# toots}} from {target} for {category}",
++  "notification.admin.report_account_other": "{name} reported {count, plural, one {one toot} other {# toots}} from {target}",
+   "notification.admin.report_statuses": "{name} reported {target} for {category}",
+   "notification.admin.report_statuses_other": "{name} reported {target}",
+   "notification.admin.sign_up": "{name} signed up",
+@@ -950,11 +950,11 @@
+   "notification.mentioned_you": "{name} mentioned you",
+   "notification.moderation-warning.learn_more": "Learn more",
+   "notification.moderation_warning": "You have received a moderation warning",
+-  "notification.moderation_warning.action_delete_statuses": "Some of your posts have been removed.",
++  "notification.moderation_warning.action_delete_statuses": "Some of your toots have been removed.",
+   "notification.moderation_warning.action_disable": "Your account has been disabled.",
+-  "notification.moderation_warning.action_mark_statuses_as_sensitive": "Some of your posts have been marked as sensitive.",
++  "notification.moderation_warning.action_mark_statuses_as_sensitive": "Some of your toots have been marked as sensitive.",
+   "notification.moderation_warning.action_none": "Your account has received a moderation warning.",
+-  "notification.moderation_warning.action_sensitive": "Your posts will be marked as sensitive from now on.",
++  "notification.moderation_warning.action_sensitive": "Your toots will be marked as sensitive from now on.",
+   "notification.moderation_warning.action_silence": "Your account has been limited.",
+   "notification.moderation_warning.action_suspend": "Your account has been suspended.",
+   "notification.own_poll": "Your poll has ended",
+@@ -1007,7 +1007,7 @@
+   "notifications.column_settings.reblog": "Boosts:",
+   "notifications.column_settings.show": "Show in column",
+   "notifications.column_settings.sound": "Play sound",
+-  "notifications.column_settings.status": "New posts:",
++  "notifications.column_settings.status": "New toots:",
+   "notifications.column_settings.unread_notifications.category": "Unread notifications",
+   "notifications.column_settings.unread_notifications.highlight": "Highlight unread notifications",
+   "notifications.column_settings.update": "Edits:",
+@@ -1050,7 +1050,7 @@
+   "onboarding.follows.search": "Search",
+   "onboarding.follows.title": "Follow people to get started",
+   "onboarding.profile.discoverable": "Make my profile discoverable",
+-  "onboarding.profile.discoverable_hint": "When you opt in to discoverability on Mastodon, your posts may appear in search results and trending, and your profile may be suggested to people with similar interests to you.",
++  "onboarding.profile.discoverable_hint": "When you opt in to discoverability on Mastodon, your toots may appear in search results and trending, and your profile may be suggested to people with similar interests to you.",
+   "onboarding.profile.display_name": "Display name",
+   "onboarding.profile.display_name_hint": "Your full name or your fun name…",
+   "onboarding.profile.finish": "Finish",
+@@ -1115,7 +1115,7 @@
+   "reply_indicator.cancel": "Cancel",
+   "reply_indicator.poll": "Poll",
+   "report.block": "Block",
+-  "report.block_explanation": "You will not see their posts. They will not be able to see your posts or follow you. They will be able to tell that they are blocked.",
++  "report.block_explanation": "You will not see their toots. They will not be able to see your toots or follow you. They will be able to tell that they are blocked.",
+   "report.categories.legal": "Legal",
+   "report.categories.other": "Other",
+   "report.categories.spam": "Spam",
+@@ -1130,7 +1130,7 @@
+   "report.forward": "Forward to {target}",
+   "report.forward_hint": "The account is from another server. Send an anonymized copy of the report there as well?",
+   "report.mute": "Mute",
+-  "report.mute_explanation": "You will not see their posts. They can still follow you and see your posts and will not know that they are muted.",
++  "report.mute_explanation": "You will not see their toots. They can still follow you and see your toots and will not know that they are muted.",
+   "report.next": "Next",
+   "report.placeholder": "Additional comments",
+   "report.reasons.dislike": "I don't like it",
+@@ -1146,7 +1146,7 @@
+   "report.rules.subtitle": "Select all that apply",
+   "report.rules.title": "Which rules are being violated?",
+   "report.statuses.subtitle": "Select all that apply",
+-  "report.statuses.title": "Are there any posts that back up this report?",
++  "report.statuses.title": "Are there any toots that back up this report?",
+   "report.submission_error": "Report could not be submitted",
+   "report.submission_error_details": "Please check your network connection and try again later.",
+   "report.submit": "Submit",
+@@ -1156,8 +1156,8 @@
+   "report.thanks.title": "Don't want to see this?",
+   "report.thanks.title_actionable": "Thanks for reporting, we'll look into this.",
+   "report.unfollow": "Unfollow @{name}",
+-  "report.unfollow_explanation": "You are following this account. To not see their posts in your home feed anymore, unfollow them.",
+-  "report_notification.attached_statuses": "{count, plural, one {{count} post} other {{count} posts}} attached",
++  "report.unfollow_explanation": "You are following this account. To not see their toots in your home feed anymore, unfollow them.",
++  "report_notification.attached_statuses": "{count, plural, one {{count} toot} other {{count} toots}} attached",
+   "report_notification.categories.legal": "Legal",
+   "report_notification.categories.legal_sentence": "illegal content",
+   "report_notification.categories.other": "Other",
+@@ -1174,7 +1174,7 @@
+   "search.quick_action.go_to_account": "Go to profile {x}",
+   "search.quick_action.go_to_hashtag": "Go to hashtag {x}",
+   "search.quick_action.open_url": "Open URL in Mastodon",
+-  "search.quick_action.status_search": "Posts matching {x}",
++  "search.quick_action.status_search": "Toots matching {x}",
+   "search.search_or_paste": "Search or paste URL",
+   "search_popout.full_text_search_disabled_message": "Not available on {domain}.",
+   "search_popout.full_text_search_logged_out_message": "Only available when logged in.",
+@@ -1188,9 +1188,9 @@
+   "search_results.all": "All",
+   "search_results.hashtags": "Hashtags",
+   "search_results.no_results": "No results.",
+-  "search_results.no_search_yet": "Try searching for posts, profiles or hashtags.",
++  "search_results.no_search_yet": "Try searching for toots, profiles or hashtags.",
+   "search_results.see_all": "See all",
+-  "search_results.statuses": "Posts",
++  "search_results.statuses": "Toots",
+   "search_results.title": "Search for \"{q}\"",
+   "server_banner.about_active_users": "People using this server during the last 30 days (Monthly Active Users)",
+   "server_banner.active_users": "active users",
+@@ -1265,7 +1265,7 @@
+   "status.quote_noun": "Quote",
+   "status.quote_policy_change": "Change who can quote",
+   "status.quote_post_author": "Quoted a post by @{name}",
+-  "status.quote_private": "Private posts cannot be quoted",
++  "status.quote_private": "Private toots cannot be quoted",
+   "status.quotes.empty": "No one has quoted this post yet. When someone does, it will show up here.",
+   "status.quotes.local_other_disclaimer": "Quotes rejected by the author will not be shown.",
+   "status.quotes.remote_other_disclaimer": "Only quotes from {domain} are guaranteed to be shown here. Quotes rejected by the author will not be shown.",
+@@ -1299,13 +1299,13 @@
+   "status.uncached_media_warning": "Preview not available",
+   "status.unmute_conversation": "Unmute conversation",
+   "status.unpin": "Unpin from profile",
+-  "subscribed_languages.lead": "Only posts in selected languages will appear on your home and list timelines after the change. Select none to receive posts in all languages.",
++  "subscribed_languages.lead": "Only toots in selected languages will appear on your home and list timelines after the change. Select none to receive toots in all languages.",
+   "subscribed_languages.save": "Save changes",
+   "subscribed_languages.target": "Change subscribed languages for {target}",
+   "tabs_bar.home": "Home",
+   "tabs_bar.menu": "Menu",
+   "tabs_bar.notifications": "Notifications",
+-  "tabs_bar.publish": "New Post",
++  "tabs_bar.publish": "New Toot",
+   "tabs_bar.search": "Search",
+   "tag.remove": "Remove",
+   "terms_of_service.effective_as_of": "Effective as of {date}",
+@@ -1356,10 +1356,10 @@
+   "visibility_modal.header": "Visibility and interaction",
+   "visibility_modal.helper.direct_quoting": "Private mentions authored on Mastodon can't be quoted by others.",
+   "visibility_modal.helper.privacy_editing": "Visibility can't be changed after a post is published.",
+-  "visibility_modal.helper.privacy_private_self_quote": "Self-quotes of private posts cannot be made public.",
+-  "visibility_modal.helper.private_quoting": "Follower-only posts authored on Mastodon can't be quoted by others.",
++  "visibility_modal.helper.privacy_private_self_quote": "Self-quotes of private toots cannot be made public.",
++  "visibility_modal.helper.private_quoting": "Follower-only toots authored on Mastodon can't be quoted by others.",
+   "visibility_modal.helper.unlisted_quoting": "When people quote you, their post will also be hidden from trending timelines.",
+-  "visibility_modal.instructions": "Control who can interact with this post. You can also apply settings to all future posts by navigating to <link>Preferences > Posting defaults</link>.",
++  "visibility_modal.instructions": "Control who can interact with this post. You can also apply settings to all future toots by navigating to <link>Preferences > Posting defaults</link>.",
+   "visibility_modal.privacy_label": "Visibility",
+   "visibility_modal.quote_followers": "Followers only",
+   "visibility_modal.quote_label": "Who can quote",
+diff --git a/app/javascript/mastodon/locales/ko.json b/app/javascript/mastodon/locales/ko.json
+index e77e324fb2..368afbaaa0 100644
+--- a/app/javascript/mastodon/locales/ko.json
++++ b/app/javascript/mastodon/locales/ko.json
+@@ -280,7 +280,7 @@
+   "compose_form.poll.switch_to_multiple": "다중 선택이 가능한 투표로 변경",
+   "compose_form.poll.switch_to_single": "단일 선택 투표로 변경",
+   "compose_form.poll.type": "형식",
+-  "compose_form.publish": "게시",
++  "compose_form.publish": "뿌우",
+   "compose_form.reply": "답장",
+   "compose_form.save_changes": "수정",
+   "compose_form.spoiler.marked": "열람주의 제거",
+@@ -356,7 +356,7 @@
+   "disabled_account_banner.text": "당신의 계정 {disabledAccount}는 현재 비활성화 상태입니다.",
+   "dismissable_banner.community_timeline": "여기 있는 것들은 계정이 {domain}에 있는 사람들의 최근 공개 게시물들입니다.",
+   "dismissable_banner.dismiss": "지우기",
+-  "dismissable_banner.public_timeline": "이 게시물들은 {domain}에 있는 사람들이 팔로우하는 페디버스 사용자들의 최신 공개 게시물입니다.",
++  "dismissable_banner.public_timeline": "이 게시물들은 {domain}에 있는 사람들이 팔로우하는 연합우주 사용자들의 최신 공개 게시물입니다.",
+   "domain_block_modal.block": "서버 차단",
+   "domain_block_modal.block_account_instead": "대신 @{name} 차단",
+   "domain_block_modal.they_can_interact_with_old_posts": "이 서버에 있는 사람들이 내 예전 게시물에 상호작용할 수는 있습니다.",
+@@ -931,10 +931,10 @@
+   "server_banner.about_active_users": "30일 동안 이 서버를 사용한 사람들 (월간 활성 이용자)",
+   "server_banner.active_users": "활성 사용자",
+   "server_banner.administered_by": "관리자:",
+-  "server_banner.is_one_of_many": "{domain}은 페디버스를 통해 참여할 수 있는 많은 마스토돈 서버들 중 하나입니다",
++  "server_banner.is_one_of_many": "{domain}은 연합우주를 통해 참여할 수 있는 많은 마스토돈 서버들 중 하나입니다",
+   "server_banner.server_stats": "서버 통계:",
+   "sign_in_banner.create_account": "계정 생성",
+-  "sign_in_banner.follow_anyone": "페디버스를 통해 누구든지 팔로우하고 시간순으로 게시물을 받아보세요. 알고리즘도, 광고도, 클릭을 유도하는 것들도 없습니다.",
++  "sign_in_banner.follow_anyone": "연합우주를 통해 누구든지 팔로우하고 시간순으로 게시물을 받아보세요. 알고리즘도, 광고도, 클릭을 유도하는 것들도 없습니다.",
+   "sign_in_banner.mastodon_is": "마스토돈은 무엇이 일어나는지 받아보는 가장 좋은 수단입니다.",
+   "sign_in_banner.sign_in": "로그인",
+   "sign_in_banner.sso_redirect": "로그인 또는 가입하기",
+diff --git a/lib/mastodon/version.rb b/lib/mastodon/version.rb
+index 2a61199c05..a456f4b61c 100644
+--- a/lib/mastodon/version.rb
++++ b/lib/mastodon/version.rb
+@@ -25,7 +25,7 @@ module Mastodon
+     end
+ 
+     def build_metadata
+-      version_configuration[:metadata]
++      'YRYRneoA'
+     end
+ 
+     def to_a
+-- 
+2.54.0
+

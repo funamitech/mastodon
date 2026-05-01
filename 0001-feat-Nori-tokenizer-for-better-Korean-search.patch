@@ -1,0 +1,83 @@
+From 17ffee5a84b805bb94c974c3fbe39c865afb16e5 Mon Sep 17 00:00:00 2001
+From: Noa Himesaka <himesaka@noa.codes>
+Date: Fri, 1 May 2026 17:57:18 +0900
+Subject: [PATCH] feat: Nori tokenizer for better Korean search
+
+---
+ app/chewy/public_statuses_index.rb | 14 ++++++++------
+ app/chewy/statuses_index.rb        | 14 ++++++++------
+ 2 files changed, 16 insertions(+), 12 deletions(-)
+
+diff --git a/app/chewy/public_statuses_index.rb b/app/chewy/public_statuses_index.rb
+index c847b0283d..9011658eab 100644
+--- a/app/chewy/public_statuses_index.rb
++++ b/app/chewy/public_statuses_index.rb
+@@ -21,14 +21,16 @@ class PublicStatusesIndex < Chewy::Index
+       },
+     },
+ 
+-    analyzer: {
+-      verbatim: {
+-        tokenizer: 'uax_url_email',
+-        filter: %w(lowercase),
++    tokenizer: {
++      nori_user_dict: {
++        type: 'nori_tokenizer',
++        decompound_mode: 'mixed',
+       },
++    },
+ 
++    analyzer: {
+       content: {
+-        tokenizer: 'standard',
++        tokenizer: 'nori_user_dict',
+         filter: %w(
+           lowercase
+           asciifolding
+@@ -60,7 +62,7 @@ class PublicStatusesIndex < Chewy::Index
+   root date_detection: false do
+     field(:id, type: 'long')
+     field(:account_id, type: 'long')
+-    field(:text, type: 'text', analyzer: 'verbatim', value: ->(status) { status.searchable_text }) { field(:stemmed, type: 'text', analyzer: 'content') }
++    field(:text, type: 'text', analyzer: 'content', value: ->(status) { status.searchable_text }) { field(:stemmed, type: 'text', analyzer: 'content') }
+     field(:tags, type: 'text', analyzer: 'hashtag', value: ->(status) { status.tags.map(&:display_name) })
+     field(:language, type: 'keyword')
+     field(:properties, type: 'keyword', value: ->(status) { status.searchable_properties })
+diff --git a/app/chewy/statuses_index.rb b/app/chewy/statuses_index.rb
+index e739ccecb4..3482f451e2 100644
+--- a/app/chewy/statuses_index.rb
++++ b/app/chewy/statuses_index.rb
+@@ -21,14 +21,16 @@ class StatusesIndex < Chewy::Index
+       },
+     },
+ 
+-    analyzer: {
+-      verbatim: {
+-        tokenizer: 'uax_url_email',
+-        filter: %w(lowercase),
++    tokenizer: {
++      nori_user_dict: {
++        type: 'nori_tokenizer',
++        decompound_mode: 'mixed',
+       },
++    },
+ 
++    analyzer: {
+       content: {
+-        tokenizer: 'standard',
++        tokenizer: 'nori_user_dict',
+         filter: %w(
+           lowercase
+           asciifolding
+@@ -57,7 +59,7 @@ class StatusesIndex < Chewy::Index
+   root date_detection: false do
+     field(:id, type: 'long')
+     field(:account_id, type: 'long')
+-    field(:text, type: 'text', analyzer: 'verbatim', value: ->(status) { status.searchable_text }) { field(:stemmed, type: 'text', analyzer: 'content') }
++    field(:text, type: 'text', analyzer: 'content', value: ->(status) { status.searchable_text }) { field(:stemmed, type: 'text', analyzer: 'content') }
+     field(:tags, type: 'text', analyzer: 'hashtag',  value: ->(status) { status.tags.map(&:display_name) })
+     field(:searchable_by, type: 'long', value: ->(status) { status.searchable_by })
+     field(:language, type: 'keyword')
+-- 
+2.54.0
+

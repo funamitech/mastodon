@@ -1,0 +1,34 @@
+From 8534ee832f1de20192d3b427ac61d10ff5257c6d Mon Sep 17 00:00:00 2001
+From: Noa Himesaka <himesaka@noa.codes>
+Date: Fri, 1 May 2026 17:58:58 +0900
+Subject: [PATCH] feat: YuruToot-specific theme color
+
+---
+ app/helpers/theme_helper.rb | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
+
+diff --git a/app/helpers/theme_helper.rb b/app/helpers/theme_helper.rb
+index a434ef40ff..a741080a70 100644
+--- a/app/helpers/theme_helper.rb
++++ b/app/helpers/theme_helper.rb
+@@ -27,13 +27,11 @@ module ThemeHelper
+     case color_scheme
+     when 'auto'
+       ''.html_safe.tap do |tags|
+-        tags << tag.meta(name: 'theme-color', content: Themes::THEME_COLORS[:dark], media: '(prefers-color-scheme: dark)')
+-        tags << tag.meta(name: 'theme-color', content: Themes::THEME_COLORS[:light], media: '(prefers-color-scheme: light)')
++        tags << tag.meta(name: 'theme-color', content: '#787878', media: '(prefers-color-scheme: dark)')
++        tags << tag.meta(name: 'theme-color', content: '#787878', media: '(prefers-color-scheme: light)')
+       end
+-    when 'light'
+-      tag.meta name: 'theme-color', content: Themes::THEME_COLORS[:light]
+-    when 'dark'
+-      tag.meta name: 'theme-color', content: Themes::THEME_COLORS[:dark]
++    else
++      tag.meta name: 'theme-color', content: '#787878'
+     end
+   end
+ 
+-- 
+2.54.0
+

@@ -1,0 +1,1825 @@
+From fa295a2bfc678434c1b09978e48c90da2dea63fa Mon Sep 17 00:00:00 2001
+From: Noa Himesaka <himesaka@noa.codes>
+Date: Fri, 1 May 2026 18:26:58 +0900
+Subject: [PATCH] feat: remove GitHub Actions CI
+
+---
+ .github/workflows/build-container-image.yml   | 170 --------
+ .github/workflows/build-nightly.yml           |  60 ---
+ .github/workflows/build-push-pr.yml           |  58 ---
+ .github/workflows/build-releases.yml          |  82 ----
+ .github/workflows/build-security.yml          |  57 ---
+ .github/workflows/bundler-audit.yml           |  39 --
+ .github/workflows/check-i18n.yml              |  51 ---
+ .github/workflows/chromatic.yml               |  62 ---
+ .github/workflows/codeql.yml                  |  66 ---
+ .github/workflows/crowdin-download-stable.yml |  70 ----
+ .github/workflows/crowdin-download.yml        |  72 ----
+ .github/workflows/crowdin-upload.yml          |  39 --
+ .github/workflows/format-check.yml            |  22 -
+ .github/workflows/lint-css.yml                |  41 --
+ .github/workflows/lint-haml.yml               |  45 --
+ .github/workflows/lint-js.yml                 |  48 ---
+ .github/workflows/lint-ruby.yml               |  50 ---
+ .github/workflows/rebase-needed.yml           |  28 --
+ .github/workflows/test-image-build.yml        |  34 --
+ .github/workflows/test-js.yml                 |  43 --
+ .github/workflows/test-migrations.yml         | 112 -----
+ .github/workflows/test-ruby.yml               | 389 ------------------
+ 22 files changed, 1638 deletions(-)
+ delete mode 100644 .github/workflows/build-container-image.yml
+ delete mode 100644 .github/workflows/build-nightly.yml
+ delete mode 100644 .github/workflows/build-push-pr.yml
+ delete mode 100644 .github/workflows/build-releases.yml
+ delete mode 100644 .github/workflows/build-security.yml
+ delete mode 100644 .github/workflows/bundler-audit.yml
+ delete mode 100644 .github/workflows/check-i18n.yml
+ delete mode 100644 .github/workflows/chromatic.yml
+ delete mode 100644 .github/workflows/codeql.yml
+ delete mode 100644 .github/workflows/crowdin-download-stable.yml
+ delete mode 100644 .github/workflows/crowdin-download.yml
+ delete mode 100644 .github/workflows/crowdin-upload.yml
+ delete mode 100644 .github/workflows/format-check.yml
+ delete mode 100644 .github/workflows/lint-css.yml
+ delete mode 100644 .github/workflows/lint-haml.yml
+ delete mode 100644 .github/workflows/lint-js.yml
+ delete mode 100644 .github/workflows/lint-ruby.yml
+ delete mode 100644 .github/workflows/rebase-needed.yml
+ delete mode 100644 .github/workflows/test-image-build.yml
+ delete mode 100644 .github/workflows/test-js.yml
+ delete mode 100644 .github/workflows/test-migrations.yml
+ delete mode 100644 .github/workflows/test-ruby.yml
+
+diff --git a/.github/workflows/build-container-image.yml b/.github/workflows/build-container-image.yml
+deleted file mode 100644
+index 595011a0c6..0000000000
+--- a/.github/workflows/build-container-image.yml
++++ /dev/null
+@@ -1,170 +0,0 @@
+-on:
+-  workflow_call:
+-    inputs:
+-      cache:
+-        type: boolean
+-        default: true
+-      push_to_images:
+-        type: string
+-      version_prerelease:
+-        type: string
+-      version_metadata:
+-        type: string
+-      flavor:
+-        type: string
+-      tags:
+-        type: string
+-      labels:
+-        type: string
+-      file_to_build:
+-        type: string
+-
+-# This builds multiple images with one runner each, allowing us to build for multiple architectures
+-# using Github's runners.
+-# The two-step process is adapted form:
+-# https://docs.docker.com/build/ci/github-actions/multi-platform/#distribute-build-across-multiple-runners
+-jobs:
+-  # Build each (amd64 and arm64) image separately
+-  build-image:
+-    runs-on: ${{ startsWith(matrix.platform, 'linux/arm') && 'ubuntu-24.04-arm' || 'ubuntu-24.04' }}
+-    strategy:
+-      fail-fast: false
+-      matrix:
+-        platform:
+-          - linux/amd64
+-          - linux/arm64
+-
+-    steps:
+-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+-
+-      - name: Prepare
+-        env:
+-          PUSH_TO_IMAGES: ${{ inputs.push_to_images }}
+-        run: |
+-          platform=${{ matrix.platform }}
+-          echo "PLATFORM_PAIR=${platform//\//-}" >> $GITHUB_ENV
+-          # Transform multi-line variable into comma-separated variable
+-          image_names=${PUSH_TO_IMAGES//$'\n'/,}
+-          echo "IMAGE_NAMES=${image_names%,}" >> $GITHUB_ENV
+-
+-      - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
+-        id: buildx
+-
+-      - name: Log in to Docker Hub
+-        if: contains(inputs.push_to_images, 'tootsuite')
+-        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
+-        with:
+-          username: ${{ secrets.DOCKERHUB_USERNAME }}
+-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+-
+-      - name: Log in to the GitHub Container registry
+-        if: contains(inputs.push_to_images, 'ghcr.io')
+-        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
+-        with:
+-          registry: ghcr.io
+-          username: ${{ github.actor }}
+-          password: ${{ secrets.GITHUB_TOKEN }}
+-
+-      - name: Docker meta
+-        id: meta
+-        uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051 # v5
+-        if: ${{ inputs.push_to_images != '' }}
+-        with:
+-          images: ${{ inputs.push_to_images }}
+-          flavor: ${{ inputs.flavor }}
+-          labels: ${{ inputs.labels }}
+-
+-      - name: Build and push by digest
+-        id: build
+-        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6
+-        with:
+-          context: .
+-          file: ${{ inputs.file_to_build }}
+-          build-args: |
+-            MASTODON_VERSION_PRERELEASE=${{ inputs.version_prerelease }}
+-            MASTODON_VERSION_METADATA=${{ inputs.version_metadata }}
+-            SOURCE_COMMIT=${{ github.sha }}
+-          platforms: ${{ matrix.platform }}
+-          provenance: false
+-          push: ${{ inputs.push_to_images != '' }}
+-          cache-from: ${{ inputs.cache && 'type=gha' || '' }}
+-          cache-to: ${{ inputs.cache && 'type=gha,mode=max' || '' }}
+-          outputs: type=image,"name=${{ env.IMAGE_NAMES }}",push-by-digest=true,name-canonical=true,push=${{ inputs.push_to_images != '' }}
+-
+-      - name: Export digest
+-        if: ${{ inputs.push_to_images != '' }}
+-        run: |
+-          mkdir -p "${{ runner.temp }}/digests"
+-          digest="${{ steps.build.outputs.digest }}"
+-          touch "${{ runner.temp }}/digests/${digest#sha256:}"
+-
+-      - name: Upload digest
+-        if: ${{ inputs.push_to_images != '' }}
+-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+-        with:
+-          # `hashFiles` is used to disambiguate between streaming and non-streaming images
+-          name: digests-${{ hashFiles(inputs.file_to_build) }}-${{ env.PLATFORM_PAIR }}
+-          path: ${{ runner.temp }}/digests/*
+-          if-no-files-found: error
+-          retention-days: 1
+-
+-  # Then merge the docker images into a single one
+-  merge-images:
+-    if: ${{ inputs.push_to_images != '' }}
+-    runs-on: ubuntu-24.04
+-    needs:
+-      - build-image
+-
+-    env:
+-      PUSH_TO_IMAGES: ${{ inputs.push_to_images }}
+-
+-    steps:
+-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+-
+-      - name: Download digests
+-        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+-        with:
+-          path: ${{ runner.temp }}/digests
+-          # `hashFiles` is used to disambiguate between streaming and non-streaming images
+-          pattern: digests-${{ hashFiles(inputs.file_to_build) }}-*
+-          merge-multiple: true
+-
+-      - name: Log in to Docker Hub
+-        if: contains(inputs.push_to_images, 'tootsuite')
+-        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
+-        with:
+-          username: ${{ secrets.DOCKERHUB_USERNAME }}
+-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+-
+-      - name: Log in to the GitHub Container registry
+-        if: contains(inputs.push_to_images, 'ghcr.io')
+-        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
+-        with:
+-          registry: ghcr.io
+-          username: ${{ github.actor }}
+-          password: ${{ secrets.GITHUB_TOKEN }}
+-
+-      - name: Set up Docker Buildx
+-        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
+-
+-      - name: Docker meta
+-        id: meta
+-        uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051 # v5
+-        if: ${{ inputs.push_to_images != '' }}
+-        with:
+-          images: ${{ inputs.push_to_images }}
+-          flavor: ${{ inputs.flavor }}
+-          tags: ${{ inputs.tags }}
+-          labels: ${{ inputs.labels }}
+-
+-      - name: Create manifest list and push
+-        working-directory: ${{ runner.temp }}/digests
+-        run: |
+-          echo "$PUSH_TO_IMAGES" | xargs -I{} \
+-            docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
+-              $(printf '{}@sha256:%s ' *)
+-
+-      - name: Inspect image
+-        run: |
+-          echo "$PUSH_TO_IMAGES" | xargs -i{} \
+-            docker buildx imagetools inspect {}:${{ steps.meta.outputs.version }}
+diff --git a/.github/workflows/build-nightly.yml b/.github/workflows/build-nightly.yml
+deleted file mode 100644
+index 7dda6cb350..0000000000
+--- a/.github/workflows/build-nightly.yml
++++ /dev/null
+@@ -1,60 +0,0 @@
+-name: Build nightly container image
+-on:
+-  workflow_dispatch:
+-  schedule:
+-    - cron: '0 2 * * *' # run at 2 AM UTC
+-
+-permissions:
+-  contents: read
+-  packages: write
+-
+-jobs:
+-  compute-suffix:
+-    runs-on: ubuntu-latest
+-    if: github.repository == 'glitch-soc/mastodon'
+-    steps:
+-      - id: version_vars
+-        env:
+-          TZ: Etc/UTC
+-        run: |
+-          echo mastodon_version_prerelease=nightly.$(date +'%Y-%m-%d')>> $GITHUB_OUTPUT
+-    outputs:
+-      prerelease: ${{ steps.version_vars.outputs.mastodon_version_prerelease }}
+-
+-  build-image:
+-    needs: compute-suffix
+-    uses: ./.github/workflows/build-container-image.yml
+-    with:
+-      file_to_build: Dockerfile
+-      cache: false
+-      push_to_images: |
+-        ghcr.io/${{ github.repository_owner }}/mastodon
+-      version_prerelease: ${{ needs.compute-suffix.outputs.prerelease }}
+-      labels: |
+-        org.opencontainers.image.description=Nightly build image used for testing purposes
+-      flavor: |
+-        latest=auto
+-      tags: |
+-        type=raw,value=edge
+-        type=raw,value=nightly
+-        type=schedule,pattern=${{ needs.compute-suffix.outputs.prerelease }}
+-    secrets: inherit
+-
+-  build-image-streaming:
+-    needs: compute-suffix
+-    uses: ./.github/workflows/build-container-image.yml
+-    with:
+-      file_to_build: streaming/Dockerfile
+-      cache: false
+-      push_to_images: |
+-        ghcr.io/${{ github.repository_owner }}/mastodon-streaming
+-      version_prerelease: ${{ needs.compute-suffix.outputs.prerelease }}
+-      labels: |
+-        org.opencontainers.image.description=Nightly build image used for testing purposes
+-      flavor: |
+-        latest=auto
+-      tags: |
+-        type=raw,value=edge
+-        type=raw,value=nightly
+-        type=schedule,pattern=${{ needs.compute-suffix.outputs.prerelease }}
+-    secrets: inherit
+diff --git a/.github/workflows/build-push-pr.yml b/.github/workflows/build-push-pr.yml
+deleted file mode 100644
+index ead1ecd082..0000000000
+--- a/.github/workflows/build-push-pr.yml
++++ /dev/null
+@@ -1,58 +0,0 @@
+-name: Build container image for PR
+-on:
+-  pull_request:
+-    types: [labeled, synchronize, reopened, ready_for_review, opened]
+-
+-permissions:
+-  contents: read
+-  packages: write
+-
+-jobs:
+-  compute-suffix:
+-    runs-on: ubuntu-latest
+-    # This is only allowed to run if:
+-    # - the PR branch is in the `mastodon/mastodon` repository
+-    # - the PR is not a draft
+-    # - the PR has the "build-image" label
+-    if: ${{ github.event.pull_request.head.repo.full_name == github.repository && !github.event.pull_request.draft && contains(github.event.pull_request.labels.*.name, 'build-image') }}
+-    steps:
+-      # Repository needs to be cloned so `git rev-parse` below works
+-      - name: Clone repository
+-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+-      - id: version_vars
+-        run: |
+-          echo mastodon_version_metadata=pr-${{ github.event.pull_request.number }}-$(git rev-parse --short ${{github.event.pull_request.head.sha}}) >> $GITHUB_OUTPUT
+-          echo mastodon_short_sha=$(git rev-parse --short ${{github.event.pull_request.head.sha}}) >> $GITHUB_OUTPUT
+-    outputs:
+-      metadata: ${{ steps.version_vars.outputs.mastodon_version_metadata }}
+-      short_sha: ${{ steps.version_vars.outputs.mastodon_short_sha }}
+-
+-  build-image:
+-    needs: compute-suffix
+-    uses: ./.github/workflows/build-container-image.yml
+-    with:
+-      file_to_build: Dockerfile
+-      push_to_images: |
+-        ghcr.io/${{ github.repository_owner }}/mastodon
+-      version_metadata: ${{ needs.compute-suffix.outputs.metadata }}
+-      flavor: |
+-        latest=auto
+-      tags: |
+-        type=ref,event=pr
+-        type=ref,event=pr,suffix=-${{ needs.compute-suffix.outputs.short_sha }}
+-    secrets: inherit
+-
+-  build-image-streaming:
+-    needs: compute-suffix
+-    uses: ./.github/workflows/build-container-image.yml
+-    with:
+-      file_to_build: streaming/Dockerfile
+-      push_to_images: |
+-        ghcr.io/${{ github.repository_owner }}/mastodon-streaming
+-      version_metadata: ${{ needs.compute-suffix.outputs.metadata }}
+-      flavor: |
+-        latest=auto
+-      tags: |
+-        type=ref,event=pr
+-        type=ref,event=pr,suffix=-${{ needs.compute-suffix.outputs.short_sha }}
+-    secrets: inherit
+diff --git a/.github/workflows/build-releases.yml b/.github/workflows/build-releases.yml
+deleted file mode 100644
+index c5a1842dff..0000000000
+--- a/.github/workflows/build-releases.yml
++++ /dev/null
+@@ -1,82 +0,0 @@
+-name: Build container release images
+-on:
+-  push:
+-    tags:
+-      - '*'
+-
+-permissions:
+-  contents: read
+-  packages: write
+-
+-jobs:
+-  check-latest-stable:
+-    runs-on: ubuntu-latest
+-    outputs:
+-      latest: ${{ steps.check.outputs.is_latest_stable }}
+-    steps:
+-      # Repository needs to be cloned to list branches
+-      - name: Clone repository
+-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+-        with:
+-          fetch-depth: 0
+-
+-      - name: Check latest stable
+-        shell: bash
+-        id: check
+-        run: |
+-          ref="${GITHUB_REF#refs/tags/}"
+-
+-          if [[ "$ref" =~ ^v([0-9]+)\.([0-9]+)(\.[0-9]+)?$ ]]; then
+-            current="${BASH_REMATCH[1]}.${BASH_REMATCH[2]}"
+-          else
+-            echo "tag $ref is not semver"
+-            echo "is_latest_stable=false" >> "$GITHUB_OUTPUT"
+-            exit 0
+-          fi
+-
+-          latest=$(git for-each-ref --format='%(refname:short)' "refs/remotes/origin/stable-*.*" \
+-            | sed -E 's#^origin/stable-##' \
+-            | sort -Vr \
+-            | head -n1)
+-
+-          if [[ "$current" == "$latest" ]]; then
+-            echo "is_latest_stable=true" >> "$GITHUB_OUTPUT"
+-          else
+-            echo "is_latest_stable=false" >> "$GITHUB_OUTPUT"
+-          fi
+-
+-  build-image:
+-    needs: check-latest-stable
+-    uses: ./.github/workflows/build-container-image.yml
+-    with:
+-      file_to_build: Dockerfile
+-      push_to_images: |
+-        ghcr.io/${{ github.repository_owner }}/mastodon
+-      # Do not use cache when building releases, so apt update is always ran and the release always contain the latest packages
+-      cache: false
+-      # Only tag with latest when ran against the latest stable branch
+-      # This needs to be updated after each minor version release
+-      flavor: |
+-        latest=${{ needs.check-latest-stable.outputs.latest }}
+-      tags: |
+-        type=pep440,pattern={{raw}}
+-        type=pep440,pattern=v{{major}}.{{minor}}
+-    secrets: inherit
+-
+-  build-image-streaming:
+-    needs: check-latest-stable
+-    uses: ./.github/workflows/build-container-image.yml
+-    with:
+-      file_to_build: streaming/Dockerfile
+-      push_to_images: |
+-        ghcr.io/${{ github.repository_owner }}/mastodon-streaming
+-      # Do not use cache when building releases, so apt update is always ran and the release always contain the latest packages
+-      cache: false
+-      # Only tag with latest when ran against the latest stable branch
+-      # This needs to be updated after each minor version release
+-      flavor: |
+-        latest=${{ needs.check-latest-stable.outputs.latest }}
+-      tags: |
+-        type=pep440,pattern={{raw}}
+-        type=pep440,pattern=v{{major}}.{{minor}}
+-    secrets: inherit
+diff --git a/.github/workflows/build-security.yml b/.github/workflows/build-security.yml
+deleted file mode 100644
+index 32a2d534bd..0000000000
+--- a/.github/workflows/build-security.yml
++++ /dev/null
+@@ -1,57 +0,0 @@
+-name: Build security nightly container image
+-on:
+-  workflow_dispatch:
+-
+-permissions:
+-  contents: read
+-  packages: write
+-
+-jobs:
+-  compute-suffix:
+-    runs-on: ubuntu-latest
+-    steps:
+-      - id: version_vars
+-        env:
+-          TZ: Etc/UTC
+-        run: |
+-          echo mastodon_version_prerelease=nightly.$(date --date='next day' +'%Y-%m-%d')-security>> $GITHUB_OUTPUT
+-    outputs:
+-      prerelease: ${{ steps.version_vars.outputs.mastodon_version_prerelease }}
+-
+-  build-image:
+-    needs: compute-suffix
+-    uses: ./.github/workflows/build-container-image.yml
+-    with:
+-      file_to_build: Dockerfile
+-      cache: false
+-      push_to_images: |
+-        ghcr.io/${{ github.repository_owner }}/mastodon
+-      version_prerelease: ${{ needs.compute-suffix.outputs.prerelease }}
+-      labels: |
+-        org.opencontainers.image.description=Nightly build image used for testing purposes
+-      flavor: |
+-        latest=auto
+-      tags: |
+-        type=raw,value=edge
+-        type=raw,value=nightly
+-        type=raw,value=${{ needs.compute-suffix.outputs.prerelease }}
+-    secrets: inherit
+-
+-  build-image-streaming:
+-    needs: compute-suffix
+-    uses: ./.github/workflows/build-container-image.yml
+-    with:
+-      file_to_build: streaming/Dockerfile
+-      cache: false
+-      push_to_images: |
+-        ghcr.io/${{ github.repository_owner }}/mastodon-streaming
+-      version_prerelease: ${{ needs.compute-suffix.outputs.prerelease }}
+-      labels: |
+-        org.opencontainers.image.description=Nightly build image used for testing purposes
+-      flavor: |
+-        latest=auto
+-      tags: |
+-        type=raw,value=edge
+-        type=raw,value=nightly
+-        type=raw,value=${{ needs.compute-suffix.outputs.prerelease }}
+-    secrets: inherit
+diff --git a/.github/workflows/bundler-audit.yml b/.github/workflows/bundler-audit.yml
+deleted file mode 100644
+index 964d93378d..0000000000
+--- a/.github/workflows/bundler-audit.yml
++++ /dev/null
+@@ -1,39 +0,0 @@
+-name: Bundler Audit
+-on:
+-  merge_group:
+-  push:
+-    branches:
+-      - 'main'
+-      - 'stable-*'
+-    paths:
+-      - 'Gemfile*'
+-      - '.ruby-version'
+-      - '.github/workflows/bundler-audit.yml'
+-
+-  pull_request:
+-    paths:
+-      - 'Gemfile*'
+-      - '.ruby-version'
+-      - '.github/workflows/bundler-audit.yml'
+-
+-  schedule:
+-    - cron: '0 5 * * 1'
+-
+-jobs:
+-  security:
+-    runs-on: ubuntu-latest
+-
+-    env:
+-      BUNDLE_ONLY: development
+-
+-    steps:
+-      - name: Clone repository
+-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+-
+-      - name: Set up Ruby
+-        uses: ruby/setup-ruby@c984c1a20bb35a1cbda04477c816cea024418be9 # v1
+-        with:
+-          bundler-cache: true
+-
+-      - name: Run bundler-audit
+-        run: bin/bundler-audit check --update
+diff --git a/.github/workflows/check-i18n.yml b/.github/workflows/check-i18n.yml
+deleted file mode 100644
+index 4906ab6cf4..0000000000
+--- a/.github/workflows/check-i18n.yml
++++ /dev/null
+@@ -1,51 +0,0 @@
+-name: Check i18n
+-
+-on:
+-  push:
+-    branches:
+-      - 'main'
+-      - 'stable-*'
+-  pull_request:
+-    branches:
+-      - 'main'
+-      - 'stable-*'
+-
+-env:
+-  RAILS_ENV: test
+-
+-permissions:
+-  contents: read
+-
+-jobs:
+-  check-i18n:
+-    runs-on: ubuntu-latest
+-
+-    steps:
+-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+-
+-      - name: Set up Ruby environment
+-        uses: ./.github/actions/setup-ruby
+-
+-      - name: Set up Javascript environment
+-        uses: ./.github/actions/setup-javascript
+-
+-      - name: Check for missing strings in English JSON
+-        run: |
+-          yarn i18n:extract --throws
+-          git diff --exit-code
+-
+-      - name: Check locale file normalization
+-        run: bin/i18n-tasks check-normalized
+-
+-      - name: Check for unused strings
+-        run: bin/i18n-tasks unused
+-
+-      - name: Check for missing strings in English YML
+-        run: |
+-          bin/i18n-tasks missing -t used -l en
+-
+-      - name: Check for wrong string interpolations
+-        run: bin/i18n-tasks check-consistent-interpolations
+-
+-      - name: Check that all required locale files exist
+-        run: bin/rake repo:check_locales_files
+diff --git a/.github/workflows/chromatic.yml b/.github/workflows/chromatic.yml
+deleted file mode 100644
+index 19548c28c1..0000000000
+--- a/.github/workflows/chromatic.yml
++++ /dev/null
+@@ -1,62 +0,0 @@
+-name: 'Chromatic'
+-permissions:
+-  contents: read
+-
+-on:
+-  push:
+-    branches-ignore:
+-      - renovate/*
+-      - stable-*
+-
+-jobs:
+-  pathcheck:
+-    name: Check for relevant changes
+-    runs-on: ubuntu-latest
+-    outputs:
+-      changed: ${{ steps.filter.outputs.src }}
+-    steps:
+-      - name: Checkout code
+-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+-        with:
+-          fetch-depth: 0
+-
+-      - uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3
+-        id: filter
+-        with:
+-          filters: |
+-            src:
+-              - 'package.json'
+-              - 'yarn.lock'
+-              - '**/*.js'
+-              - '**/*.jsx'
+-              - '**/*.ts'
+-              - '**/*.tsx'
+-              - '**/*.css'
+-              - '**/*.scss'
+-              - '.github/workflows/chromatic.yml'
+-
+-  chromatic:
+-    name: Run Chromatic
+-    runs-on: ubuntu-latest
+-    needs: pathcheck
+-    if: github.repository == 'mastodon/mastodon' && needs.pathcheck.outputs.changed == 'true'
+-    steps:
+-      - name: Checkout code
+-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+-        with:
+-          fetch-depth: 0
+-
+-      - name: Set up Javascript environment
+-        uses: ./.github/actions/setup-javascript
+-
+-      - name: Build Storybook
+-        run: yarn build-storybook
+-
+-      - name: Run Chromatic
+-        uses: chromaui/action@07791f8243f4cb2698bf4d00426baf4b2d1cb7e0 # v13
+-        with:
+-          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+-          zip: true
+-          storybookBuildDir: 'storybook-static'
+-          exitOnceUploaded: true # Exit immediately after upload
+-          autoAcceptChanges: 'main' # Auto-accept changes on main branch only
+diff --git a/.github/workflows/codeql.yml b/.github/workflows/codeql.yml
+deleted file mode 100644
+index 4e55219f55..0000000000
+--- a/.github/workflows/codeql.yml
++++ /dev/null
+@@ -1,66 +0,0 @@
+-name: 'CodeQL'
+-
+-on:
+-  merge_group:
+-  push:
+-    branches:
+-      - 'main'
+-      - 'stable-*'
+-  pull_request:
+-    branches:
+-      - 'main'
+-      - 'stable-*'
+-  schedule:
+-    - cron: '22 6 * * 1'
+-
+-jobs:
+-  analyze:
+-    name: Analyze
+-    runs-on: ubuntu-latest
+-    permissions:
+-      actions: read
+-      contents: read
+-      security-events: write
+-
+-    strategy:
+-      fail-fast: false
+-      matrix:
+-        language: ['actions', 'javascript', 'ruby']
+-        # CodeQL supports [ 'actions', 'cpp', 'csharp', 'go', 'java', 'javascript', 'python', 'ruby' ]
+-        # Learn more about CodeQL language support at https://aka.ms/codeql-docs/language-support
+-
+-    steps:
+-      - name: Checkout repository
+-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+-
+-      # Initializes the CodeQL tools for scanning.
+-      - name: Initialize CodeQL
+-        uses: github/codeql-action/init@45cbd0c69e560cd9e7cd7f8c32362050c9b7ded2 # v4
+-        with:
+-          languages: ${{ matrix.language }}
+-          # If you wish to specify custom queries, you can do so here or in a config file.
+-          # By default, queries listed here will override any specified in a config file.
+-          # Prefix the list here with "+" to use these queries and those in the config file.
+-
+-          # Details on CodeQL's query packs refer to : https://docs.github.com/en/code-security/code-scanning/automatically-scanning-your-code-for-vulnerabilities-and-errors/configuring-code-scanning#using-queries-in-ql-packs
+-          # queries: security-extended,security-and-quality
+-
+-      # Autobuild attempts to build any compiled languages  (C/C++, C#, Go, or Java).
+-      # If this step fails, then you should remove it and run the build manually (see below)
+-      - name: Autobuild
+-        uses: github/codeql-action/autobuild@45cbd0c69e560cd9e7cd7f8c32362050c9b7ded2 # v4
+-
+-      # ℹ️ Command-line programs to run using the OS shell.
+-      # 📚 See https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsrun
+-
+-      #   If the Autobuild fails above, remove it and uncomment the following three lines.
+-      #   modify them (or add more) to build your code if your project, please refer to the EXAMPLE below for guidance.
+-
+-      # - run: |
+-      #   echo "Run, Build Application using script"
+-      #   ./location_of_script_within_repo/buildscript.sh
+-
+-      - name: Perform CodeQL Analysis
+-        uses: github/codeql-action/analyze@45cbd0c69e560cd9e7cd7f8c32362050c9b7ded2 # v4
+-        with:
+-          category: '/language:${{matrix.language}}'
+diff --git a/.github/workflows/crowdin-download-stable.yml b/.github/workflows/crowdin-download-stable.yml
+deleted file mode 100644
+index 47876f8e41..0000000000
+--- a/.github/workflows/crowdin-download-stable.yml
++++ /dev/null
+@@ -1,70 +0,0 @@
+-name: Crowdin / Download translations (stable branches)
+-on:
+-  workflow_dispatch:
+-
+-permissions:
+-  contents: write
+-  pull-requests: write
+-
+-jobs:
+-  download-translations-stable:
+-    runs-on: ubuntu-latest
+-    if: github.repository == 'glitch-soc/mastodon'
+-
+-    steps:
+-      - name: Checkout
+-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+-
+-      - name: Increase Git http.postBuffer
+-        # This is needed due to a bug in Ubuntu's cURL version?
+-        # See https://github.com/orgs/community/discussions/55820
+-        run: |
+-          git config --global http.version HTTP/1.1
+-          git config --global http.postBuffer 157286400
+-
+-      # Download the translation files from Crowdin
+-      - name: crowdin action
+-        uses: crowdin/github-action@8868a33591d21088edfc398968173a3b98d51706 # v2
+-        with:
+-          config: crowdin-glitch.yml
+-          upload_sources: false
+-          upload_translations: false
+-          download_translations: true
+-          crowdin_branch_name: ${{ github.base_ref || github.ref_name }}
+-          push_translations: false
+-          create_pull_request: false
+-        env:
+-          CROWDIN_PROJECT_ID: ${{ vars.CROWDIN_PROJECT_ID }}
+-          CROWDIN_PERSONAL_TOKEN: ${{ secrets.CROWDIN_PERSONAL_TOKEN }}
+-
+-      # As the files are extracted from a Docker container, they belong to root:root
+-      # We need to fix this before the next steps
+-      - name: Fix file permissions
+-        run: sudo chown -R runner:docker .
+-
+-      # This is needed to run the normalize step
+-      - name: Set up Ruby environment
+-        uses: ./.github/actions/setup-ruby
+-
+-      - name: Run i18n normalize task
+-        run: bin/i18n-tasks normalize
+-
+-      # Create or update the pull request
+-      - name: Create Pull Request
+-        uses: peter-evans/create-pull-request@c0f553fe549906ede9cf27b5156039d195d2ece0 # v8.1.0
+-        with:
+-          commit-message: 'New Crowdin translations'
+-          title: 'New Crowdin Translations for ${{ github.base_ref || github.ref_name }} (automated)'
+-          author: 'GitHub Actions <noreply@github.com>'
+-          body: |
+-            New Crowdin translations, automated with GitHub Actions
+-
+-            See `.github/workflows/crowdin-download.yml`
+-
+-            This PR will be updated every day with new translations.
+-
+-            Due to a limitation in GitHub Actions, checks are not running on this PR without manual action.
+-            If you want to run the checks, then close and re-open it.
+-          branch: i18n/crowdin/translations-${{ github.base_ref || github.ref_name }}
+-          base: ${{ github.base_ref || github.ref_name }}
+-          labels: i18n
+diff --git a/.github/workflows/crowdin-download.yml b/.github/workflows/crowdin-download.yml
+deleted file mode 100644
+index 9e8c794ee0..0000000000
+--- a/.github/workflows/crowdin-download.yml
++++ /dev/null
+@@ -1,72 +0,0 @@
+-name: Crowdin / Download translations
+-on:
+-  schedule:
+-    - cron: '17 4 * * *' # Every day
+-  workflow_dispatch:
+-
+-permissions:
+-  contents: write
+-  pull-requests: write
+-
+-jobs:
+-  download-translations:
+-    runs-on: ubuntu-latest
+-    if: github.repository == 'glitch-soc/mastodon'
+-
+-    steps:
+-      - name: Checkout
+-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+-
+-      - name: Increase Git http.postBuffer
+-        # This is needed due to a bug in Ubuntu's cURL version?
+-        # See https://github.com/orgs/community/discussions/55820
+-        run: |
+-          git config --global http.version HTTP/1.1
+-          git config --global http.postBuffer 157286400
+-
+-      # Download the translation files from Crowdin
+-      - name: crowdin action
+-        uses: crowdin/github-action@8868a33591d21088edfc398968173a3b98d51706 # v2
+-        with:
+-          config: crowdin-glitch.yml
+-          upload_sources: false
+-          upload_translations: false
+-          download_translations: true
+-          crowdin_branch_name: main
+-          push_translations: false
+-          create_pull_request: false
+-        env:
+-          CROWDIN_PROJECT_ID: ${{ vars.CROWDIN_PROJECT_ID }}
+-          CROWDIN_PERSONAL_TOKEN: ${{ secrets.CROWDIN_PERSONAL_TOKEN }}
+-
+-      # As the files are extracted from a Docker container, they belong to root:root
+-      # We need to fix this before the next steps
+-      - name: Fix file permissions
+-        run: sudo chown -R runner:docker .
+-
+-      # This is needed to run the normalize step
+-      - name: Set up Ruby environment
+-        uses: ./.github/actions/setup-ruby
+-
+-      - name: Run i18n normalize task
+-        run: bin/i18n-tasks normalize
+-
+-      # Create or update the pull request
+-      - name: Create Pull Request
+-        uses: peter-evans/create-pull-request@c0f553fe549906ede9cf27b5156039d195d2ece0 # v8
+-        with:
+-          commit-message: 'New Crowdin translations'
+-          title: 'New Crowdin Translations (automated)'
+-          author: 'GitHub Actions <noreply@github.com>'
+-          body: |
+-            New Crowdin translations, automated with GitHub Actions
+-
+-            See `.github/workflows/crowdin-download.yml`
+-
+-            This PR will be updated every day with new translations.
+-
+-            Due to a limitation in GitHub Actions, checks are not running on this PR without manual action.
+-            If you want to run the checks, then close and re-open it.
+-          branch: i18n/crowdin/translations
+-          base: main
+-          labels: i18n
+diff --git a/.github/workflows/crowdin-upload.yml b/.github/workflows/crowdin-upload.yml
+deleted file mode 100644
+index 83b913ca56..0000000000
+--- a/.github/workflows/crowdin-upload.yml
++++ /dev/null
+@@ -1,39 +0,0 @@
+-name: Crowdin / Upload translations
+-
+-on:
+-  push:
+-    branches:
+-      - 'main'
+-      - 'stable-*'
+-    paths:
+-      - crowdin-glitch.yml
+-      - app/javascript/flavours/glitch/locales/en.json
+-      - config/locales-glitch/en.yml
+-      - config/locales-glitch/simple_form.en.yml
+-      - config/locales-glitch/activerecord.en.yml
+-      - config/locales-glitch/devise.en.yml
+-      - config/locales-glitch/doorkeeper.en.yml
+-      - .github/workflows/crowdin-upload.yml
+-  workflow_dispatch:
+-
+-jobs:
+-  upload-translations:
+-    runs-on: ubuntu-latest
+-    if: github.repository == 'glitch-soc/mastodon'
+-
+-    steps:
+-      - name: Checkout
+-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+-
+-      - name: crowdin action
+-        uses: crowdin/github-action@8868a33591d21088edfc398968173a3b98d51706 # v2
+-        with:
+-          config: crowdin-glitch.yml
+-          upload_sources: true
+-          upload_translations: false
+-          download_translations: false
+-          crowdin_branch_name: ${{ github.base_ref || github.ref_name }}
+-
+-        env:
+-          CROWDIN_PROJECT_ID: ${{ vars.CROWDIN_PROJECT_ID }}
+-          CROWDIN_PERSONAL_TOKEN: ${{ secrets.CROWDIN_PERSONAL_TOKEN }}
+diff --git a/.github/workflows/format-check.yml b/.github/workflows/format-check.yml
+deleted file mode 100644
+index 9a200504ef..0000000000
+--- a/.github/workflows/format-check.yml
++++ /dev/null
+@@ -1,22 +0,0 @@
+-name: Check formatting
+-on:
+-  merge_group:
+-  push:
+-    branches:
+-      - 'main'
+-      - 'stable-*'
+-  pull_request:
+-
+-jobs:
+-  lint:
+-    runs-on: ubuntu-latest
+-
+-    steps:
+-      - name: Clone repository
+-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+-
+-      - name: Set up Javascript environment
+-        uses: ./.github/actions/setup-javascript
+-
+-      - name: Check formatting
+-        run: yarn format:check
+diff --git a/.github/workflows/lint-css.yml b/.github/workflows/lint-css.yml
+deleted file mode 100644
+index 60778f11a0..0000000000
+--- a/.github/workflows/lint-css.yml
++++ /dev/null
+@@ -1,41 +0,0 @@
+-name: CSS Linting
+-on:
+-  merge_group:
+-  push:
+-    branches:
+-      - 'main'
+-      - 'stable-*'
+-    paths:
+-      - 'package.json'
+-      - 'yarn.lock'
+-      - '.nvmrc'
+-      - 'stylelint.config.js'
+-      - '**/*.css'
+-      - '**/*.scss'
+-      - '.github/workflows/lint-css.yml'
+-      - '.github/stylelint-matcher.json'
+-
+-  pull_request:
+-    paths:
+-      - 'package.json'
+-      - 'yarn.lock'
+-      - '.nvmrc'
+-      - 'stylelint.config.js'
+-      - '**/*.css'
+-      - '**/*.scss'
+-      - '.github/workflows/lint-css.yml'
+-      - '.github/stylelint-matcher.json'
+-
+-jobs:
+-  lint:
+-    runs-on: ubuntu-latest
+-
+-    steps:
+-      - name: Clone repository
+-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+-
+-      - name: Set up Javascript environment
+-        uses: ./.github/actions/setup-javascript
+-
+-      - name: Stylelint
+-        run: yarn lint:css --custom-formatter @csstools/stylelint-formatter-github
+diff --git a/.github/workflows/lint-haml.yml b/.github/workflows/lint-haml.yml
+deleted file mode 100644
+index 33dc4e4fb6..0000000000
+--- a/.github/workflows/lint-haml.yml
++++ /dev/null
+@@ -1,45 +0,0 @@
+-name: Haml Linting
+-on:
+-  merge_group:
+-  push:
+-    branches:
+-      - 'main'
+-      - 'stable-*'
+-    paths:
+-      - '.github/workflows/haml-lint-problem-matcher.json'
+-      - '.github/workflows/lint-haml.yml'
+-      - '.haml-lint*.yml'
+-      - '.rubocop*.yml'
+-      - '.ruby-version'
+-      - '**/*.haml'
+-      - 'Gemfile*'
+-
+-  pull_request:
+-    paths:
+-      - '.github/workflows/haml-lint-problem-matcher.json'
+-      - '.github/workflows/lint-haml.yml'
+-      - '.haml-lint*.yml'
+-      - '.rubocop*.yml'
+-      - '.ruby-version'
+-      - '**/*.haml'
+-      - 'Gemfile*'
+-
+-jobs:
+-  lint:
+-    runs-on: ubuntu-latest
+-
+-    env:
+-      BUNDLE_ONLY: development
+-
+-    steps:
+-      - name: Clone repository
+-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+-
+-      - name: Set up Ruby
+-        uses: ruby/setup-ruby@c984c1a20bb35a1cbda04477c816cea024418be9 # v1
+-        with:
+-          bundler-cache: true
+-
+-      - name: Run haml-lint
+-        run: |
+-          bin/haml-lint --reporter github
+diff --git a/.github/workflows/lint-js.yml b/.github/workflows/lint-js.yml
+deleted file mode 100644
+index f16e01d4d2..0000000000
+--- a/.github/workflows/lint-js.yml
++++ /dev/null
+@@ -1,48 +0,0 @@
+-name: JavaScript Linting
+-on:
+-  merge_group:
+-  push:
+-    branches:
+-      - 'main'
+-      - 'stable-*'
+-    paths:
+-      - 'package.json'
+-      - 'yarn.lock'
+-      - 'tsconfig.json'
+-      - '.nvmrc'
+-      - 'eslint.config.mjs'
+-      - '**/*.js'
+-      - '**/*.jsx'
+-      - '**/*.ts'
+-      - '**/*.tsx'
+-      - '.github/workflows/lint-js.yml'
+-
+-  pull_request:
+-    paths:
+-      - 'package.json'
+-      - 'yarn.lock'
+-      - 'tsconfig.json'
+-      - '.nvmrc'
+-      - 'eslint.config.mjs'
+-      - '**/*.js'
+-      - '**/*.jsx'
+-      - '**/*.ts'
+-      - '**/*.tsx'
+-      - '.github/workflows/lint-js.yml'
+-
+-jobs:
+-  lint:
+-    runs-on: ubuntu-latest
+-
+-    steps:
+-      - name: Clone repository
+-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+-
+-      - name: Set up Javascript environment
+-        uses: ./.github/actions/setup-javascript
+-
+-      - name: ESLint
+-        run: yarn workspaces foreach --all --parallel run lint:js --max-warnings 0
+-
+-      - name: Typecheck
+-        run: yarn typecheck
+diff --git a/.github/workflows/lint-ruby.yml b/.github/workflows/lint-ruby.yml
+deleted file mode 100644
+index b68f50e033..0000000000
+--- a/.github/workflows/lint-ruby.yml
++++ /dev/null
+@@ -1,50 +0,0 @@
+-name: Ruby Linting
+-on:
+-  merge_group:
+-  push:
+-    branches:
+-      - 'main'
+-      - 'stable-*'
+-    paths:
+-      - 'Gemfile*'
+-      - '.rubocop*.yml'
+-      - '.ruby-version'
+-      - 'bin/rubocop'
+-      - 'config/brakeman.ignore'
+-      - '**/*.rb'
+-      - '**/*.rake'
+-      - '.github/workflows/lint-ruby.yml'
+-
+-  pull_request:
+-    paths:
+-      - 'Gemfile*'
+-      - '.rubocop*.yml'
+-      - '.ruby-version'
+-      - 'bin/rubocop'
+-      - 'config/brakeman.ignore'
+-      - '**/*.rb'
+-      - '**/*.rake'
+-      - '.github/workflows/lint-ruby.yml'
+-
+-jobs:
+-  lint:
+-    runs-on: ubuntu-latest
+-
+-    env:
+-      BUNDLE_ONLY: development
+-
+-    steps:
+-      - name: Clone repository
+-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+-
+-      - name: Set up Ruby
+-        uses: ruby/setup-ruby@c984c1a20bb35a1cbda04477c816cea024418be9 # v1
+-        with:
+-          bundler-cache: true
+-
+-      - name: Run rubocop
+-        run: bin/rubocop --format github
+-
+-      - name: Run brakeman
+-        if: always() # Run both checks, even if the first failed
+-        run: bin/brakeman
+diff --git a/.github/workflows/rebase-needed.yml b/.github/workflows/rebase-needed.yml
+deleted file mode 100644
+index 5293480079..0000000000
+--- a/.github/workflows/rebase-needed.yml
++++ /dev/null
+@@ -1,28 +0,0 @@
+-name: PR Needs Rebase
+-
+-on:
+-  schedule:
+-    - cron: '0 * * * *'
+-
+-permissions:
+-  pull-requests: write
+-
+-jobs:
+-  label-rebase-needed:
+-    runs-on: ubuntu-latest
+-    if: github.repository == 'glitch-soc/mastodon'
+-
+-    concurrency:
+-      group: ${{ github.workflow }}-${{ github.ref }}
+-      cancel-in-progress: true
+-
+-    steps:
+-      - name: Check for merge conflicts
+-        uses: eps1lon/actions-label-merge-conflict@1df065ebe6e3310545d4f4c4e862e43bdca146f0 # v3
+-        with:
+-          dirtyLabel: 'rebase needed :construction:'
+-          repoToken: '${{ secrets.GITHUB_TOKEN }}'
+-          commentOnClean: This pull request has resolved merge conflicts and is ready for review.
+-          commentOnDirty: This pull request has merge conflicts that must be resolved before it can be merged.
+-          retryMax: 30
+-          continueOnMissingPermissions: false
+diff --git a/.github/workflows/test-image-build.yml b/.github/workflows/test-image-build.yml
+deleted file mode 100644
+index 121b8b0ddf..0000000000
+--- a/.github/workflows/test-image-build.yml
++++ /dev/null
+@@ -1,34 +0,0 @@
+-name: Test container image build
+-on:
+-  pull_request:
+-    paths:
+-      - .github/workflows/build-nightly.yml
+-      - .github/workflows/build-push-pr.yml
+-      - .github/workflows/build-releases.yml
+-      - .github/workflows/test-image-build.yml
+-      - Dockerfile
+-      - streaming/Dockerfile
+-      - .dockerignore
+-permissions:
+-  contents: read
+-
+-jobs:
+-  build-image:
+-    concurrency:
+-      group: ${{ github.workflow }}-${{ github.ref }}
+-      cancel-in-progress: true
+-
+-    uses: ./.github/workflows/build-container-image.yml
+-    with:
+-      file_to_build: Dockerfile
+-      cache: true
+-
+-  build-image-streaming:
+-    concurrency:
+-      group: ${{ github.workflow }}-${{ github.ref }}-streaming
+-      cancel-in-progress: true
+-
+-    uses: ./.github/workflows/build-container-image.yml
+-    with:
+-      file_to_build: streaming/Dockerfile
+-      cache: true
+diff --git a/.github/workflows/test-js.yml b/.github/workflows/test-js.yml
+deleted file mode 100644
+index d1b55a5e0b..0000000000
+--- a/.github/workflows/test-js.yml
++++ /dev/null
+@@ -1,43 +0,0 @@
+-name: JavaScript Testing
+-on:
+-  merge_group:
+-  push:
+-    branches:
+-      - 'main'
+-      - 'stable-*'
+-    paths:
+-      - 'package.json'
+-      - 'yarn.lock'
+-      - '.nvmrc'
+-      - '**/*.js'
+-      - '**/*.jsx'
+-      - '**/*.ts'
+-      - '**/*.tsx'
+-      - '**/*.snap'
+-      - '.github/workflows/test-js.yml'
+-
+-  pull_request:
+-    paths:
+-      - 'package.json'
+-      - 'yarn.lock'
+-      - '.nvmrc'
+-      - '**/*.js'
+-      - '**/*.jsx'
+-      - '**/*.ts'
+-      - '**/*.tsx'
+-      - '**/*.snap'
+-      - '.github/workflows/test-js.yml'
+-
+-jobs:
+-  test:
+-    runs-on: ubuntu-latest
+-
+-    steps:
+-      - name: Clone repository
+-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+-
+-      - name: Set up Javascript environment
+-        uses: ./.github/actions/setup-javascript
+-
+-      - name: JavaScript testing
+-        run: yarn test:js
+diff --git a/.github/workflows/test-migrations.yml b/.github/workflows/test-migrations.yml
+deleted file mode 100644
+index f33bf981cc..0000000000
+--- a/.github/workflows/test-migrations.yml
++++ /dev/null
+@@ -1,112 +0,0 @@
+-name: Historical data migration test
+-
+-on:
+-  merge_group:
+-  push:
+-    branches:
+-      - 'main'
+-      - 'stable-*'
+-    paths:
+-      - 'Gemfile*'
+-      - '.ruby-version'
+-      - '**/*.rb'
+-      - '.github/workflows/test-migrations.yml'
+-      - 'lib/tasks/tests.rake'
+-      - 'lib/tasks/db.rake'
+-
+-  pull_request:
+-    paths:
+-      - 'Gemfile*'
+-      - '.ruby-version'
+-      - '**/*.rb'
+-      - '.github/workflows/test-migrations.yml'
+-      - 'lib/tasks/tests.rake'
+-
+-jobs:
+-  test:
+-    runs-on: ubuntu-latest
+-
+-    strategy:
+-      fail-fast: false
+-
+-      matrix:
+-        postgres:
+-          - 14-alpine
+-          - 15-alpine
+-          - 16-alpine
+-          - 17-alpine
+-
+-    services:
+-      postgres:
+-        image: postgres:${{ matrix.postgres}}
+-        env:
+-          POSTGRES_PASSWORD: postgres
+-          POSTGRES_USER: postgres
+-        options: >-
+-          --health-cmd pg_isready
+-          --health-interval 10ms
+-          --health-timeout 3s
+-          --health-retries 50
+-        ports:
+-          - 5432:5432
+-
+-      redis:
+-        image: redis:7-alpine
+-        options: >-
+-          --health-cmd "redis-cli ping"
+-          --health-interval 10ms
+-          --health-timeout 3s
+-          --health-retries 50
+-        ports:
+-          - 6379:6379
+-
+-    env:
+-      DB_HOST: localhost
+-      DB_USER: postgres
+-      DB_PASS: postgres
+-      RAILS_ENV: test
+-      BUNDLE_CLEAN: true
+-      BUNDLE_FROZEN: true
+-      BUNDLE_WITHOUT: 'development:production'
+-      BUNDLE_JOBS: 3
+-      BUNDLE_RETRY: 3
+-
+-    steps:
+-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+-
+-      - name: Set up Ruby environment
+-        uses: ./.github/actions/setup-ruby
+-
+-      - name: Ensure no errors with `db:prepare`
+-        run: |
+-          bin/rails db:drop
+-          bin/rails db:prepare
+-          bin/rails db:migrate
+-
+-      - name: Ensure no errors with `db:prepare` and SKIP_POST_DEPLOYMENT_MIGRATIONS
+-        run: |
+-          bin/rails db:drop
+-          SKIP_POST_DEPLOYMENT_MIGRATIONS=true bin/rails db:prepare
+-          bin/rails db:migrate
+-
+-      - name: Test "one step migration" flow
+-        run: |
+-          bin/rails db:drop
+-          bin/rails db:create
+-          bin/rails tests:migrations:prepare_database
+-          bin/rails db:migrate
+-          bin/rails tests:migrations:check_database
+-
+-      - name: Test "two step migration" flow
+-        run: |
+-          bin/rails db:drop
+-          bin/rails db:create
+-          SKIP_POST_DEPLOYMENT_MIGRATIONS=true bin/rails tests:migrations:prepare_database
+-
+-          # Migrate up to v4.2.0 breakpoint
+-          bin/rails db:migrate VERSION=20230907150100
+-
+-          # Migrate the rest
+-          SKIP_POST_DEPLOYMENT_MIGRATIONS=true bin/rails db:migrate
+-          bin/rails db:migrate
+-          bin/rails tests:migrations:check_database
+diff --git a/.github/workflows/test-ruby.yml b/.github/workflows/test-ruby.yml
+deleted file mode 100644
+index a8695cae8c..0000000000
+--- a/.github/workflows/test-ruby.yml
++++ /dev/null
+@@ -1,389 +0,0 @@
+-name: Ruby Testing
+-
+-on:
+-  merge_group:
+-  push:
+-    branches:
+-      - 'main'
+-      - 'stable-*'
+-  pull_request:
+-
+-env:
+-  BUNDLE_CLEAN: true
+-  BUNDLE_FROZEN: true
+-
+-concurrency:
+-  group: ${{ github.workflow }}-${{ github.ref }}
+-  cancel-in-progress: true
+-
+-jobs:
+-  build:
+-    runs-on: ubuntu-latest
+-
+-    strategy:
+-      fail-fast: true
+-      matrix:
+-        mode:
+-          - production
+-          - test
+-    env:
+-      RAILS_ENV: ${{ matrix.mode }}
+-      BUNDLE_WITH: ${{ matrix.mode }}
+-      SECRET_KEY_BASE_DUMMY: 1
+-
+-    steps:
+-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+-
+-      - name: Set up Ruby environment
+-        uses: ./.github/actions/setup-ruby
+-
+-      - name: Set up Javascript environment
+-        uses: ./.github/actions/setup-javascript
+-        with:
+-          onlyProduction: 'true'
+-
+-      - name: Cache assets from compilation
+-        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5
+-        with:
+-          path: |
+-            public/assets
+-            public/packs
+-            public/packs-test
+-            tmp/cache/vite
+-          key: ${{ matrix.mode }}-assets-${{ github.head_ref || github.ref_name }}-${{ github.sha }}
+-          restore-keys: |
+-            ${{ matrix.mode }}-assets-${{ github.head_ref || github.ref_name }}-${{ github.sha }}
+-            ${{ matrix.mode }}-assets-${{ github.head_ref || github.ref_name }}
+-            ${{ matrix.mode }}-assets-main
+-            ${{ matrix.mode }}-assets
+-
+-      - name: Precompile assets
+-        run: |-
+-          bin/rails assets:precompile
+-
+-      - name: Archive asset artifacts
+-        run: |
+-          tar --exclude={"*.br","*.gz"} -zcf artifacts.tar.gz public/assets public/packs* tmp/cache/vite/last-build*.json
+-
+-      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+-        if: matrix.mode == 'test'
+-        with:
+-          path: |-
+-            ./artifacts.tar.gz
+-          name: ${{ github.sha }}
+-          retention-days: 0
+-
+-  test:
+-    runs-on: ubuntu-latest
+-
+-    needs:
+-      - build
+-
+-    services:
+-      postgres:
+-        image: postgres:14-alpine
+-        env:
+-          POSTGRES_PASSWORD: postgres
+-          POSTGRES_USER: postgres
+-        options: >-
+-          --health-cmd pg_isready
+-          --health-interval 10ms
+-          --health-timeout 3s
+-          --health-retries 50
+-        ports:
+-          - 5432:5432
+-
+-      redis:
+-        image: redis:7-alpine
+-        options: >-
+-          --health-cmd "redis-cli ping"
+-          --health-interval 10ms
+-          --health-timeout 3s
+-          --health-retries 50
+-        ports:
+-          - 6379:6379
+-
+-    env:
+-      DB_HOST: localhost
+-      DB_USER: postgres
+-      DB_PASS: postgres
+-      COVERAGE: ${{ matrix.ruby-version == '.ruby-version' }}
+-      RAILS_ENV: test
+-      ALLOW_NOPAM: true
+-      PAM_ENABLED: true
+-      PAM_DEFAULT_SERVICE: pam_test
+-      PAM_CONTROLLED_SERVICE: pam_test_controlled
+-      OIDC_ENABLED: true
+-      OIDC_SCOPE: read
+-      SAML_ENABLED: true
+-      CAS_ENABLED: true
+-      BUNDLE_WITH: 'pam_authentication test'
+-      GITHUB_RSPEC: ${{ matrix.ruby-version == '.ruby-version' && github.event.pull_request && 'true' }}
+-
+-    strategy:
+-      fail-fast: false
+-      matrix:
+-        ruby-version:
+-          - '3.3'
+-          - '3.4'
+-          - '.ruby-version'
+-    steps:
+-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+-
+-      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+-        with:
+-          path: './'
+-          name: ${{ github.sha }}
+-
+-      - name: Expand archived asset artifacts
+-        run: |
+-          tar xvzf artifacts.tar.gz
+-
+-      - name: Set up Ruby environment
+-        uses: ./.github/actions/setup-ruby
+-        with:
+-          ruby-version: ${{ matrix.ruby-version}}
+-          additional-system-dependencies: ffmpeg libpam-dev
+-
+-      - name: Load database schema
+-        run: |
+-          bin/rails db:setup
+-          bin/flatware fan bin/rails db:test:prepare
+-
+-      - name: Cache RSpec persistence file
+-        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5
+-        with:
+-          path: |
+-            tmp/rspec/examples.txt
+-          key: rspec-persistence-${{ github.head_ref || github.ref_name }}-${{ github.sha }}
+-          restore-keys: |
+-            rspec-persistence-${{ github.head_ref || github.ref_name }}-${{ github.sha }}-${{ matrix.ruby-version }}
+-            rspec-persistence-${{ github.head_ref || github.ref_name }}-${{ github.sha }}
+-            rspec-persistence-${{ github.head_ref || github.ref_name }}
+-            rspec-persistence-main
+-            rspec-persistence
+-
+-      - run: bin/flatware rspec -r ./spec/flatware_helper.rb
+-
+-      - name: Upload coverage reports to Codecov
+-        if: matrix.ruby-version == '.ruby-version'
+-        uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5
+-        with:
+-          files: coverage/lcov/*.lcov
+-        env:
+-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+-
+-  test-e2e:
+-    name: End to End testing
+-    runs-on: ubuntu-latest
+-
+-    needs:
+-      - build
+-
+-    services:
+-      postgres:
+-        image: postgres:14-alpine
+-        env:
+-          POSTGRES_PASSWORD: postgres
+-          POSTGRES_USER: postgres
+-        options: >-
+-          --health-cmd pg_isready
+-          --health-interval 10ms
+-          --health-timeout 3s
+-          --health-retries 50
+-        ports:
+-          - 5432:5432
+-
+-      redis:
+-        image: redis:7-alpine
+-        options: >-
+-          --health-cmd "redis-cli ping"
+-          --health-interval 10ms
+-          --health-timeout 3s
+-          --health-retries 50
+-        ports:
+-          - 6379:6379
+-
+-    env:
+-      DB_HOST: localhost
+-      DB_USER: postgres
+-      DB_PASS: postgres
+-      RAILS_ENV: test
+-      BUNDLE_WITH: test
+-      LOCAL_DOMAIN: localhost:3000
+-      LOCAL_HTTPS: false
+-
+-    strategy:
+-      fail-fast: false
+-      matrix:
+-        ruby-version:
+-          - '3.3'
+-          - '3.4'
+-          - '.ruby-version'
+-
+-    steps:
+-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+-
+-      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+-        with:
+-          path: './'
+-          name: ${{ github.sha }}
+-
+-      - name: Expand archived asset artifacts
+-        run: |
+-          tar xvzf artifacts.tar.gz
+-
+-      - name: Set up Ruby environment
+-        uses: ./.github/actions/setup-ruby
+-        with:
+-          ruby-version: ${{ matrix.ruby-version}}
+-          additional-system-dependencies: ffmpeg
+-
+-      - name: Set up Javascript environment
+-        uses: ./.github/actions/setup-javascript
+-
+-      - name: Load database schema
+-        run: './bin/rails db:create db:schema:load db:seed'
+-
+-      - name: Cache Playwright Chromium browser
+-        id: playwright-cache
+-        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5
+-        with:
+-          path: ~/.cache/ms-playwright
+-          key: playwright-browsers-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
+-
+-      - name: Install Playwright Chromium browser (with deps)
+-        if: steps.playwright-cache.outputs.cache-hit != 'true'
+-        run: yarn run playwright install --with-deps chromium
+-
+-      - name: Install Playwright Chromium browser deps
+-        if: steps.playwright-cache.outputs.cache-hit == 'true'
+-        run: yarn run playwright install-deps chromium
+-
+-      - run: bin/rspec spec/system --tag streaming --tag js
+-
+-      - name: Archive logs
+-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+-        if: failure()
+-        with:
+-          name: e2e-logs-${{ matrix.ruby-version }}
+-          path: log/
+-
+-      - name: Archive test screenshots
+-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+-        if: failure()
+-        with:
+-          name: e2e-screenshots-${{ matrix.ruby-version }}
+-          path: tmp/capybara/
+-
+-  test-search:
+-    name: Elastic Search integration testing
+-    runs-on: ubuntu-latest
+-
+-    needs:
+-      - build
+-
+-    services:
+-      postgres:
+-        image: postgres:14-alpine
+-        env:
+-          POSTGRES_PASSWORD: postgres
+-          POSTGRES_USER: postgres
+-        options: >-
+-          --health-cmd pg_isready
+-          --health-interval 10ms
+-          --health-timeout 3s
+-          --health-retries 50
+-        ports:
+-          - 5432:5432
+-
+-      redis:
+-        image: redis:7-alpine
+-        options: >-
+-          --health-cmd "redis-cli ping"
+-          --health-interval 10ms
+-          --health-timeout 3s
+-          --health-retries 50
+-        ports:
+-          - 6379:6379
+-
+-      elasticsearch:
+-        image: ${{ contains(matrix.search-image, 'elasticsearch') && matrix.search-image || '' }}
+-        env:
+-          discovery.type: single-node
+-          xpack.security.enabled: false
+-        options: >-
+-          --health-cmd "curl http://localhost:9200/_cluster/health"
+-          --health-interval 2s
+-          --health-timeout 3s
+-          --health-retries 50
+-        ports:
+-          - 9200:9200
+-
+-      opensearch:
+-        image: ${{ contains(matrix.search-image, 'opensearch') && matrix.search-image || '' }}
+-        env:
+-          discovery.type: single-node
+-          DISABLE_INSTALL_DEMO_CONFIG: true
+-          DISABLE_SECURITY_PLUGIN: true
+-        options: >-
+-          --health-cmd "curl http://localhost:9200/_cluster/health"
+-          --health-interval 2s
+-          --health-timeout 3s
+-          --health-retries 50
+-        ports:
+-          - 9200:9200
+-
+-    env:
+-      DB_HOST: localhost
+-      DB_USER: postgres
+-      DB_PASS: postgres
+-      RAILS_ENV: test
+-      BUNDLE_WITH: test
+-      ES_ENABLED: true
+-      ES_HOST: localhost
+-      ES_PORT: 9200
+-
+-    strategy:
+-      fail-fast: false
+-      matrix:
+-        ruby-version:
+-          - '3.3'
+-          - '3.4'
+-          - '.ruby-version'
+-        search-image:
+-          - docker.elastic.co/elasticsearch/elasticsearch:7.17.29
+-        include:
+-          - ruby-version: '.ruby-version'
+-            search-image: docker.elastic.co/elasticsearch/elasticsearch:8.19.2
+-          - ruby-version: '.ruby-version'
+-            search-image: opensearchproject/opensearch:2
+-
+-    steps:
+-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+-
+-      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+-        with:
+-          path: './'
+-          name: ${{ github.sha }}
+-
+-      - name: Set up Ruby environment
+-        uses: ./.github/actions/setup-ruby
+-        with:
+-          ruby-version: ${{ matrix.ruby-version}}
+-          additional-system-dependencies: ffmpeg
+-
+-      - name: Set up Javascript environment
+-        uses: ./.github/actions/setup-javascript
+-
+-      - name: Load database schema
+-        run: './bin/rails db:create db:schema:load db:seed'
+-
+-      - run: bin/rspec --tag search
+-
+-      - name: Archive logs
+-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+-        if: failure()
+-        with:
+-          name: test-search-logs-${{ matrix.ruby-version }}
+-          path: log/
+-- 
+2.54.0
+
