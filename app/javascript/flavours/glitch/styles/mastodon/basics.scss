@@ -8,8 +8,8 @@ html {
     scrollbar-color: var(--color-text-secondary) var(--color-bg-secondary);
   }
 
-  --font-body: mastodon-font-sans-serif, sans-serif;
-  --font-heading: Cal Sans UI, sans-serif;
+  --font-body: 'Pretendard Variable', 'Pretendard JP Variable', mastodon-font-sans-serif, sans-serif;
+  --font-heading: Cal Sans UI, 'Pretendard Variable', 'Pretendard JP Variable', sans-serif;
   --font-monospace: mastodon-font-monospace, monospace;
   --outline-focus-default: 2px solid var(--color-border-brand);
   --avatar-border-radius: 8px;
@@ -21,7 +21,7 @@ html {
   --column-header-height: 62px;
 
   &[data-redesign='true'] {
-    --font-body: Inter, sans-serif;
+    --font-body: 'Pretendard Variable', 'Pretendard JP Variable', Inter, sans-serif;
     --avatar-border-radius: var(--radius-round);
     --mobile-bottom-nav-height: calc(58px + var(--space-md));
 
