@@ -55,7 +55,7 @@ module Mastodon
     end
 
     def source_base_url
-      source_configuration[:base_url] || "https://github.com/#{repository}"
+       "https://github.com/funamitech/mastodon"
     end
 
     # specify git tag or commit hash here
