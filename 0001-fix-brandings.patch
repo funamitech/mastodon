@@ -1,0 +1,43 @@
+From 528385438635920d3310e45cbed790ebb2da64bb Mon Sep 17 00:00:00 2001
+From: Noa Himesaka <himesaka@noa.codes>
+Date: Tue, 7 Jul 2026 00:18:51 +0900
+Subject: [PATCH] fix: brandings
+
+---
+ config/mastodon.yml     | 4 ++--
+ lib/mastodon/version.rb | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/config/mastodon.yml b/config/mastodon.yml
+index 7ebc6eb56f..e140143fc7 100644
+--- a/config/mastodon.yml
++++ b/config/mastodon.yml
+@@ -9,10 +9,10 @@ shared:
+     environment: <%= ENV.fetch('DONATION_CAMPAIGNS_ENVIRONMENT', nil)&.to_json %>
+   source:
+     base_url: <%= ENV.fetch('SOURCE_BASE_URL', nil)&.to_json %>
+-    repository: <%= ENV.fetch('GITHUB_REPOSITORY', 'glitch-soc/mastodon') %>
++    repository: <%= ENV.fetch('GITHUB_REPOSITORY', 'funamitech/mastodon') %>
+     tag: <%= ENV.fetch('SOURCE_TAG', nil) %>
+   version:
+-    metadata: <%= ['glitch', ENV.fetch('MASTODON_VERSION_METADATA', nil)].compact_blank.join('.').to_json %>
++    metadata: <%= ['YRYRneoA', ENV.fetch('MASTODON_VERSION_METADATA', nil)].compact_blank.join('.').to_json %>
+     prerelease: <%= ENV.fetch('MASTODON_VERSION_PRERELEASE', nil)&.to_json %>
+ test:
+   experimental_features: <%= [ENV.fetch('EXPERIMENTAL_FEATURES', nil), 'testing_only'].compact.join(',') %>
+diff --git a/lib/mastodon/version.rb b/lib/mastodon/version.rb
+index 4092132f56..23bfaf62ad 100644
+--- a/lib/mastodon/version.rb
++++ b/lib/mastodon/version.rb
+@@ -55,7 +55,7 @@ module Mastodon
+     end
+ 
+     def source_base_url
+-      source_configuration[:base_url] || "https://github.com/#{repository}"
++       "https://github.com/funamitech/mastodon"
+     end
+ 
+     # specify git tag or commit hash here
+-- 
+2.55.0
+

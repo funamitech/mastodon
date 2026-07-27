@@ -1,4 +1,4 @@
-From 8534ee832f1de20192d3b427ac61d10ff5257c6d Mon Sep 17 00:00:00 2001
+From 9f7ebfa1766019eeaccffd7c1374a08d6dd2a7a4 Mon Sep 17 00:00:00 2001
 From: Noa Himesaka <himesaka@noa.codes>
 Date: Fri, 1 May 2026 17:58:58 +0900
 Subject: [PATCH] feat: YuruToot-specific theme color
@@ -30,5 +30,5 @@ index a434ef40ff..a741080a70 100644
    end
  
 -- 
-2.54.0
+2.55.0
 

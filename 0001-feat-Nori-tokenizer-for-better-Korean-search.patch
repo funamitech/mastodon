@@ -1,4 +1,4 @@
-From 17ffee5a84b805bb94c974c3fbe39c865afb16e5 Mon Sep 17 00:00:00 2001
+From e1149430509262e5b57a610066b0a0c808d595b2 Mon Sep 17 00:00:00 2001
 From: Noa Himesaka <himesaka@noa.codes>
 Date: Fri, 1 May 2026 17:57:18 +0900
 Subject: [PATCH] feat: Nori tokenizer for better Korean search
@@ -79,5 +79,5 @@ index e739ccecb4..3482f451e2 100644
      field(:searchable_by, type: 'long', value: ->(status) { status.searchable_by })
      field(:language, type: 'keyword')
 -- 
-2.54.0
+2.55.0
 

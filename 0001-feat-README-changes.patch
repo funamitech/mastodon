@@ -1,4 +1,4 @@
-From 7a0c79245e2f4fe1b6253a6f464ab4a8850b2251 Mon Sep 17 00:00:00 2001
+From 714619c260b753490fb9e234b4546802492c651f Mon Sep 17 00:00:00 2001
 From: Noa Himesaka <himesaka@noa.codes>
 Date: Fri, 1 May 2026 17:52:43 +0900
 Subject: [PATCH] feat: README changes
@@ -8,7 +8,7 @@ Subject: [PATCH] feat: README changes
  1 file changed, 17 insertions(+), 6 deletions(-)
 
 diff --git a/README.md b/README.md
-index e4b25b1716..2bf246dd2a 100644
+index 04a2bf524e..40ef1b6f98 100644
 --- a/README.md
 +++ b/README.md
 @@ -1,16 +1,27 @@
@@ -46,5 +46,5 @@ index e4b25b1716..2bf246dd2a 100644
  ---
  
 -- 
-2.54.0
+2.55.0
 

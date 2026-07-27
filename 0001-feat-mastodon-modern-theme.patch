@@ -1,4 +1,4 @@
-From dd2529cee3a7863e6183cb2bf5ac2ad4a154c5bb Mon Sep 17 00:00:00 2001
+From 6f8253ca457cf08e31f9607d5ff3afa88047a87c Mon Sep 17 00:00:00 2001
 From: Noa Himesaka <himesaka@noa.codes>
 Date: Fri, 1 May 2026 18:12:30 +0900
 Subject: [PATCH] feat: mastodon-modern theme
@@ -3047,5 +3047,5 @@ index 0000000000..f2890ec816
 +    glitch:
 +      modern: Modern
 -- 
-2.54.0
+2.55.0
 

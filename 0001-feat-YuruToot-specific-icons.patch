@@ -1,4 +1,4 @@
-From cc9a3dad432eab95fbee2a45025e1da6a20af310 Mon Sep 17 00:00:00 2001
+From 5cad52f3ecf74e7fdec58eb55d8e09f73820bc73 Mon Sep 17 00:00:00 2001
 From: Noa Himesaka <himesaka@noa.codes>
 Date: Fri, 1 May 2026 18:25:30 +0900
 Subject: [PATCH] feat: YuruToot-specific icons
@@ -42712,5 +42712,5 @@ index 11d0c30c56..7f6feb50c0 100644
 +  </g>
  </svg>
 -- 
-2.54.0
+2.55.0
 
