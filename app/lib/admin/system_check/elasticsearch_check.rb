@@ -29,6 +29,7 @@ class Admin::SystemCheck::ElasticsearchCheck < Admin::SystemCheck::BaseCheck
         :elasticsearch_version_check,
         I18n.t(
           'admin.system_checks.elasticsearch_version_check.version_comparison',
+          distribution: distribution_name,
           running_version: running_version,
           required_version: required_version
         )
@@ -76,8 +77,16 @@ class Admin::SystemCheck::ElasticsearchCheck < Admin::SystemCheck::BaseCheck
     Chewy.client.info['version']['minimum_wire_compatibility_version']
   end
 
+  def opensearch?
+    Chewy.client.info.dig('version', 'distribution') == 'opensearch'
+  end
+
+  def distribution_name
+    opensearch? ? 'OpenSearch' : 'Elasticsearch'
+  end
+
   def required_version
-    '7.x'
+    opensearch? ? '1.x' : '7.x'
   end
 
   def compatible_version?
