@@ -466,7 +466,7 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
 
     case @status_parser.visibility
     when :public, :unlisted
-      followed_by_local_accounts? || requested_through_relay? || responds_to_followed_account? || addresses_local_accounts?
+      followed_by_local_accounts? || requested_through_relay? || responds_to_followed_account? || quotes_local_status? || addresses_local_accounts?
     when :private
       followed_by_local_accounts? || addresses_local_accounts?
     when :direct
@@ -476,6 +476,10 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
 
   def responds_to_followed_account?
     !replied_to_status.nil? && (replied_to_status.account.local? || replied_to_status.account.passive_relationships.exists?)
+  end
+
+  def quotes_local_status?
+    @status_parser.quote? && status_from_uri(@status_parser.quote_uri)&.account&.local?
   end
 
   def addresses_local_accounts?
