@@ -16,6 +16,8 @@ class ActivityPub::CollectionSerializer < ActivityPub::Serializer
       ActivityPub::NoteSerializer
     when 'FeaturedTag'
       ActivityPub::HashtagSerializer
+    when 'StatusReaction'
+      ActivityPub::EmojiReactionSerializer
     when 'ActivityPub::CollectionPresenter'
       ActivityPub::CollectionSerializer
     when 'Collection'

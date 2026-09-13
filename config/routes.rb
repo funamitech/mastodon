@@ -120,6 +120,7 @@ Rails.application.routes.draw do
       resources :replies, only: [:index], module: :activitypub
       resources :likes, only: [:index], module: :activitypub
       resources :shares, only: [:index], module: :activitypub
+      resources :emoji_reactions, only: [:index], module: :activitypub
     end
   end
 
@@ -138,6 +139,7 @@ Rails.application.routes.draw do
         resources :replies, only: [:index], module: :activitypub
         resources :likes, only: [:index], module: :activitypub
         resources :shares, only: [:index], module: :activitypub
+        resources :emoji_reactions, only: [:index], module: :activitypub
       end
     end
   end
