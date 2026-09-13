@@ -140,8 +140,7 @@ class PostStatusService < BaseService
 
     status.quote = Quote.create(quoted_status: @quoted_status, status: status)
     status.quote.ensure_quoted_access
-
-    status.quote.accept! if @quoted_status.local? && StatusPolicy.new(@status.account, @quoted_status).quote?
+    status.quote.accept!
   end
 
   def attach_tagged_objects!(status)

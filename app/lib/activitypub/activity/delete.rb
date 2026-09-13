@@ -31,14 +31,7 @@ class ActivityPub::Activity::Delete < ActivityPub::Activity
         Tombstone.find_or_create_by(uri: object_uri, account: @account)
       end
 
-      case @object['type']
-      when 'QuoteAuthorization'
-        revoke_quote
-      when 'Note', 'Question'
-        delete_status
-      else
-        delete_status || revoke_quote
-      end
+      delete_status
     end
   end
 
@@ -50,19 +43,6 @@ class ActivityPub::Activity::Delete < ActivityPub::Activity
 
     forwarder.forward! if forwarder.forwardable?
     RemoveStatusService.new.call(@status, redraft: false)
-
-    true
-  end
-
-  def revoke_quote
-    @quote = Quote.find_by(approval_uri: object_uri, quoted_account: @account, state: [:pending, :accepted])
-    return if @quote.nil?
-
-    ActivityPub::Forwarder.new(@account, @json, @quote.status).forward! if @quote.status.present?
-
-    @quote.reject!
-
-    DistributionWorker.perform_async(@quote.status_id, { 'update' => true }) if @quote.status.present?
   end
 
   def delete_feature_authorization!

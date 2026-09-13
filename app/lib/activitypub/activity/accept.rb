@@ -46,11 +46,10 @@ class ActivityPub::Activity::Accept < ActivityPub::Activity
 
   def accept_quote!(quote)
     approval_uri = value_or_id(first_of_value(@json['result']))
-    return if unsupported_uri_scheme?(approval_uri) || non_matching_uri_hosts?(approval_uri, @account.uri) || quote.quoted_account != @account || !quote.status.local? || !quote.pending?
+    return if unsupported_uri_scheme?(approval_uri) || non_matching_uri_hosts?(approval_uri, @account.uri) || quote.quoted_account != @account || !quote.status.local? || quote.approval_uri.present?
 
-    # NOTE: we are not going through `ActivityPub::VerifyQuoteService` as the `Accept` is as authoritative
-    # as the stamp, but this means we are not checking the stamp, which may lead to inconsistencies
-    # in case of an implementation bug
+    # NOTE: the quote has been accepted without waiting for this `Accept`, the stamp
+    # is only recorded so that it can be advertised to servers that do verify quotes
     quote.update!(state: :accepted, approval_uri: approval_uri)
 
     DistributionWorker.perform_async(quote.status_id, { 'update' => true })
