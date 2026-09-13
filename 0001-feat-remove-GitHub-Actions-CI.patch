@@ -1,32 +1,32 @@
-From fa295a2bfc678434c1b09978e48c90da2dea63fa Mon Sep 17 00:00:00 2001
+From 739e77ed9399662445d1d017ed8d013b493d2a5b Mon Sep 17 00:00:00 2001
 From: Noa Himesaka <himesaka@noa.codes>
 Date: Fri, 1 May 2026 18:26:58 +0900
 Subject: [PATCH] feat: remove GitHub Actions CI
 
 ---
- .github/workflows/build-container-image.yml   | 170 --------
+ .github/workflows/build-container-image.yml   | 171 --------
  .github/workflows/build-nightly.yml           |  60 ---
  .github/workflows/build-push-pr.yml           |  58 ---
  .github/workflows/build-releases.yml          |  82 ----
  .github/workflows/build-security.yml          |  57 ---
- .github/workflows/bundler-audit.yml           |  39 --
- .github/workflows/check-i18n.yml              |  51 ---
- .github/workflows/chromatic.yml               |  62 ---
- .github/workflows/codeql.yml                  |  66 ---
+ .github/workflows/bundler-audit.yml           |  40 --
+ .github/workflows/check-i18n.yml              |  52 ---
+ .github/workflows/chromatic.yml               |  64 ---
+ .github/workflows/codeql.yml                  |  67 ---
  .github/workflows/crowdin-download-stable.yml |  70 ----
  .github/workflows/crowdin-download.yml        |  72 ----
  .github/workflows/crowdin-upload.yml          |  39 --
- .github/workflows/format-check.yml            |  22 -
- .github/workflows/lint-css.yml                |  41 --
- .github/workflows/lint-haml.yml               |  45 --
- .github/workflows/lint-js.yml                 |  48 ---
- .github/workflows/lint-ruby.yml               |  50 ---
+ .github/workflows/format-check.yml            |  23 -
+ .github/workflows/lint-css.yml                |  40 --
+ .github/workflows/lint-haml.yml               |  44 --
+ .github/workflows/lint-js.yml                 |  49 ---
+ .github/workflows/lint-ruby.yml               |  49 ---
  .github/workflows/rebase-needed.yml           |  28 --
  .github/workflows/test-image-build.yml        |  34 --
- .github/workflows/test-js.yml                 |  43 --
- .github/workflows/test-migrations.yml         | 112 -----
- .github/workflows/test-ruby.yml               | 389 ------------------
- 22 files changed, 1638 deletions(-)
+ .github/workflows/test-js.yml                 |  44 --
+ .github/workflows/test-migrations.yml         | 113 -----
+ .github/workflows/test-ruby.yml               | 396 ------------------
+ 22 files changed, 1652 deletions(-)
  delete mode 100644 .github/workflows/build-container-image.yml
  delete mode 100644 .github/workflows/build-nightly.yml
  delete mode 100644 .github/workflows/build-push-pr.yml
@@ -52,10 +52,10 @@ Subject: [PATCH] feat: remove GitHub Actions CI
 
 diff --git a/.github/workflows/build-container-image.yml b/.github/workflows/build-container-image.yml
 deleted file mode 100644
-index 595011a0c6..0000000000
+index 7924655f34..0000000000
 --- a/.github/workflows/build-container-image.yml
 +++ /dev/null
-@@ -1,170 +0,0 @@
+@@ -1,171 +0,0 @@
 -on:
 -  workflow_call:
 -    inputs:
@@ -93,7 +93,7 @@ index 595011a0c6..0000000000
 -          - linux/arm64
 -
 -    steps:
--      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
 -
 -      - name: Prepare
 -        env:
@@ -103,7 +103,8 @@ index 595011a0c6..0000000000
 -          echo "PLATFORM_PAIR=${platform//\//-}" >> $GITHUB_ENV
 -          # Transform multi-line variable into comma-separated variable
 -          image_names=${PUSH_TO_IMAGES//$'\n'/,}
--          echo "IMAGE_NAMES=${image_names%,}" >> $GITHUB_ENV
+-          image_names_split=${image_names%,}
+-          echo "IMAGE_NAMES=${image_names_split,,}" >> $GITHUB_ENV
 -
 -      - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
 -        id: buildx
@@ -134,7 +135,7 @@ index 595011a0c6..0000000000
 -
 -      - name: Build and push by digest
 -        id: build
--        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6
+-        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
 -        with:
 -          context: .
 -          file: ${{ inputs.file_to_build }}
@@ -145,8 +146,8 @@ index 595011a0c6..0000000000
 -          platforms: ${{ matrix.platform }}
 -          provenance: false
 -          push: ${{ inputs.push_to_images != '' }}
--          cache-from: ${{ inputs.cache && 'type=gha' || '' }}
--          cache-to: ${{ inputs.cache && 'type=gha,mode=max' || '' }}
+-          cache-from: ${{ inputs.cache && format('type=gha,scope=build-{0}-{1}', hashFiles(inputs.file_to_build), env.PLATFORM_PAIR) || '' }}
+-          cache-to: ${{ inputs.cache && format('type=gha,mode=max,scope=build-{0}-{1}', hashFiles(inputs.file_to_build), env.PLATFORM_PAIR) || '' }}
 -          outputs: type=image,"name=${{ env.IMAGE_NAMES }}",push-by-digest=true,name-canonical=true,push=${{ inputs.push_to_images != '' }}
 -
 -      - name: Export digest
@@ -177,7 +178,7 @@ index 595011a0c6..0000000000
 -      PUSH_TO_IMAGES: ${{ inputs.push_to_images }}
 -
 -    steps:
--      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
 -
 -      - name: Download digests
 -        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
@@ -218,13 +219,13 @@ index 595011a0c6..0000000000
 -      - name: Create manifest list and push
 -        working-directory: ${{ runner.temp }}/digests
 -        run: |
--          echo "$PUSH_TO_IMAGES" | xargs -I{} \
+-          echo "${PUSH_TO_IMAGES,,}" | xargs -I{} \
 -            docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
 -              $(printf '{}@sha256:%s ' *)
 -
 -      - name: Inspect image
 -        run: |
--          echo "$PUSH_TO_IMAGES" | xargs -i{} \
+-          echo "${PUSH_TO_IMAGES,,}" | xargs -i{} \
 -            docker buildx imagetools inspect {}:${{ steps.meta.outputs.version }}
 diff --git a/.github/workflows/build-nightly.yml b/.github/workflows/build-nightly.yml
 deleted file mode 100644
@@ -294,7 +295,7 @@ index 7dda6cb350..0000000000
 -    secrets: inherit
 diff --git a/.github/workflows/build-push-pr.yml b/.github/workflows/build-push-pr.yml
 deleted file mode 100644
-index ead1ecd082..0000000000
+index 252175c2c8..0000000000
 --- a/.github/workflows/build-push-pr.yml
 +++ /dev/null
 @@ -1,58 +0,0 @@
@@ -318,7 +319,7 @@ index ead1ecd082..0000000000
 -    steps:
 -      # Repository needs to be cloned so `git rev-parse` below works
 -      - name: Clone repository
--        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
 -      - id: version_vars
 -        run: |
 -          echo mastodon_version_metadata=pr-${{ github.event.pull_request.number }}-$(git rev-parse --short ${{github.event.pull_request.head.sha}}) >> $GITHUB_OUTPUT
@@ -358,7 +359,7 @@ index ead1ecd082..0000000000
 -    secrets: inherit
 diff --git a/.github/workflows/build-releases.yml b/.github/workflows/build-releases.yml
 deleted file mode 100644
-index c5a1842dff..0000000000
+index ca19a529d8..0000000000
 --- a/.github/workflows/build-releases.yml
 +++ /dev/null
 @@ -1,82 +0,0 @@
@@ -380,7 +381,7 @@ index c5a1842dff..0000000000
 -    steps:
 -      # Repository needs to be cloned to list branches
 -      - name: Clone repository
--        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
 -        with:
 -          fetch-depth: 0
 -
@@ -509,10 +510,10 @@ index 32a2d534bd..0000000000
 -    secrets: inherit
 diff --git a/.github/workflows/bundler-audit.yml b/.github/workflows/bundler-audit.yml
 deleted file mode 100644
-index 964d93378d..0000000000
+index b51f792ec6..0000000000
 --- a/.github/workflows/bundler-audit.yml
 +++ /dev/null
-@@ -1,39 +0,0 @@
+@@ -1,40 +0,0 @@
 -name: Bundler Audit
 -on:
 -  merge_group:
@@ -537,16 +538,17 @@ index 964d93378d..0000000000
 -jobs:
 -  security:
 -    runs-on: ubuntu-latest
+-    timeout-minutes: 15
 -
 -    env:
 -      BUNDLE_ONLY: development
 -
 -    steps:
 -      - name: Clone repository
--        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
 -
 -      - name: Set up Ruby
--        uses: ruby/setup-ruby@c984c1a20bb35a1cbda04477c816cea024418be9 # v1
+-        uses: ruby/setup-ruby@6e5d382445ae5590b7449d8b3bc8cb1c2c27f617 # v1
 -        with:
 -          bundler-cache: true
 -
@@ -554,10 +556,10 @@ index 964d93378d..0000000000
 -        run: bin/bundler-audit check --update
 diff --git a/.github/workflows/check-i18n.yml b/.github/workflows/check-i18n.yml
 deleted file mode 100644
-index 4906ab6cf4..0000000000
+index bd77ec5dbe..0000000000
 --- a/.github/workflows/check-i18n.yml
 +++ /dev/null
-@@ -1,51 +0,0 @@
+@@ -1,52 +0,0 @@
 -name: Check i18n
 -
 -on:
@@ -579,9 +581,10 @@ index 4906ab6cf4..0000000000
 -jobs:
 -  check-i18n:
 -    runs-on: ubuntu-latest
+-    timeout-minutes: 15
 -
 -    steps:
--      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
 -
 -      - name: Set up Ruby environment
 -        uses: ./.github/actions/setup-ruby
@@ -598,7 +601,7 @@ index 4906ab6cf4..0000000000
 -        run: bin/i18n-tasks check-normalized
 -
 -      - name: Check for unused strings
--        run: bin/i18n-tasks unused
+-        run: bin/i18n-tasks unused -l en
 -
 -      - name: Check for missing strings in English YML
 -        run: |
@@ -611,10 +614,10 @@ index 4906ab6cf4..0000000000
 -        run: bin/rake repo:check_locales_files
 diff --git a/.github/workflows/chromatic.yml b/.github/workflows/chromatic.yml
 deleted file mode 100644
-index 19548c28c1..0000000000
+index 0068fc2d12..0000000000
 --- a/.github/workflows/chromatic.yml
 +++ /dev/null
-@@ -1,62 +0,0 @@
+@@ -1,64 +0,0 @@
 -name: 'Chromatic'
 -permissions:
 -  contents: read
@@ -629,15 +632,16 @@ index 19548c28c1..0000000000
 -  pathcheck:
 -    name: Check for relevant changes
 -    runs-on: ubuntu-latest
+-    timeout-minutes: 15
 -    outputs:
 -      changed: ${{ steps.filter.outputs.src }}
 -    steps:
 -      - name: Checkout code
--        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
 -        with:
 -          fetch-depth: 0
 -
--      - uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3
+-      - uses: dorny/paths-filter@0e4a8c6effa4802afeda77dc8d303f8176d7dfad # v3
 -        id: filter
 -        with:
 -          filters: |
@@ -655,11 +659,12 @@ index 19548c28c1..0000000000
 -  chromatic:
 -    name: Run Chromatic
 -    runs-on: ubuntu-latest
+-    timeout-minutes: 15
 -    needs: pathcheck
 -    if: github.repository == 'mastodon/mastodon' && needs.pathcheck.outputs.changed == 'true'
 -    steps:
 -      - name: Checkout code
--        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
 -        with:
 -          fetch-depth: 0
 -
@@ -670,7 +675,7 @@ index 19548c28c1..0000000000
 -        run: yarn build-storybook
 -
 -      - name: Run Chromatic
--        uses: chromaui/action@07791f8243f4cb2698bf4d00426baf4b2d1cb7e0 # v13
+-        uses: chromaui/action@98132da0fca2211fb41b3af7b49ce85176007851 # v17
 -        with:
 -          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
 -          zip: true
@@ -679,10 +684,10 @@ index 19548c28c1..0000000000
 -          autoAcceptChanges: 'main' # Auto-accept changes on main branch only
 diff --git a/.github/workflows/codeql.yml b/.github/workflows/codeql.yml
 deleted file mode 100644
-index 4e55219f55..0000000000
+index fea0b4679a..0000000000
 --- a/.github/workflows/codeql.yml
 +++ /dev/null
-@@ -1,66 +0,0 @@
+@@ -1,67 +0,0 @@
 -name: 'CodeQL'
 -
 -on:
@@ -702,6 +707,7 @@ index 4e55219f55..0000000000
 -  analyze:
 -    name: Analyze
 -    runs-on: ubuntu-latest
+-    timeout-minutes: 15
 -    permissions:
 -      actions: read
 -      contents: read
@@ -716,11 +722,11 @@ index 4e55219f55..0000000000
 -
 -    steps:
 -      - name: Checkout repository
--        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
 -
 -      # Initializes the CodeQL tools for scanning.
 -      - name: Initialize CodeQL
--        uses: github/codeql-action/init@45cbd0c69e560cd9e7cd7f8c32362050c9b7ded2 # v4
+-        uses: github/codeql-action/init@5595ccaf912efad79be6eef63a5619ff05969be3 # v4
 -        with:
 -          languages: ${{ matrix.language }}
 -          # If you wish to specify custom queries, you can do so here or in a config file.
@@ -733,7 +739,7 @@ index 4e55219f55..0000000000
 -      # Autobuild attempts to build any compiled languages  (C/C++, C#, Go, or Java).
 -      # If this step fails, then you should remove it and run the build manually (see below)
 -      - name: Autobuild
--        uses: github/codeql-action/autobuild@45cbd0c69e560cd9e7cd7f8c32362050c9b7ded2 # v4
+-        uses: github/codeql-action/autobuild@5595ccaf912efad79be6eef63a5619ff05969be3 # v4
 -
 -      # ℹ️ Command-line programs to run using the OS shell.
 -      # 📚 See https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsrun
@@ -746,12 +752,12 @@ index 4e55219f55..0000000000
 -      #   ./location_of_script_within_repo/buildscript.sh
 -
 -      - name: Perform CodeQL Analysis
--        uses: github/codeql-action/analyze@45cbd0c69e560cd9e7cd7f8c32362050c9b7ded2 # v4
+-        uses: github/codeql-action/analyze@5595ccaf912efad79be6eef63a5619ff05969be3 # v4
 -        with:
 -          category: '/language:${{matrix.language}}'
 diff --git a/.github/workflows/crowdin-download-stable.yml b/.github/workflows/crowdin-download-stable.yml
 deleted file mode 100644
-index 47876f8e41..0000000000
+index 529bf31bb8..0000000000
 --- a/.github/workflows/crowdin-download-stable.yml
 +++ /dev/null
 @@ -1,70 +0,0 @@
@@ -770,7 +776,7 @@ index 47876f8e41..0000000000
 -
 -    steps:
 -      - name: Checkout
--        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
 -
 -      - name: Increase Git http.postBuffer
 -        # This is needed due to a bug in Ubuntu's cURL version?
@@ -781,7 +787,7 @@ index 47876f8e41..0000000000
 -
 -      # Download the translation files from Crowdin
 -      - name: crowdin action
--        uses: crowdin/github-action@8868a33591d21088edfc398968173a3b98d51706 # v2
+-        uses: crowdin/github-action@c7af9bc98b01694653031fef2a0dc6c7888ce9bc # v2
 -        with:
 -          config: crowdin-glitch.yml
 -          upload_sources: false
@@ -821,13 +827,13 @@ index 47876f8e41..0000000000
 -            This PR will be updated every day with new translations.
 -
 -            Due to a limitation in GitHub Actions, checks are not running on this PR without manual action.
--            If you want to run the checks, then close and re-open it.
+-            If you want to run the checks, then please press “Approve workflows to run”.
 -          branch: i18n/crowdin/translations-${{ github.base_ref || github.ref_name }}
 -          base: ${{ github.base_ref || github.ref_name }}
 -          labels: i18n
 diff --git a/.github/workflows/crowdin-download.yml b/.github/workflows/crowdin-download.yml
 deleted file mode 100644
-index 9e8c794ee0..0000000000
+index 4b040821c9..0000000000
 --- a/.github/workflows/crowdin-download.yml
 +++ /dev/null
 @@ -1,72 +0,0 @@
@@ -848,7 +854,7 @@ index 9e8c794ee0..0000000000
 -
 -    steps:
 -      - name: Checkout
--        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
 -
 -      - name: Increase Git http.postBuffer
 -        # This is needed due to a bug in Ubuntu's cURL version?
@@ -859,7 +865,7 @@ index 9e8c794ee0..0000000000
 -
 -      # Download the translation files from Crowdin
 -      - name: crowdin action
--        uses: crowdin/github-action@8868a33591d21088edfc398968173a3b98d51706 # v2
+-        uses: crowdin/github-action@c7af9bc98b01694653031fef2a0dc6c7888ce9bc # v2
 -        with:
 -          config: crowdin-glitch.yml
 -          upload_sources: false
@@ -886,7 +892,7 @@ index 9e8c794ee0..0000000000
 -
 -      # Create or update the pull request
 -      - name: Create Pull Request
--        uses: peter-evans/create-pull-request@c0f553fe549906ede9cf27b5156039d195d2ece0 # v8
+-        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8
 -        with:
 -          commit-message: 'New Crowdin translations'
 -          title: 'New Crowdin Translations (automated)'
@@ -899,13 +905,13 @@ index 9e8c794ee0..0000000000
 -            This PR will be updated every day with new translations.
 -
 -            Due to a limitation in GitHub Actions, checks are not running on this PR without manual action.
--            If you want to run the checks, then close and re-open it.
+-            If you want to run the checks, then please press “Approve workflows to run”.
 -          branch: i18n/crowdin/translations
 -          base: main
 -          labels: i18n
 diff --git a/.github/workflows/crowdin-upload.yml b/.github/workflows/crowdin-upload.yml
 deleted file mode 100644
-index 83b913ca56..0000000000
+index ce20a287af..0000000000
 --- a/.github/workflows/crowdin-upload.yml
 +++ /dev/null
 @@ -1,39 +0,0 @@
@@ -934,10 +940,10 @@ index 83b913ca56..0000000000
 -
 -    steps:
 -      - name: Checkout
--        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
 -
 -      - name: crowdin action
--        uses: crowdin/github-action@8868a33591d21088edfc398968173a3b98d51706 # v2
+-        uses: crowdin/github-action@c7af9bc98b01694653031fef2a0dc6c7888ce9bc # v2
 -        with:
 -          config: crowdin-glitch.yml
 -          upload_sources: true
@@ -950,10 +956,10 @@ index 83b913ca56..0000000000
 -          CROWDIN_PERSONAL_TOKEN: ${{ secrets.CROWDIN_PERSONAL_TOKEN }}
 diff --git a/.github/workflows/format-check.yml b/.github/workflows/format-check.yml
 deleted file mode 100644
-index 9a200504ef..0000000000
+index ee4b262acd..0000000000
 --- a/.github/workflows/format-check.yml
 +++ /dev/null
-@@ -1,22 +0,0 @@
+@@ -1,23 +0,0 @@
 -name: Check formatting
 -on:
 -  merge_group:
@@ -966,10 +972,11 @@ index 9a200504ef..0000000000
 -jobs:
 -  lint:
 -    runs-on: ubuntu-latest
+-    timeout-minutes: 15
 -
 -    steps:
 -      - name: Clone repository
--        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
 -
 -      - name: Set up Javascript environment
 -        uses: ./.github/actions/setup-javascript
@@ -978,10 +985,10 @@ index 9a200504ef..0000000000
 -        run: yarn format:check
 diff --git a/.github/workflows/lint-css.yml b/.github/workflows/lint-css.yml
 deleted file mode 100644
-index 60778f11a0..0000000000
+index e69fdc15e8..0000000000
 --- a/.github/workflows/lint-css.yml
 +++ /dev/null
-@@ -1,41 +0,0 @@
+@@ -1,40 +0,0 @@
 -name: CSS Linting
 -on:
 -  merge_group:
@@ -997,7 +1004,6 @@ index 60778f11a0..0000000000
 -      - '**/*.css'
 -      - '**/*.scss'
 -      - '.github/workflows/lint-css.yml'
--      - '.github/stylelint-matcher.json'
 -
 -  pull_request:
 -    paths:
@@ -1008,15 +1014,15 @@ index 60778f11a0..0000000000
 -      - '**/*.css'
 -      - '**/*.scss'
 -      - '.github/workflows/lint-css.yml'
--      - '.github/stylelint-matcher.json'
 -
 -jobs:
 -  lint:
 -    runs-on: ubuntu-latest
+-    timeout-minutes: 15
 -
 -    steps:
 -      - name: Clone repository
--        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
 -
 -      - name: Set up Javascript environment
 -        uses: ./.github/actions/setup-javascript
@@ -1025,10 +1031,10 @@ index 60778f11a0..0000000000
 -        run: yarn lint:css --custom-formatter @csstools/stylelint-formatter-github
 diff --git a/.github/workflows/lint-haml.yml b/.github/workflows/lint-haml.yml
 deleted file mode 100644
-index 33dc4e4fb6..0000000000
+index fdb6cf1dac..0000000000
 --- a/.github/workflows/lint-haml.yml
 +++ /dev/null
-@@ -1,45 +0,0 @@
+@@ -1,44 +0,0 @@
 -name: Haml Linting
 -on:
 -  merge_group:
@@ -1037,7 +1043,6 @@ index 33dc4e4fb6..0000000000
 -      - 'main'
 -      - 'stable-*'
 -    paths:
--      - '.github/workflows/haml-lint-problem-matcher.json'
 -      - '.github/workflows/lint-haml.yml'
 -      - '.haml-lint*.yml'
 -      - '.rubocop*.yml'
@@ -1047,7 +1052,6 @@ index 33dc4e4fb6..0000000000
 -
 -  pull_request:
 -    paths:
--      - '.github/workflows/haml-lint-problem-matcher.json'
 -      - '.github/workflows/lint-haml.yml'
 -      - '.haml-lint*.yml'
 -      - '.rubocop*.yml'
@@ -1058,16 +1062,17 @@ index 33dc4e4fb6..0000000000
 -jobs:
 -  lint:
 -    runs-on: ubuntu-latest
+-    timeout-minutes: 15
 -
 -    env:
 -      BUNDLE_ONLY: development
 -
 -    steps:
 -      - name: Clone repository
--        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
 -
 -      - name: Set up Ruby
--        uses: ruby/setup-ruby@c984c1a20bb35a1cbda04477c816cea024418be9 # v1
+-        uses: ruby/setup-ruby@6e5d382445ae5590b7449d8b3bc8cb1c2c27f617 # v1
 -        with:
 -          bundler-cache: true
 -
@@ -1076,10 +1081,10 @@ index 33dc4e4fb6..0000000000
 -          bin/haml-lint --reporter github
 diff --git a/.github/workflows/lint-js.yml b/.github/workflows/lint-js.yml
 deleted file mode 100644
-index f16e01d4d2..0000000000
+index 65c305604c..0000000000
 --- a/.github/workflows/lint-js.yml
 +++ /dev/null
-@@ -1,48 +0,0 @@
+@@ -1,49 +0,0 @@
 -name: JavaScript Linting
 -on:
 -  merge_group:
@@ -1115,10 +1120,11 @@ index f16e01d4d2..0000000000
 -jobs:
 -  lint:
 -    runs-on: ubuntu-latest
+-    timeout-minutes: 15
 -
 -    steps:
 -      - name: Clone repository
--        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
 -
 -      - name: Set up Javascript environment
 -        uses: ./.github/actions/setup-javascript
@@ -1130,10 +1136,10 @@ index f16e01d4d2..0000000000
 -        run: yarn typecheck
 diff --git a/.github/workflows/lint-ruby.yml b/.github/workflows/lint-ruby.yml
 deleted file mode 100644
-index b68f50e033..0000000000
+index 950e502941..0000000000
 --- a/.github/workflows/lint-ruby.yml
 +++ /dev/null
-@@ -1,50 +0,0 @@
+@@ -1,49 +0,0 @@
 -name: Ruby Linting
 -on:
 -  merge_group:
@@ -1146,7 +1152,6 @@ index b68f50e033..0000000000
 -      - '.rubocop*.yml'
 -      - '.ruby-version'
 -      - 'bin/rubocop'
--      - 'config/brakeman.ignore'
 -      - '**/*.rb'
 -      - '**/*.rake'
 -      - '.github/workflows/lint-ruby.yml'
@@ -1157,7 +1162,6 @@ index b68f50e033..0000000000
 -      - '.rubocop*.yml'
 -      - '.ruby-version'
 -      - 'bin/rubocop'
--      - 'config/brakeman.ignore'
 -      - '**/*.rb'
 -      - '**/*.rake'
 -      - '.github/workflows/lint-ruby.yml'
@@ -1165,16 +1169,17 @@ index b68f50e033..0000000000
 -jobs:
 -  lint:
 -    runs-on: ubuntu-latest
+-    timeout-minutes: 15
 -
 -    env:
 -      BUNDLE_ONLY: development
 -
 -    steps:
 -      - name: Clone repository
--        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
 -
 -      - name: Set up Ruby
--        uses: ruby/setup-ruby@c984c1a20bb35a1cbda04477c816cea024418be9 # v1
+-        uses: ruby/setup-ruby@6e5d382445ae5590b7449d8b3bc8cb1c2c27f617 # v1
 -        with:
 -          bundler-cache: true
 -
@@ -1260,10 +1265,10 @@ index 121b8b0ddf..0000000000
 -      cache: true
 diff --git a/.github/workflows/test-js.yml b/.github/workflows/test-js.yml
 deleted file mode 100644
-index d1b55a5e0b..0000000000
+index 5a3c578899..0000000000
 --- a/.github/workflows/test-js.yml
 +++ /dev/null
-@@ -1,43 +0,0 @@
+@@ -1,44 +0,0 @@
 -name: JavaScript Testing
 -on:
 -  merge_group:
@@ -1297,10 +1302,11 @@ index d1b55a5e0b..0000000000
 -jobs:
 -  test:
 -    runs-on: ubuntu-latest
+-    timeout-minutes: 15
 -
 -    steps:
 -      - name: Clone repository
--        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
 -
 -      - name: Set up Javascript environment
 -        uses: ./.github/actions/setup-javascript
@@ -1309,10 +1315,10 @@ index d1b55a5e0b..0000000000
 -        run: yarn test:js
 diff --git a/.github/workflows/test-migrations.yml b/.github/workflows/test-migrations.yml
 deleted file mode 100644
-index f33bf981cc..0000000000
+index 79268f3e60..0000000000
 --- a/.github/workflows/test-migrations.yml
 +++ /dev/null
-@@ -1,112 +0,0 @@
+@@ -1,113 +0,0 @@
 -name: Historical data migration test
 -
 -on:
@@ -1340,6 +1346,7 @@ index f33bf981cc..0000000000
 -jobs:
 -  test:
 -    runs-on: ubuntu-latest
+-    timeout-minutes: 15
 -
 -    strategy:
 -      fail-fast: false
@@ -1387,7 +1394,7 @@ index f33bf981cc..0000000000
 -      BUNDLE_RETRY: 3
 -
 -    steps:
--      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
 -
 -      - name: Set up Ruby environment
 -        uses: ./.github/actions/setup-ruby
@@ -1418,8 +1425,8 @@ index f33bf981cc..0000000000
 -          bin/rails db:create
 -          SKIP_POST_DEPLOYMENT_MIGRATIONS=true bin/rails tests:migrations:prepare_database
 -
--          # Migrate up to v4.2.0 breakpoint
--          bin/rails db:migrate VERSION=20230907150100
+-          # Migrate up to v4.3.0 breakpoint
+-          bin/rails db:migrate VERSION=20241007071624
 -
 -          # Migrate the rest
 -          SKIP_POST_DEPLOYMENT_MIGRATIONS=true bin/rails db:migrate
@@ -1427,10 +1434,10 @@ index f33bf981cc..0000000000
 -          bin/rails tests:migrations:check_database
 diff --git a/.github/workflows/test-ruby.yml b/.github/workflows/test-ruby.yml
 deleted file mode 100644
-index a8695cae8c..0000000000
+index 9a792be882..0000000000
 --- a/.github/workflows/test-ruby.yml
 +++ /dev/null
-@@ -1,389 +0,0 @@
+@@ -1,396 +0,0 @@
 -name: Ruby Testing
 -
 -on:
@@ -1452,6 +1459,7 @@ index a8695cae8c..0000000000
 -jobs:
 -  build:
 -    runs-on: ubuntu-latest
+-    timeout-minutes: 15
 -
 -    strategy:
 -      fail-fast: true
@@ -1465,7 +1473,7 @@ index a8695cae8c..0000000000
 -      SECRET_KEY_BASE_DUMMY: 1
 -
 -    steps:
--      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
 -
 -      - name: Set up Ruby environment
 -        uses: ./.github/actions/setup-ruby
@@ -1476,7 +1484,7 @@ index a8695cae8c..0000000000
 -          onlyProduction: 'true'
 -
 -      - name: Cache assets from compilation
--        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5
+-        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5
 -        with:
 -          path: |
 -            public/assets
@@ -1496,7 +1504,7 @@ index a8695cae8c..0000000000
 -
 -      - name: Archive asset artifacts
 -        run: |
--          tar --exclude={"*.br","*.gz"} -zcf artifacts.tar.gz public/assets public/packs* tmp/cache/vite/last-build*.json
+-          tar --exclude={"*.br","*.gz"} -zcf artifacts.tar.gz public/assets public/packs*
 -
 -      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
 -        if: matrix.mode == 'test'
@@ -1508,6 +1516,7 @@ index a8695cae8c..0000000000
 -
 -  test:
 -    runs-on: ubuntu-latest
+-    timeout-minutes: 60
 -
 -    needs:
 -      - build
@@ -1561,7 +1570,7 @@ index a8695cae8c..0000000000
 -          - '3.4'
 -          - '.ruby-version'
 -    steps:
--      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
 -
 -      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
 -        with:
@@ -1573,6 +1582,7 @@ index a8695cae8c..0000000000
 -          tar xvzf artifacts.tar.gz
 -
 -      - name: Set up Ruby environment
+-        timeout-minutes: 15
 -        uses: ./.github/actions/setup-ruby
 -        with:
 -          ruby-version: ${{ matrix.ruby-version}}
@@ -1584,7 +1594,7 @@ index a8695cae8c..0000000000
 -          bin/flatware fan bin/rails db:test:prepare
 -
 -      - name: Cache RSpec persistence file
--        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5
+-        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5
 -        with:
 -          path: |
 -            tmp/rspec/examples.txt
@@ -1596,11 +1606,11 @@ index a8695cae8c..0000000000
 -            rspec-persistence-main
 -            rspec-persistence
 -
--      - run: bin/flatware rspec -r ./spec/flatware_helper.rb
+-      - run: bin/flatware rspec
 -
 -      - name: Upload coverage reports to Codecov
 -        if: matrix.ruby-version == '.ruby-version'
--        uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5
+-        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v6
 -        with:
 -          files: coverage/lcov/*.lcov
 -        env:
@@ -1609,6 +1619,7 @@ index a8695cae8c..0000000000
 -  test-e2e:
 -    name: End to End testing
 -    runs-on: ubuntu-latest
+-    timeout-minutes: 30
 -
 -    needs:
 -      - build
@@ -1655,7 +1666,7 @@ index a8695cae8c..0000000000
 -          - '.ruby-version'
 -
 -    steps:
--      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
 -
 -      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
 -        with:
@@ -1668,6 +1679,7 @@ index a8695cae8c..0000000000
 -
 -      - name: Set up Ruby environment
 -        uses: ./.github/actions/setup-ruby
+-        timeout-minutes: 15
 -        with:
 -          ruby-version: ${{ matrix.ruby-version}}
 -          additional-system-dependencies: ffmpeg
@@ -1680,7 +1692,7 @@ index a8695cae8c..0000000000
 -
 -      - name: Cache Playwright Chromium browser
 -        id: playwright-cache
--        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5
+-        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5
 -        with:
 -          path: ~/.cache/ms-playwright
 -          key: playwright-browsers-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
@@ -1712,6 +1724,7 @@ index a8695cae8c..0000000000
 -  test-search:
 -    name: Elastic Search integration testing
 -    runs-on: ubuntu-latest
+-    timeout-minutes: 30
 -
 -    needs:
 -      - build
@@ -1793,7 +1806,7 @@ index a8695cae8c..0000000000
 -            search-image: opensearchproject/opensearch:2
 -
 -    steps:
--      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
 -
 -      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
 -        with:
@@ -1802,6 +1815,7 @@ index a8695cae8c..0000000000
 -
 -      - name: Set up Ruby environment
 -        uses: ./.github/actions/setup-ruby
+-        timeout-minutes: 15
 -        with:
 -          ruby-version: ${{ matrix.ruby-version}}
 -          additional-system-dependencies: ffmpeg
@@ -1821,5 +1835,5 @@ index a8695cae8c..0000000000
 -          name: test-search-logs-${{ matrix.ruby-version }}
 -          path: log/
 -- 
-2.54.0
+2.55.0
 

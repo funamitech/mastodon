@@ -1,4 +1,4 @@
-From 528385438635920d3310e45cbed790ebb2da64bb Mon Sep 17 00:00:00 2001
+From 015bac142d7a9ee1fab6ed0471ebcc9bf43be508 Mon Sep 17 00:00:00 2001
 From: Noa Himesaka <himesaka@noa.codes>
 Date: Tue, 7 Jul 2026 00:18:51 +0900
 Subject: [PATCH] fix: brandings
@@ -26,7 +26,7 @@ index 7ebc6eb56f..e140143fc7 100644
  test:
    experimental_features: <%= [ENV.fetch('EXPERIMENTAL_FEATURES', nil), 'testing_only'].compact.join(',') %>
 diff --git a/lib/mastodon/version.rb b/lib/mastodon/version.rb
-index 4092132f56..23bfaf62ad 100644
+index 27fbdb89e0..228d596778 100644
 --- a/lib/mastodon/version.rb
 +++ b/lib/mastodon/version.rb
 @@ -55,7 +55,7 @@ module Mastodon

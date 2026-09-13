@@ -1,4 +1,4 @@
-From e1149430509262e5b57a610066b0a0c808d595b2 Mon Sep 17 00:00:00 2001
+From 6b8b26764cea37167a44712d06419341d1330a73 Mon Sep 17 00:00:00 2001
 From: Noa Himesaka <himesaka@noa.codes>
 Date: Fri, 1 May 2026 17:57:18 +0900
 Subject: [PATCH] feat: Nori tokenizer for better Korean search

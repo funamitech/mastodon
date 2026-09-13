@@ -1,4 +1,4 @@
-From 6271664cbc9cf0516793c0221a10b6ae3fca819b Mon Sep 17 00:00:00 2001
+From 2041160235176e102f40e3cd007138d84fde466f Mon Sep 17 00:00:00 2001
 From: Noa Himesaka <himesaka@noa.codes>
 Date: Fri, 1 May 2026 18:09:58 +0900
 Subject: [PATCH] feat: YuruToot-specific texts
@@ -8,7 +8,7 @@ Subject: [PATCH] feat: YuruToot-specific texts
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/app/javascript/flavours/glitch/features/about/index.jsx b/app/javascript/flavours/glitch/features/about/index.jsx
-index e0c641f9cf..d65ac95af1 100644
+index 8c64d419a5..37d2b1c077 100644
 --- a/app/javascript/flavours/glitch/features/about/index.jsx
 +++ b/app/javascript/flavours/glitch/features/about/index.jsx
 @@ -173,7 +173,7 @@ class About extends PureComponent {
