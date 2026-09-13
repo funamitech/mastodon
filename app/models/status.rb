@@ -40,6 +40,7 @@ class Status < ApplicationRecord
   include RateLimitable
   include Status::FaspConcern
   include Status::FetchRepliesConcern
+  include Status::FetchReactionsConcern
   include Status::SafeReblogInsert
   include Status::SearchConcern
   include Status::SnapshotConcern
