@@ -1,0 +1,150 @@
+From e99abe6eef2bf143332a2bba522ef467445d2753 Mon Sep 17 00:00:00 2001
+From: Noa Himesaka <himesaka@noa.codes>
+Date: Mon, 14 Sep 2026 01:20:11 +0900
+Subject: [PATCH] fix: Modern theme for current glitch-soc
+
+---
+ .../glitch/styles/modern-contrast.scss        |  6 ---
+ .../flavours/glitch/styles/modern-light.scss  |  6 ---
+ .../flavours/glitch/styles/modern.scss        |  2 +
+ .../flavours/glitch/styles/modern/fixes.scss  | 43 +++++++++++++++++++
+ .../skins/glitch/modern-contrast.scss         |  1 -
+ .../skins/glitch/modern-contrast/names.yml    |  4 --
+ app/javascript/skins/glitch/modern-light.scss |  1 -
+ .../skins/glitch/modern-light/names.yml       |  4 --
+ .../{modern.scss => modern/common.scss}       |  0
+ 9 files changed, 45 insertions(+), 22 deletions(-)
+ delete mode 100644 app/javascript/flavours/glitch/styles/modern-contrast.scss
+ delete mode 100644 app/javascript/flavours/glitch/styles/modern-light.scss
+ create mode 100644 app/javascript/flavours/glitch/styles/modern/fixes.scss
+ delete mode 100644 app/javascript/skins/glitch/modern-contrast.scss
+ delete mode 100644 app/javascript/skins/glitch/modern-contrast/names.yml
+ delete mode 100644 app/javascript/skins/glitch/modern-light.scss
+ delete mode 100644 app/javascript/skins/glitch/modern-light/names.yml
+ rename app/javascript/skins/glitch/{modern.scss => modern/common.scss} (100%)
+
+diff --git a/app/javascript/flavours/glitch/styles/modern-contrast.scss b/app/javascript/flavours/glitch/styles/modern-contrast.scss
+deleted file mode 100644
+index 04afa8a5ac..0000000000
+--- a/app/javascript/flavours/glitch/styles/modern-contrast.scss
++++ /dev/null
+@@ -1,6 +0,0 @@
+-// Mastodon Modern theme by Freeplay! Check the original repo for more info: https://git.gay/freeplay/Mastodon-Modern
+-// Everything in the "modern" directory is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License: http://creativecommons.org/licenses/by-sa/4.0/
+-
+-@use 'application';
+-@use 'modern/style';
+-
+diff --git a/app/javascript/flavours/glitch/styles/modern-light.scss b/app/javascript/flavours/glitch/styles/modern-light.scss
+deleted file mode 100644
+index 04afa8a5ac..0000000000
+--- a/app/javascript/flavours/glitch/styles/modern-light.scss
++++ /dev/null
+@@ -1,6 +0,0 @@
+-// Mastodon Modern theme by Freeplay! Check the original repo for more info: https://git.gay/freeplay/Mastodon-Modern
+-// Everything in the "modern" directory is licensed under a Creative Commons Attribution-ShareAlike 4.0 International License: http://creativecommons.org/licenses/by-sa/4.0/
+-
+-@use 'application';
+-@use 'modern/style';
+-
+diff --git a/app/javascript/flavours/glitch/styles/modern.scss b/app/javascript/flavours/glitch/styles/modern.scss
+index 04afa8a5ac..62fde56461 100644
+--- a/app/javascript/flavours/glitch/styles/modern.scss
++++ b/app/javascript/flavours/glitch/styles/modern.scss
+@@ -3,4 +3,6 @@
+ 
+ @use 'application';
+ @use 'modern/style';
++@use 'modern/glitch-fixes';
++@use 'modern/fixes';
+ 
+diff --git a/app/javascript/flavours/glitch/styles/modern/fixes.scss b/app/javascript/flavours/glitch/styles/modern/fixes.scss
+new file mode 100644
+index 0000000000..dbfb93e405
+--- /dev/null
++++ b/app/javascript/flavours/glitch/styles/modern/fixes.scss
+@@ -0,0 +1,43 @@
++// Adjustments for the current glitch-soc, on top of the stylesheet shipped by
++// Mastodon Modern.
++
++// Search results render their tab bar (and, on medium screens, a second search
++// form) inside the column header, which Modern pins into the navigation column
++// at a fixed 50px. Drop the duplicate form, make room for the 46px tab bar and
++// push the navigation menu down by the same amount.
++@media (min-width: 760px) {
++  .tabs-bar__wrapper:has(.account__section-headline) {
++    height: 96px !important;
++  }
++
++  .tabs-bar__wrapper .explore__search-header {
++    display: none;
++  }
++
++  .columns-area__panels:has(.tabs-bar__wrapper .account__section-headline)
++    .navigation-panel {
++    padding-top: calc(10px + var(--radius) + 46px);
++  }
++}
++
++// glitch-fixes keeps the blurhash preview visible at half opacity even after
++// the media has loaded, which only washes out the image.
++html[data-user-flavour='glitch']
++  #mastodon
++  .media-gallery__item
++  > .media-gallery__preview--hidden {
++  display: none;
++}
++
++// Modern stretches every settings label with a ::before over its whole row so
++// the row toggles its checkbox. In a radio group that lets the last option's
++// label cover its siblings, so only the last colour scheme, contrast or emoji
++// style could ever be picked.
++.admin-wrapper
++  .fields-group
++  .input.radio_buttons
++  .label_input__wrapper
++  .radio
++  > label::before {
++  content: none;
++}
+diff --git a/app/javascript/skins/glitch/modern-contrast.scss b/app/javascript/skins/glitch/modern-contrast.scss
+deleted file mode 100644
+index 7b17b5ad45..0000000000
+--- a/app/javascript/skins/glitch/modern-contrast.scss
++++ /dev/null
+@@ -1 +0,0 @@
+-@use '@/flavours/glitch/styles/modern-contrast';
+diff --git a/app/javascript/skins/glitch/modern-contrast/names.yml b/app/javascript/skins/glitch/modern-contrast/names.yml
+deleted file mode 100644
+index 9673f81a9b..0000000000
+--- a/app/javascript/skins/glitch/modern-contrast/names.yml
++++ /dev/null
+@@ -1,4 +0,0 @@
+-en:
+-  skins:
+-    glitch:
+-      modern-contrast: Modern (high contrast)
+diff --git a/app/javascript/skins/glitch/modern-light.scss b/app/javascript/skins/glitch/modern-light.scss
+deleted file mode 100644
+index e4587e75e1..0000000000
+--- a/app/javascript/skins/glitch/modern-light.scss
++++ /dev/null
+@@ -1 +0,0 @@
+-@use '@/flavours/glitch/styles/modern-light';
+diff --git a/app/javascript/skins/glitch/modern-light/names.yml b/app/javascript/skins/glitch/modern-light/names.yml
+deleted file mode 100644
+index 453d7e04b7..0000000000
+--- a/app/javascript/skins/glitch/modern-light/names.yml
++++ /dev/null
+@@ -1,4 +0,0 @@
+-en:
+-  skins:
+-    glitch:
+-      modern-light: Modern (light)
+diff --git a/app/javascript/skins/glitch/modern.scss b/app/javascript/skins/glitch/modern/common.scss
+similarity index 100%
+rename from app/javascript/skins/glitch/modern.scss
+rename to app/javascript/skins/glitch/modern/common.scss
+-- 
+2.55.0
+

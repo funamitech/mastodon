@@ -1,0 +1,460 @@
+From 9e9fa2334238b51b1b0e042eb350600c5bc064eb Mon Sep 17 00:00:00 2001
+From: Noa Himesaka <himesaka@noa.codes>
+Date: Mon, 14 Sep 2026 01:20:11 +0900
+Subject: [PATCH] feat: fetch emoji reactions of remote posts
+
+---
+ .../activitypub/emoji_reactions_controller.rb |  68 +++++++++
+ .../api/v1/statuses/contexts_controller.rb    |   5 +-
+ app/helpers/context_helper.rb                 |   1 +
+ .../status/components/refresh_controller.tsx  |   5 +
+ app/lib/activitypub/tag_manager.rb            |   6 +
+ .../status/fetch_reactions_concern.rb         |  22 +++
+ app/models/status.rb                          |   1 +
+ app/models/status_reaction.rb                 |   2 +
+ .../activitypub/collection_serializer.rb      |   2 +
+ .../activitypub/note_serializer.rb            |   7 +-
+ .../activitypub/fetch_reactions_service.rb    | 133 ++++++++++++++++++
+ .../activitypub/fetch_reactions_worker.rb     |  23 +++
+ config/routes.rb                              |   2 +
+ 13 files changed, 274 insertions(+), 3 deletions(-)
+ create mode 100644 app/controllers/activitypub/emoji_reactions_controller.rb
+ create mode 100644 app/models/concerns/status/fetch_reactions_concern.rb
+ create mode 100644 app/services/activitypub/fetch_reactions_service.rb
+ create mode 100644 app/workers/activitypub/fetch_reactions_worker.rb
+
+diff --git a/app/controllers/activitypub/emoji_reactions_controller.rb b/app/controllers/activitypub/emoji_reactions_controller.rb
+new file mode 100644
+index 0000000000..304840826b
+--- /dev/null
++++ b/app/controllers/activitypub/emoji_reactions_controller.rb
+@@ -0,0 +1,68 @@
++# frozen_string_literal: true
++
++class ActivityPub::EmojiReactionsController < ActivityPub::BaseController
++  include Authorization
++
++  REACTIONS_LIMIT = 60
++
++  vary_by -> { 'Signature' if authorized_fetch_mode? }
++
++  before_action :require_account_signature!, if: :authorized_fetch_mode?
++  before_action :set_status
++  before_action :set_reactions
++
++  def index
++    expires_in 0, public: @status.distributable? && public_fetch_mode?
++    render json: emoji_reactions_collection_presenter, serializer: ActivityPub::CollectionSerializer, adapter: ActivityPub::Adapter, content_type: 'application/activity+json'
++  end
++
++  private
++
++  def pundit_user
++    signed_request_account
++  end
++
++  def set_status
++    @status = @account.statuses.find(params[:status_id])
++    authorize @status, :show?
++  rescue ActiveRecord::RecordNotFound, Mastodon::NotPermittedError
++    not_found
++  end
++
++  def set_reactions
++    @reactions = @status.status_reactions.joins(:account).merge(Account.without_suspended)
++    @reactions = @reactions.paginate_by_min_id(REACTIONS_LIMIT, params[:min_id])
++  end
++
++  def emoji_reactions_collection_presenter
++    page = ActivityPub::CollectionPresenter.new(
++      id: ActivityPub::TagManager.instance.emoji_reactions_uri_for(@status, page_params),
++      type: :unordered,
++      part_of: ActivityPub::TagManager.instance.emoji_reactions_uri_for(@status),
++      next: next_page,
++      items: @reactions
++    )
++
++    return page if page_requested?
++
++    ActivityPub::CollectionPresenter.new(
++      id: ActivityPub::TagManager.instance.emoji_reactions_uri_for(@status),
++      type: :unordered,
++      first: page
++    )
++  end
++
++  def page_requested?
++    truthy_param?(:page)
++  end
++
++  def next_page
++    return if @reactions.size < REACTIONS_LIMIT
++
++    ActivityPub::TagManager.instance.emoji_reactions_uri_for(@status, page: true, min_id: @reactions.last.id)
++  end
++
++  def page_params
++    params_slice(:min_id).merge(page: true)
++  end
++end
+diff --git a/app/controllers/api/v1/statuses/contexts_controller.rb b/app/controllers/api/v1/statuses/contexts_controller.rb
+index 2719bbe832..e0999d5a8c 100644
+--- a/app/controllers/api/v1/statuses/contexts_controller.rb
++++ b/app/controllers/api/v1/statuses/contexts_controller.rb
+@@ -44,12 +44,13 @@ class Api::V1::Statuses::ContextsController < Api::BaseController
+ 
+     if async_refresh.running?
+       add_async_refresh_header(async_refresh)
+-    elsif !current_account.nil? && @status.should_fetch_replies?
++    elsif !current_account.nil? && (@status.should_fetch_replies? || @status.should_fetch_reactions?)
+       add_async_refresh_header(AsyncRefresh.create(refresh_key, count_results: true))
+ 
+       WorkerBatch.new.within do |batch|
+         batch.connect(refresh_key, threshold: 1.0)
+-        ActivityPub::FetchAllRepliesWorker.perform_async(@status.id, { 'batch_id' => batch.id })
++        ActivityPub::FetchAllRepliesWorker.perform_async(@status.id, { 'batch_id' => batch.id }) if @status.should_fetch_replies?
++        ActivityPub::FetchReactionsWorker.perform_async(@status.id, { 'batch_id' => batch.id }) if @status.should_fetch_reactions?
+       end
+     end
+ 
+diff --git a/app/helpers/context_helper.rb b/app/helpers/context_helper.rb
+index e6ba07e3c3..1192696dfb 100644
+--- a/app/helpers/context_helper.rb
++++ b/app/helpers/context_helper.rb
+@@ -17,6 +17,7 @@ module ContextHelper
+     also_known_as: { 'alsoKnownAs' => { '@id' => 'as:alsoKnownAs', '@type' => '@id' } },
+     emoji: { 'toot' => 'http://joinmastodon.org/ns#', 'Emoji' => 'toot:Emoji' },
+     emoji_react: { 'litepub' => 'http://litepub.social/ns#', 'EmojiReact' => 'litepub:EmojiReact' },
++    emoji_reactions: { 'fedibird' => 'http://fedibird.com/ns#', 'emojiReactions' => { '@id' => 'fedibird:emojiReactions', '@type' => '@id' } },
+     featured: { 'toot' => 'http://joinmastodon.org/ns#', 'featured' => { '@id' => 'toot:featured', '@type' => '@id' }, 'featuredTags' => { '@id' => 'toot:featuredTags', '@type' => '@id' } },
+     property_value: { 'schema' => 'http://schema.org#', 'PropertyValue' => 'schema:PropertyValue', 'value' => 'schema:value' },
+     atom_uri: { 'ostatus' => 'http://ostatus.org#', 'atomUri' => 'ostatus:atomUri' },
+diff --git a/app/javascript/flavours/glitch/features/status/components/refresh_controller.tsx b/app/javascript/flavours/glitch/features/status/components/refresh_controller.tsx
+index e29461347b..7e8ce22bdc 100644
+--- a/app/javascript/flavours/glitch/features/status/components/refresh_controller.tsx
++++ b/app/javascript/flavours/glitch/features/status/components/refresh_controller.tsx
+@@ -6,6 +6,7 @@ import { useDebouncedCallback } from 'use-debounce';
+ 
+ import {
+   fetchContext,
++  fetchStatus,
+   completeContextRefresh,
+   showPendingReplies,
+   clearPendingReplies,
+@@ -130,6 +131,10 @@ function useCheckForRemoteReplies({
+           // (we don't want to do this if it's just a long-running job)
+           if (status === 'finished') {
+             dispatch(completeContextRefresh({ statusId }));
++            // Reactions fetched from the origin server live on the post itself
++            void dispatch(
++              fetchStatus(statusId, { forceFetch: true, alsoFetchContext: false }),
++            );
+           }
+ 
+           // Exit if there's nothing to fetch
+diff --git a/app/lib/activitypub/tag_manager.rb b/app/lib/activitypub/tag_manager.rb
+index cc91bb08f7..fe49707dfd 100644
+--- a/app/lib/activitypub/tag_manager.rb
++++ b/app/lib/activitypub/tag_manager.rb
+@@ -110,6 +110,12 @@ class ActivityPub::TagManager
+     target.account.numeric_ap_id? ? ap_account_status_replies_url(target.account.id, target, page_params) : account_status_replies_url(target.account, target, page_params)
+   end
+ 
++  def emoji_reactions_uri_for(target, page_params = nil)
++    raise ArgumentError, 'target must be a local activity' unless %i(note comment activity).include?(target.object_type) && target.local?
++
++    target.account.numeric_ap_id? ? ap_account_status_emoji_reactions_url(target.account.id, target, page_params) : account_status_emoji_reactions_url(target.account, target, page_params)
++  end
++
+   def likes_uri_for(target)
+     raise ArgumentError, 'target must be a local activity' unless %i(note comment activity).include?(target.object_type) && target.local?
+ 
+diff --git a/app/models/concerns/status/fetch_reactions_concern.rb b/app/models/concerns/status/fetch_reactions_concern.rb
+new file mode 100644
+index 0000000000..d30d00b93f
+--- /dev/null
++++ b/app/models/concerns/status/fetch_reactions_concern.rb
+@@ -0,0 +1,22 @@
++# frozen_string_literal: true
++
++module Status::FetchReactionsConcern
++  extend ActiveSupport::Concern
++
++  # Debounce period for fetching the reactions of a remote post from its origin
++  FETCH_REACTIONS_COOLDOWN_MINUTES = 15.minutes
++
++  def should_fetch_reactions?
++    !local? && distributable? && !Rails.cache.exist?(fetch_reactions_cache_key)
++  end
++
++  def touch_fetched_reactions!
++    Rails.cache.write(fetch_reactions_cache_key, true, expires_in: FETCH_REACTIONS_COOLDOWN_MINUTES)
++  end
++
++  private
++
++  def fetch_reactions_cache_key
++    "fetch_reactions:#{id}"
++  end
++end
+diff --git a/app/models/status.rb b/app/models/status.rb
+index c682b3445e..08dcf8f5a9 100644
+--- a/app/models/status.rb
++++ b/app/models/status.rb
+@@ -40,6 +40,7 @@ class Status < ApplicationRecord
+   include RateLimitable
+   include Status::FaspConcern
+   include Status::FetchRepliesConcern
++  include Status::FetchReactionsConcern
+   include Status::SafeReblogInsert
+   include Status::SearchConcern
+   include Status::SnapshotConcern
+diff --git a/app/models/status_reaction.rb b/app/models/status_reaction.rb
+index 2fdb3da0ac..f206282d58 100644
+--- a/app/models/status_reaction.rb
++++ b/app/models/status_reaction.rb
+@@ -13,6 +13,8 @@
+ #  updated_at      :datetime         not null
+ #
+ class StatusReaction < ApplicationRecord
++  include Paginable
++
+   belongs_to :account
+   belongs_to :status, inverse_of: :status_reactions
+   belongs_to :custom_emoji, optional: true
+diff --git a/app/serializers/activitypub/collection_serializer.rb b/app/serializers/activitypub/collection_serializer.rb
+index ba0d17f540..783694acb0 100644
+--- a/app/serializers/activitypub/collection_serializer.rb
++++ b/app/serializers/activitypub/collection_serializer.rb
+@@ -16,6 +16,8 @@ class ActivityPub::CollectionSerializer < ActivityPub::Serializer
+       ActivityPub::NoteSerializer
+     when 'FeaturedTag'
+       ActivityPub::HashtagSerializer
++    when 'StatusReaction'
++      ActivityPub::EmojiReactionSerializer
+     when 'ActivityPub::CollectionPresenter'
+       ActivityPub::CollectionSerializer
+     when 'Collection'
+diff --git a/app/serializers/activitypub/note_serializer.rb b/app/serializers/activitypub/note_serializer.rb
+index cd41abdad5..722c9f082b 100644
+--- a/app/serializers/activitypub/note_serializer.rb
++++ b/app/serializers/activitypub/note_serializer.rb
+@@ -4,7 +4,7 @@ class ActivityPub::NoteSerializer < ActivityPub::Serializer
+   include FormattingHelper
+   include JsonLdHelper
+ 
+-  context_extensions :atom_uri, :conversation, :sensitive, :voters_count, :quotes, :interaction_policies, :direct_message
++  context_extensions :atom_uri, :conversation, :sensitive, :voters_count, :quotes, :interaction_policies, :direct_message, :emoji_reactions
+ 
+   attributes :id, :type, :summary,
+              :in_reply_to, :published, :url,
+@@ -24,6 +24,7 @@ class ActivityPub::NoteSerializer < ActivityPub::Serializer
+   has_one :replies, serializer: ActivityPub::CollectionSerializer, if: :local?
+   has_one :likes, serializer: ActivityPub::CollectionSerializer, if: :local?
+   has_one :shares, serializer: ActivityPub::CollectionSerializer, if: :local?
++  attribute :emoji_reactions, if: :local?
+ 
+   has_many :poll_options, key: :one_of, if: :poll_and_not_multiple?
+   has_many :poll_options, key: :any_of, if: :poll_and_multiple?
+@@ -102,6 +103,10 @@ class ActivityPub::NoteSerializer < ActivityPub::Serializer
+     )
+   end
+ 
++  def emoji_reactions
++    ActivityPub::TagManager.instance.emoji_reactions_uri_for(object)
++  end
++
+   def language?
+     object.language.present?
+   end
+diff --git a/app/services/activitypub/fetch_reactions_service.rb b/app/services/activitypub/fetch_reactions_service.rb
+new file mode 100644
+index 0000000000..5fcc48ba73
+--- /dev/null
++++ b/app/services/activitypub/fetch_reactions_service.rb
+@@ -0,0 +1,133 @@
++# frozen_string_literal: true
++
++class ActivityPub::FetchReactionsService < BaseService
++  include JsonLdHelper
++
++  # Limit of fetched reactions per post
++  MAX_REACTIONS = 100
++
++  ACTIVITY_TYPES = %w(Like EmojiReact).freeze
++
++  # Custom emoji reactions carry the shortcode and, in Misskey, the emoji's
++  # host (`.` for the server the reaction was made on)
++  CUSTOM_EMOJI_REGEX = /\A:(?<shortcode>[^:@]+)(?:@(?<domain>[^:]+))?:\z/
++
++  # Notes of Misskey and its forks, which serve reactions through their API
++  # rather than through a collection
++  MISSKEY_NOTE_URI = %r{\Ahttps://(?<host>[^/]+)/notes/(?<id>[a-z0-9]+)\z}i
++
++  # Returns the number of reactions added
++  def call(status, request_id: nil)
++    @status     = status
++    @request_id = request_id
++
++    items = collection_reactions || misskey_reactions
++    return 0 if items.blank?
++
++    items.take(MAX_REACTIONS).count { |item| process_reaction(item) }
++  end
++
++  private
++
++  # FEP-c0e0: the note advertises an `emojiReactions` collection of `Like`
++  # and `EmojiReact` activities
++  def collection_reactions
++    note = fetch_resource(@status.uri, true)
++    return if note.nil? || note['emojiReactions'].blank?
++
++    items, = collection_items(note['emojiReactions'], max_pages: 2, max_items: MAX_REACTIONS, reference_uri: @status.uri)
++    items
++  end
++
++  # Misskey lists reactions through `notes/reactions` and serves each of them
++  # as a `Like` activity at /likes/:id
++  def misskey_reactions
++    match = MISSKEY_NOTE_URI.match(@status.uri)
++    return if match.nil?
++
++    reactions = Request.new(:post, "https://#{match[:host]}/api/notes/reactions", body: JSON.generate({ noteId: match[:id], limit: MAX_REACTIONS })).add_headers('Content-Type' => 'application/json').perform do |response|
++      body_to_json(response.body_with_limit) if response.code == 200
++    end
++
++    as_array(reactions).filter_map do |reaction|
++      next unless reaction.is_a?(Hash) && reaction['id'].present? && reaction['user'].is_a?(Hash)
++
++      {
++        'id' => "https://#{match[:host]}/likes/#{reaction['id']}",
++        'type' => 'Like',
++        'object' => @status.uri,
++        'content' => reaction['type'].to_s.sub(/@\.:\z/, "@#{match[:host]}:"),
++        'acct' => [reaction['user']['username'], reaction['user']['host'].presence || match[:host]].join('@'),
++      }
++    end
++  rescue Mastodon::UnexpectedResponseError, HTTP::Error, OpenSSL::SSL::SSLError => e
++    Rails.logger.debug { "Error fetching reactions of #{@status.uri} through the Misskey API: #{e}" }
++    nil
++  end
++
++  def process_reaction(item)
++    json = item.is_a?(String) ? fetch_resource(item, true) : item
++    return false unless json.is_a?(Hash) && ACTIVITY_TYPES.include?(json['type']) && value_or_id(json['object']) == @status.uri
++
++    account = reactor(json)
++    return false if account.nil? || account.suspended?
++
++    name  = Emoji.normalize((json['content'] || json['_misskey_reaction']).to_s)
++    match = CUSTOM_EMOJI_REGEX.match(name)
++
++    if match
++      custom_emoji = custom_emoji_for(match[:shortcode], match[:domain] || account.domain, json)
++      return false if custom_emoji.nil?
++
++      name = custom_emoji.shortcode
++    end
++
++    return true if account.reacted?(@status, name, custom_emoji)
++
++    @status.status_reactions.create!(account: account, name: name, custom_emoji: custom_emoji)
++    true
++  rescue ActiveRecord::RecordInvalid
++    false
++  end
++
++  def reactor(json)
++    if json['acct'].present?
++      ResolveAccountService.new.call(json['acct'])
++    else
++      actor_uri = value_or_id(json['actor'])
++      ActivityPub::TagManager.instance.uri_to_resource(actor_uri, Account) || ActivityPub::FetchRemoteAccountService.new.call(actor_uri, request_id: @request_id)
++    end
++  rescue Mastodon::UnexpectedResponseError, HTTP::Error, OpenSSL::SSL::SSLError, Webfinger::Error
++    nil
++  end
++
++  # Like Misskey, use the emoji as already learnt from that server's posts;
++  # otherwise fetch it, from the activity's `Emoji` tag or from the emoji's
++  # own URI (Misskey serves them at /emojis/:name)
++  def custom_emoji_for(shortcode, domain, json)
++    domain = nil if domain == Rails.configuration.x.local_domain
++    emoji  = CustomEmoji.find_by(shortcode: shortcode, domain: domain)
++    return emoji if emoji.present? || domain.nil?
++
++    tag = emoji_tag(json) || fetch_resource("https://#{domain}/emojis/#{shortcode}", true)
++    return unless tag.is_a?(Hash) && tag['type'] == 'Emoji'
++
++    parser = ActivityPub::Parser::CustomEmojiParser.new(tag)
++    return if parser.shortcode != shortcode || parser.image_remote_url.blank?
++
++    CustomEmoji.create!(domain: domain, shortcode: shortcode, uri: parser.uri, image_remote_url: parser.image_remote_url)
++  rescue ActiveRecord::RecordInvalid, Seahorse::Client::NetworkingError => e
++    Rails.logger.debug { "Error fetching custom emoji :#{shortcode}: of #{domain}: #{e}" }
++    nil
++  end
++
++  # Misskey leaves the `Emoji` tag out of its API listing, but includes it in
++  # the activity itself for its own emoji
++  def emoji_tag(json)
++    tag = as_array(json['tag']).find { |item| item['type'] == 'Emoji' }
++    return tag unless tag.nil? || json['acct'].blank?
++
++    activity = fetch_resource(json['id'], true)
++    as_array(activity['tag']).find { |item| item['type'] == 'Emoji' } if activity.is_a?(Hash)
++  end
++end
+diff --git a/app/workers/activitypub/fetch_reactions_worker.rb b/app/workers/activitypub/fetch_reactions_worker.rb
+new file mode 100644
+index 0000000000..f8ec80413f
+--- /dev/null
++++ b/app/workers/activitypub/fetch_reactions_worker.rb
+@@ -0,0 +1,23 @@
++# frozen_string_literal: true
++
++# Fetch the emoji reactions of a remote post from its origin server, through
++# its FEP-c0e0 `emojiReactions` collection or, for Misskey and its forks,
++# through their public API
++class ActivityPub::FetchReactionsWorker
++  include Sidekiq::Worker
++  include ExponentialBackoff
++
++  sidekiq_options queue: 'pull', retry: 3
++
++  def perform(status_id, options = {})
++    batch  = WorkerBatch.new(options.delete('batch_id')) if options['batch_id']
++    status = Status.remote.find_by(id: status_id)
++
++    return if status.nil? || !status.should_fetch_reactions?
++
++    status.touch_fetched_reactions!
++    ActivityPub::FetchReactionsService.new.call(status, **options.deep_symbolize_keys)
++  ensure
++    batch&.remove_job(jid)
++  end
++end
+diff --git a/config/routes.rb b/config/routes.rb
+index ee040a3072..5e868efe7c 100644
+--- a/config/routes.rb
++++ b/config/routes.rb
+@@ -120,6 +120,7 @@ Rails.application.routes.draw do
+       resources :replies, only: [:index], module: :activitypub
+       resources :likes, only: [:index], module: :activitypub
+       resources :shares, only: [:index], module: :activitypub
++      resources :emoji_reactions, only: [:index], module: :activitypub
+     end
+   end
+ 
+@@ -138,6 +139,7 @@ Rails.application.routes.draw do
+         resources :replies, only: [:index], module: :activitypub
+         resources :likes, only: [:index], module: :activitypub
+         resources :shares, only: [:index], module: :activitypub
++        resources :emoji_reactions, only: [:index], module: :activitypub
+       end
+     end
+   end
+-- 
+2.55.0
+
