@@ -1,4 +1,4 @@
-From 015bac142d7a9ee1fab6ed0471ebcc9bf43be508 Mon Sep 17 00:00:00 2001
+From 06418700188ec981e4e03a180e57aee65137bc13 Mon Sep 17 00:00:00 2001
 From: Noa Himesaka <himesaka@noa.codes>
 Date: Tue, 7 Jul 2026 00:18:51 +0900
 Subject: [PATCH] fix: brandings
@@ -9,7 +9,7 @@ Subject: [PATCH] fix: brandings
  2 files changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/config/mastodon.yml b/config/mastodon.yml
-index 7ebc6eb56f..e140143fc7 100644
+index 7ebc6eb56f..8cd14a7d79 100644
 --- a/config/mastodon.yml
 +++ b/config/mastodon.yml
 @@ -9,10 +9,10 @@ shared:
@@ -21,7 +21,7 @@ index 7ebc6eb56f..e140143fc7 100644
      tag: <%= ENV.fetch('SOURCE_TAG', nil) %>
    version:
 -    metadata: <%= ['glitch', ENV.fetch('MASTODON_VERSION_METADATA', nil)].compact_blank.join('.').to_json %>
-+    metadata: <%= ['YRYRneoA', ENV.fetch('MASTODON_VERSION_METADATA', nil)].compact_blank.join('.').to_json %>
++    metadata: <%= ['YRYRneoB', ENV.fetch('MASTODON_VERSION_METADATA', nil)].compact_blank.join('.').to_json %>
      prerelease: <%= ENV.fetch('MASTODON_VERSION_PRERELEASE', nil)&.to_json %>
  test:
    experimental_features: <%= [ENV.fetch('EXPERIMENTAL_FEATURES', nil), 'testing_only'].compact.join(',') %>

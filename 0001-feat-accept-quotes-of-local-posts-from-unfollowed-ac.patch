@@ -1,0 +1,36 @@
+From 6a5fe3be8b7f013f6bf4e296af4c056cb01fd42b Mon Sep 17 00:00:00 2001
+From: Noa Himesaka <himesaka@noa.codes>
+Date: Mon, 14 Sep 2026 02:53:18 +0900
+Subject: [PATCH] feat: accept quotes of local posts from unfollowed accounts
+
+---
+ app/lib/activitypub/activity/create.rb | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/app/lib/activitypub/activity/create.rb b/app/lib/activitypub/activity/create.rb
+index 1ad26d1f49..d6e249ed5a 100644
+--- a/app/lib/activitypub/activity/create.rb
++++ b/app/lib/activitypub/activity/create.rb
+@@ -466,7 +466,7 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
+ 
+     case @status_parser.visibility
+     when :public, :unlisted
+-      followed_by_local_accounts? || requested_through_relay? || responds_to_followed_account? || addresses_local_accounts?
++      followed_by_local_accounts? || requested_through_relay? || responds_to_followed_account? || quotes_local_status? || addresses_local_accounts?
+     when :private
+       followed_by_local_accounts? || addresses_local_accounts?
+     when :direct
+@@ -478,6 +478,10 @@ class ActivityPub::Activity::Create < ActivityPub::Activity
+     !replied_to_status.nil? && (replied_to_status.account.local? || replied_to_status.account.passive_relationships.exists?)
+   end
+ 
++  def quotes_local_status?
++    @status_parser.quote? && status_from_uri(@status_parser.quote_uri)&.account&.local?
++  end
++
+   def addresses_local_accounts?
+     return true if @options[:delivered_to_account_id]
+ 
+-- 
+2.55.0
+

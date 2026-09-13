@@ -1,0 +1,56 @@
+From eaca78814123db2bf422c22ae5ef55850d181bbb Mon Sep 17 00:00:00 2001
+From: Noa Himesaka <himesaka@noa.codes>
+Date: Mon, 14 Sep 2026 03:13:40 +0900
+Subject: [PATCH] fix: accept OpenSearch in the search server system check
+
+---
+ app/lib/admin/system_check/elasticsearch_check.rb | 11 ++++++++++-
+ config/locales/en.yml                             |  2 +-
+ 2 files changed, 11 insertions(+), 2 deletions(-)
+
+diff --git a/app/lib/admin/system_check/elasticsearch_check.rb b/app/lib/admin/system_check/elasticsearch_check.rb
+index 1d404950e3..0e328fc7ca 100644
+--- a/app/lib/admin/system_check/elasticsearch_check.rb
++++ b/app/lib/admin/system_check/elasticsearch_check.rb
+@@ -29,6 +29,7 @@ class Admin::SystemCheck::ElasticsearchCheck < Admin::SystemCheck::BaseCheck
+         :elasticsearch_version_check,
+         I18n.t(
+           'admin.system_checks.elasticsearch_version_check.version_comparison',
++          distribution: distribution_name,
+           running_version: running_version,
+           required_version: required_version
+         )
+@@ -76,8 +77,16 @@ class Admin::SystemCheck::ElasticsearchCheck < Admin::SystemCheck::BaseCheck
+     Chewy.client.info['version']['minimum_wire_compatibility_version']
+   end
+ 
++  def opensearch?
++    Chewy.client.info.dig('version', 'distribution') == 'opensearch'
++  end
++
++  def distribution_name
++    opensearch? ? 'OpenSearch' : 'Elasticsearch'
++  end
++
+   def required_version
+-    '7.x'
++    opensearch? ? '1.x' : '7.x'
+   end
+ 
+   def compatible_version?
+diff --git a/config/locales/en.yml b/config/locales/en.yml
+index 06b146c431..5d7f115404 100644
+--- a/config/locales/en.yml
++++ b/config/locales/en.yml
+@@ -1111,7 +1111,7 @@ en:
+         message_html: Could not connect to Elasticsearch. Please check that it is running, or disable full-text search
+       elasticsearch_version_check:
+         message_html: 'Incompatible Elasticsearch version: %{value}'
+-        version_comparison: Elasticsearch %{running_version} is running while %{required_version} is required
++        version_comparison: '%{distribution} %{running_version} is running while %{required_version} is required'
+       rules_check:
+         action: Manage server rules
+         message_html: You haven't defined any server rules.
+-- 
+2.55.0
+

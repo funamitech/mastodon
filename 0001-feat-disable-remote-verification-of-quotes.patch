@@ -1,0 +1,235 @@
+From 75084916fb6a1e4d8bba801aa774f77a815a921f Mon Sep 17 00:00:00 2001
+From: Noa Himesaka <himesaka@noa.codes>
+Date: Mon, 14 Sep 2026 02:42:47 +0900
+Subject: [PATCH] feat: disable remote verification of quotes
+
+---
+ app/lib/activitypub/activity/accept.rb        |  7 +-
+ app/lib/activitypub/activity/delete.rb        | 22 +----
+ app/lib/activitypub/activity/reject.rb        |  8 --
+ .../activitypub/verify_quote_service.rb       | 87 ++-----------------
+ app/services/post_status_service.rb           |  3 +-
+ 5 files changed, 14 insertions(+), 113 deletions(-)
+
+diff --git a/app/lib/activitypub/activity/accept.rb b/app/lib/activitypub/activity/accept.rb
+index a8daf39fac..88f4074de4 100644
+--- a/app/lib/activitypub/activity/accept.rb
++++ b/app/lib/activitypub/activity/accept.rb
+@@ -46,11 +46,10 @@ class ActivityPub::Activity::Accept < ActivityPub::Activity
+ 
+   def accept_quote!(quote)
+     approval_uri = value_or_id(first_of_value(@json['result']))
+-    return if unsupported_uri_scheme?(approval_uri) || non_matching_uri_hosts?(approval_uri, @account.uri) || quote.quoted_account != @account || !quote.status.local? || !quote.pending?
++    return if unsupported_uri_scheme?(approval_uri) || non_matching_uri_hosts?(approval_uri, @account.uri) || quote.quoted_account != @account || !quote.status.local? || quote.approval_uri.present?
+ 
+-    # NOTE: we are not going through `ActivityPub::VerifyQuoteService` as the `Accept` is as authoritative
+-    # as the stamp, but this means we are not checking the stamp, which may lead to inconsistencies
+-    # in case of an implementation bug
++    # NOTE: the quote has been accepted without waiting for this `Accept`, the stamp
++    # is only recorded so that it can be advertised to servers that do verify quotes
+     quote.update!(state: :accepted, approval_uri: approval_uri)
+ 
+     DistributionWorker.perform_async(quote.status_id, { 'update' => true })
+diff --git a/app/lib/activitypub/activity/delete.rb b/app/lib/activitypub/activity/delete.rb
+index 1e3cd1a647..e4f6e7e5b4 100644
+--- a/app/lib/activitypub/activity/delete.rb
++++ b/app/lib/activitypub/activity/delete.rb
+@@ -31,14 +31,7 @@ class ActivityPub::Activity::Delete < ActivityPub::Activity
+         Tombstone.find_or_create_by(uri: object_uri, account: @account)
+       end
+ 
+-      case @object['type']
+-      when 'QuoteAuthorization'
+-        revoke_quote
+-      when 'Note', 'Question'
+-        delete_status
+-      else
+-        delete_status || revoke_quote
+-      end
++      delete_status
+     end
+   end
+ 
+@@ -50,19 +43,6 @@ class ActivityPub::Activity::Delete < ActivityPub::Activity
+ 
+     forwarder.forward! if forwarder.forwardable?
+     RemoveStatusService.new.call(@status, redraft: false)
+-
+-    true
+-  end
+-
+-  def revoke_quote
+-    @quote = Quote.find_by(approval_uri: object_uri, quoted_account: @account, state: [:pending, :accepted])
+-    return if @quote.nil?
+-
+-    ActivityPub::Forwarder.new(@account, @json, @quote.status).forward! if @quote.status.present?
+-
+-    @quote.reject!
+-
+-    DistributionWorker.perform_async(@quote.status_id, { 'update' => true }) if @quote.status.present?
+   end
+ 
+   def delete_feature_authorization!
+diff --git a/app/lib/activitypub/activity/reject.rb b/app/lib/activitypub/activity/reject.rb
+index b0a4a72436..564a2d7e7e 100644
+--- a/app/lib/activitypub/activity/reject.rb
++++ b/app/lib/activitypub/activity/reject.rb
+@@ -5,7 +5,6 @@ class ActivityPub::Activity::Reject < ActivityPub::Activity
+     return reject_follow_for_relay if relay_follow?
+     return follow_request_from_object.reject! unless follow_request_from_object.nil?
+     return UnfollowService.new.call(follow_from_object.account, @account) unless follow_from_object.nil?
+-    return reject_quote!(quote_request_from_object) unless quote_request_from_object.nil?
+     return reject_feature_request! unless feature_request_from_object.nil?
+ 
+     case @object['type']
+@@ -31,13 +30,6 @@ class ActivityPub::Activity::Reject < ActivityPub::Activity
+     relay.update!(state: :rejected)
+   end
+ 
+-  def reject_quote!(quote)
+-    return unless quote.quoted_account == @account && quote.status.local?
+-
+-    # TODO: broadcast an update?
+-    quote.reject!
+-  end
+-
+   def reject_feature_request!
+     collection_item = feature_request_from_object
+     return unless collection_item.account == @account && collection_item.local?
+diff --git a/app/services/activitypub/verify_quote_service.rb b/app/services/activitypub/verify_quote_service.rb
+index 095e416c70..582cddfe89 100644
+--- a/app/services/activitypub/verify_quote_service.rb
++++ b/app/services/activitypub/verify_quote_service.rb
+@@ -1,12 +1,11 @@
+ # frozen_string_literal: true
+ 
+ class ActivityPub::VerifyQuoteService < BaseService
+-  include JsonLdHelper
+-
+   MAX_SYNCHRONOUS_DEPTH = 2
+ 
+-  # Optionally fetch quoted post, and verify the quote is authorized
+-  def call(quote, approval_uri, fetchable_quoted_uri: nil, prefetched_quoted_object: nil, prefetched_approval: nil, request_id: nil, depth: nil)
++  # Optionally fetch quoted post, and accept the quote without going through
++  # the FEP-044f approval flow, like Misskey does
++  def call(quote, approval_uri, fetchable_quoted_uri: nil, prefetched_quoted_object: nil, request_id: nil, depth: nil)
+     @request_id = request_id
+     @depth = depth || 0
+     @quote = quote
+@@ -14,57 +13,20 @@ class ActivityPub::VerifyQuoteService < BaseService
+     @fetching_error = nil
+ 
+     fetch_quoted_post_if_needed!(fetchable_quoted_uri, prefetched_body: prefetched_quoted_object)
+-    return if quote.quoted_account&.local?
+-    return if fast_track_approval! || @approval_uri.blank?
+-
+-    @json = fetch_approval_object(@approval_uri, prefetched_body: prefetched_approval)
+-    return quote.reject! if @json.nil?
+-
+-    return if non_matching_uri_hosts?(@approval_uri, value_or_id(@json['attributedTo']))
+-    return unless matching_type? && matching_quote_uri?
+-
+-    # Opportunistically import embedded posts if needed
+-    return if import_quoted_post_if_needed!(fetchable_quoted_uri) && fast_track_approval!
+ 
+     # Raise an error if we failed to fetch the status
+-    raise @fetching_error if @quote.status.nil? && @fetching_error
+-
+-    return unless matching_quoted_post? && matching_quoted_author?
+-
+-    quote.accept!(approval_uri: @approval_uri)
+-  end
+-
+-  private
+-
+-  # FEP-044f defines rules that don't require the approval flow
+-  def fast_track_approval!
+-    return false if @quote.quoted_status_id.blank?
++    raise @fetching_error if @quote.quoted_status.nil? && @fetching_error
++    return if @quote.quoted_status.nil?
+ 
+-    # Always allow someone to quote themselves
+-    if @quote.account_id == @quote.quoted_account_id
++    if @quote.quoted_account.local?
++      @quote.ensure_quoted_access
+       @quote.accept!
+-
+-      true
+-    end
+-
+-    false
+-  end
+-
+-  def fetch_approval_object(uri, prefetched_body: nil)
+-    if prefetched_body.nil?
+-      fetch_resource(uri, true, @quote.account.followers.local.first, raise_on_error: :temporary)
+     else
+-      body_to_json(prefetched_body, compare_id: uri)
++      @quote.accept!(approval_uri: @approval_uri)
+     end
+   end
+ 
+-  def matching_type?
+-    supported_context?(@json) && equals_or_includes?(@json['type'], 'QuoteAuthorization')
+-  end
+-
+-  def matching_quote_uri?
+-    ActivityPub::TagManager.instance.uri_for(@quote.status) == value_or_id(@json['interactingObject'])
+-  end
++  private
+ 
+   def fetch_quoted_post_if_needed!(uri, prefetched_body: nil)
+     return if uri.nil? || @quote.quoted_status.present?
+@@ -78,35 +40,4 @@ class ActivityPub::VerifyQuoteService < BaseService
+   rescue Mastodon::RecursionLimitExceededError, Mastodon::UnexpectedResponseError, *Mastodon::HTTP_CONNECTION_ERRORS => e
+     @fetching_error = e
+   end
+-
+-  def import_quoted_post_if_needed!(uri)
+-    # No need to fetch if we already have a post
+-    return if uri.nil? || @quote.quoted_status_id.present? || !@json['interactionTarget'].is_a?(Hash)
+-
+-    # NOTE: Replacing the object's context by that of the parent activity is
+-    # not sound, but it's consistent with the rest of the codebase
+-    object = @json['interactionTarget'].merge({ '@context' => @json['@context'] })
+-
+-    # It's not safe to fetch if the inlined object is cross-origin or doesn't match expectations
+-    return if object['id'] != uri || non_matching_uri_hosts?(@approval_uri, object['id'])
+-
+-    status = ActivityPub::FetchRemoteStatusService.new.call(object['id'], prefetched_body: object, on_behalf_of: @quote.account.followers.local.first, request_id: @request_id, depth: @depth)
+-
+-    if status.present? && !status.reblog?
+-      @quote.update(quoted_status: status)
+-      true
+-    else
+-      false
+-    end
+-  end
+-
+-  def matching_quoted_post?
+-    return false if @quote.quoted_status_id.blank?
+-
+-    ActivityPub::TagManager.instance.uri_for(@quote.quoted_status) == value_or_id(@json['interactionTarget'])
+-  end
+-
+-  def matching_quoted_author?
+-    ActivityPub::TagManager.instance.uri_for(@quote.quoted_account) == value_or_id(@json['attributedTo'])
+-  end
+ end
+diff --git a/app/services/post_status_service.rb b/app/services/post_status_service.rb
+index 920a7b57d0..2c96127776 100644
+--- a/app/services/post_status_service.rb
++++ b/app/services/post_status_service.rb
+@@ -140,8 +140,7 @@ class PostStatusService < BaseService
+ 
+     status.quote = Quote.create(quoted_status: @quoted_status, status: status)
+     status.quote.ensure_quoted_access
+-
+-    status.quote.accept! if @quoted_status.local? && StatusPolicy.new(@status.account, @quoted_status).quote?
++    status.quote.accept!
+   end
+ 
+   def attach_tagged_objects!(status)
+-- 
+2.55.0
+
