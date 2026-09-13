@@ -6,6 +6,7 @@ import { useDebouncedCallback } from 'use-debounce';
 
 import {
   fetchContext,
+  fetchStatus,
   completeContextRefresh,
   showPendingReplies,
   clearPendingReplies,
@@ -130,6 +131,10 @@ function useCheckForRemoteReplies({
           // (we don't want to do this if it's just a long-running job)
           if (status === 'finished') {
             dispatch(completeContextRefresh({ statusId }));
+            // Reactions fetched from the origin server live on the post itself
+            void dispatch(
+              fetchStatus(statusId, { forceFetch: true, alsoFetchContext: false }),
+            );
           }
 
           // Exit if there's nothing to fetch

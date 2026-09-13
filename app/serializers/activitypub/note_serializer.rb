@@ -4,7 +4,7 @@ class ActivityPub::NoteSerializer < ActivityPub::Serializer
   include FormattingHelper
   include JsonLdHelper
 
-  context_extensions :atom_uri, :conversation, :sensitive, :voters_count, :quotes, :interaction_policies, :direct_message
+  context_extensions :atom_uri, :conversation, :sensitive, :voters_count, :quotes, :interaction_policies, :direct_message, :emoji_reactions
 
   attributes :id, :type, :summary,
              :in_reply_to, :published, :url,
@@ -24,6 +24,7 @@ class ActivityPub::NoteSerializer < ActivityPub::Serializer
   has_one :replies, serializer: ActivityPub::CollectionSerializer, if: :local?
   has_one :likes, serializer: ActivityPub::CollectionSerializer, if: :local?
   has_one :shares, serializer: ActivityPub::CollectionSerializer, if: :local?
+  attribute :emoji_reactions, if: :local?
 
   has_many :poll_options, key: :one_of, if: :poll_and_not_multiple?
   has_many :poll_options, key: :any_of, if: :poll_and_multiple?
@@ -100,6 +101,10 @@ class ActivityPub::NoteSerializer < ActivityPub::Serializer
       type: :unordered,
       size: object.reblogs_count
     )
+  end
+
+  def emoji_reactions
+    ActivityPub::TagManager.instance.emoji_reactions_uri_for(object)
   end
 
   def language?
