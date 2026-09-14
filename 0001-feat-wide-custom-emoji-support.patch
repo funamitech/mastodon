@@ -1,0 +1,251 @@
+From 67d53e42d79056a5bed09f8509ecdb8e647b396d Mon Sep 17 00:00:00 2001
+From: Noa Himesaka <himesaka@noa.codes>
+Date: Mon, 14 Sep 2026 15:12:29 +0900
+Subject: [PATCH] feat: wide custom emoji support
+
+---
+ .../glitch/styles/mastodon/components.scss    | 26 ++++++++++++-------
+ .../glitch/styles/mastodon/tables.scss        |  2 +-
+ .../flavours/glitch/styles/modern/fixes.scss  |  7 +++++
+ .../styles/mastodon/components.scss           | 26 ++++++++++++-------
+ app/javascript/styles/mastodon/tables.scss    |  2 +-
+ 5 files changed, 41 insertions(+), 22 deletions(-)
+
+diff --git a/app/javascript/flavours/glitch/styles/mastodon/components.scss b/app/javascript/flavours/glitch/styles/mastodon/components.scss
+index e052994575..3fbf0942e0 100644
+--- a/app/javascript/flavours/glitch/styles/mastodon/components.scss
++++ b/app/javascript/flavours/glitch/styles/mastodon/components.scss
+@@ -517,14 +517,20 @@ body > [data-popover-placement] {
+   }
+ }
+ 
+-.autosuggest-account .account__avatar,
+-.autosuggest-emoji .emojione {
++.autosuggest-account .account__avatar {
+   display: block;
+   width: 24px;
+   height: 24px;
+   flex: 0 0 auto;
+ }
+ 
++.autosuggest-emoji .emojione {
++  display: block;
++  width: auto;
++  height: 24px;
++  flex: 0 0 auto;
++}
++
+ .compose-form {
+   display: flex;
+   flex-direction: column;
+@@ -1090,7 +1096,7 @@ body > [data-popover-placement] {
+   vertical-align: middle;
+   object-fit: contain;
+   margin: -0.2ex 0.15em 0.2ex;
+-  width: 16px;
++  width: auto;
+   height: 16px;
+ 
+   img {
+@@ -1133,7 +1139,7 @@ body > [data-popover-placement] {
+   }
+ 
+   .emojione {
+-    width: 20px;
++    width: auto;
+     height: 20px;
+     margin: -3px 0 0;
+   }
+@@ -1367,7 +1373,7 @@ body > [data-popover-placement] {
+ .edit-indicator__content,
+ .reply-indicator__content {
+   .emojione {
+-    width: 18px;
++    width: auto;
+     height: 18px;
+     margin: -3px 0 0;
+   }
+@@ -1378,7 +1384,7 @@ body > [data-popover-placement] {
+   overflow-y: auto;
+ 
+   .emojione {
+-    width: 20px;
++    width: auto;
+     height: 20px;
+     margin: -3px 0 0;
+   }
+@@ -1893,7 +1899,7 @@ body > [data-popover-placement] {
+     line-height: 24px;
+ 
+     .emojione {
+-      width: 24px;
++      width: auto;
+       height: 24px;
+       margin: -1px 0 0;
+     }
+@@ -7328,7 +7334,7 @@ a.status-card {
+     line-height: 24px;
+ 
+     .emojione {
+-      width: 24px;
++      width: auto;
+       height: 24px;
+       margin: -1px 0 0;
+     }
+@@ -8996,13 +9002,13 @@ noscript {
+     &__emoji {
+       display: block;
+       margin: 3px 0;
+-      width: 16px;
++      width: auto;
+       height: 16px;
+ 
+       img {
+         display: block;
+         margin: 0;
+-        width: 100%;
++        width: auto;
+         height: 100%;
+         min-width: auto;
+         min-height: auto;
+diff --git a/app/javascript/flavours/glitch/styles/mastodon/tables.scss b/app/javascript/flavours/glitch/styles/mastodon/tables.scss
+index 338a8aa30d..00d66be949 100644
+--- a/app/javascript/flavours/glitch/styles/mastodon/tables.scss
++++ b/app/javascript/flavours/glitch/styles/mastodon/tables.scss
+@@ -373,7 +373,7 @@ a.table-action-link {
+         margin-inline-end: 10px;
+ 
+         .emojione {
+-          width: 32px;
++          width: auto;
+           height: 32px;
+         }
+       }
+diff --git a/app/javascript/flavours/glitch/styles/modern/fixes.scss b/app/javascript/flavours/glitch/styles/modern/fixes.scss
+index dbfb93e405..cd8153f594 100644
+--- a/app/javascript/flavours/glitch/styles/modern/fixes.scss
++++ b/app/javascript/flavours/glitch/styles/modern/fixes.scss
+@@ -41,3 +41,10 @@ html[data-user-flavour='glitch']
+   > label::before {
+   content: none;
+ }
++
++// Modern caps a reaction's emoji at 70px, which clips the wide custom emoji
++// Misskey servers are fond of now that the base stylesheet lets them keep
++// their aspect ratio.
++.reactions-bar button .reactions-bar__item__emoji {
++  max-width: none;
++}
+diff --git a/app/javascript/styles/mastodon/components.scss b/app/javascript/styles/mastodon/components.scss
+index 34dfe38fa5..e726c64f68 100644
+--- a/app/javascript/styles/mastodon/components.scss
++++ b/app/javascript/styles/mastodon/components.scss
+@@ -517,14 +517,20 @@ body > [data-popover-placement] {
+   }
+ }
+ 
+-.autosuggest-account .account__avatar,
+-.autosuggest-emoji .emojione {
++.autosuggest-account .account__avatar {
+   display: block;
+   width: 24px;
+   height: 24px;
+   flex: 0 0 auto;
+ }
+ 
++.autosuggest-emoji .emojione {
++  display: block;
++  width: auto;
++  height: 24px;
++  flex: 0 0 auto;
++}
++
+ .compose-form {
+   display: flex;
+   flex-direction: column;
+@@ -1037,7 +1043,7 @@ body > [data-popover-placement] {
+   vertical-align: middle;
+   object-fit: contain;
+   margin: -0.2ex 0.15em 0.2ex;
+-  width: 16px;
++  width: auto;
+   height: 16px;
+ 
+   img {
+@@ -1080,7 +1086,7 @@ body > [data-popover-placement] {
+   }
+ 
+   .emojione {
+-    width: 20px;
++    width: auto;
+     height: 20px;
+     margin: -3px 0 0;
+   }
+@@ -1308,7 +1314,7 @@ body > [data-popover-placement] {
+ .edit-indicator__content,
+ .reply-indicator__content {
+   .emojione {
+-    width: 18px;
++    width: auto;
+     height: 18px;
+     margin: -3px 0 0;
+   }
+@@ -1319,7 +1325,7 @@ body > [data-popover-placement] {
+   overflow-y: auto;
+ 
+   .emojione {
+-    width: 20px;
++    width: auto;
+     height: 20px;
+     margin: -3px 0 0;
+   }
+@@ -1817,7 +1823,7 @@ body > [data-popover-placement] {
+     line-height: 24px;
+ 
+     .emojione {
+-      width: 24px;
++      width: auto;
+       height: 24px;
+       margin: -1px 0 0;
+     }
+@@ -7046,7 +7052,7 @@ a.status-card {
+     line-height: 24px;
+ 
+     .emojione {
+-      width: 24px;
++      width: auto;
+       height: 24px;
+       margin: -1px 0 0;
+     }
+@@ -8648,13 +8654,13 @@ noscript {
+     &__emoji {
+       display: block;
+       margin: 3px 0;
+-      width: 16px;
++      width: auto;
+       height: 16px;
+ 
+       img {
+         display: block;
+         margin: 0;
+-        width: 100%;
++        width: auto;
+         height: 100%;
+         min-width: auto;
+         min-height: auto;
+diff --git a/app/javascript/styles/mastodon/tables.scss b/app/javascript/styles/mastodon/tables.scss
+index 338a8aa30d..00d66be949 100644
+--- a/app/javascript/styles/mastodon/tables.scss
++++ b/app/javascript/styles/mastodon/tables.scss
+@@ -373,7 +373,7 @@ a.table-action-link {
+         margin-inline-end: 10px;
+ 
+         .emojione {
+-          width: 32px;
++          width: auto;
+           height: 32px;
+         }
+       }
+-- 
+2.55.0
+

@@ -1,0 +1,53 @@
+From b202ab96bc2dbe70080c743e8a8e2563d043de37 Mon Sep 17 00:00:00 2001
+From: Noa Himesaka <himesaka@noa.codes>
+Date: Mon, 14 Sep 2026 15:12:31 +0900
+Subject: [PATCH] fix: wordmark logo aspect ratio
+
+---
+ app/helpers/branding_helper.rb                     | 2 +-
+ app/javascript/flavours/glitch/components/logo.tsx | 2 +-
+ app/javascript/mastodon/components/logo.tsx        | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/app/helpers/branding_helper.rb b/app/helpers/branding_helper.rb
+index ef6d33ae5c..eac4ea8211 100644
+--- a/app/helpers/branding_helper.rb
++++ b/app/helpers/branding_helper.rb
+@@ -11,7 +11,7 @@ module BrandingHelper
+   end
+ 
+   def _logo_as_symbol_wordmark
+-    tag.svg(viewBox: '0 0 261 66', class: 'logo logo--wordmark') do
++    tag.svg(viewBox: '0 0 129 66', class: 'logo logo--wordmark') do
+       tag.title('Mastodon') +
+         tag.use(href: '#logo-symbol-wordmark')
+     end
+diff --git a/app/javascript/flavours/glitch/components/logo.tsx b/app/javascript/flavours/glitch/components/logo.tsx
+index 99d134265d..11d4cfe299 100644
+--- a/app/javascript/flavours/glitch/components/logo.tsx
++++ b/app/javascript/flavours/glitch/components/logo.tsx
+@@ -5,7 +5,7 @@ import classNames from 'classnames';
+ import logo from '@/images/logo.svg';
+ 
+ export const WordmarkLogo: React.FC = () => (
+-  <svg viewBox='0 0 261 66' className='logo logo--wordmark' role='img'>
++  <svg viewBox='0 0 129 66' className='logo logo--wordmark' role='img'>
+     <title>Mastodon</title>
+     <use xlinkHref='#logo-symbol-wordmark' />
+   </svg>
+diff --git a/app/javascript/mastodon/components/logo.tsx b/app/javascript/mastodon/components/logo.tsx
+index 99d134265d..11d4cfe299 100644
+--- a/app/javascript/mastodon/components/logo.tsx
++++ b/app/javascript/mastodon/components/logo.tsx
+@@ -5,7 +5,7 @@ import classNames from 'classnames';
+ import logo from '@/images/logo.svg';
+ 
+ export const WordmarkLogo: React.FC = () => (
+-  <svg viewBox='0 0 261 66' className='logo logo--wordmark' role='img'>
++  <svg viewBox='0 0 129 66' className='logo logo--wordmark' role='img'>
+     <title>Mastodon</title>
+     <use xlinkHref='#logo-symbol-wordmark' />
+   </svg>
+-- 
+2.55.0
+

@@ -1,0 +1,42 @@
+From bae046dfc666fb6be72e6e280f61a0a37285ad4d Mon Sep 17 00:00:00 2001
+From: Noa Himesaka <himesaka@noa.codes>
+Date: Mon, 14 Sep 2026 14:59:22 +0900
+Subject: [PATCH] feat: allow quoting remote posts without an interaction
+ policy
+
+---
+ app/lib/interaction_policy.rb                            | 4 ++++
+ app/models/concerns/status/interaction_policy_concern.rb | 4 ++++
+ 2 files changed, 8 insertions(+)
+
+diff --git a/app/lib/interaction_policy.rb b/app/lib/interaction_policy.rb
+index 8d0b8dd060..50edae2618 100644
+--- a/app/lib/interaction_policy.rb
++++ b/app/lib/interaction_policy.rb
+@@ -36,4 +36,8 @@ class InteractionPolicy
+     @automatic = SubPolicy.new(@bitmap >> 16)
+     @manual = SubPolicy.new(@bitmap & 0xFFFF)
+   end
++
++  def missing?
++    @bitmap.zero?
++  end
+ end
+diff --git a/app/models/concerns/status/interaction_policy_concern.rb b/app/models/concerns/status/interaction_policy_concern.rb
+index 332feef86b..5c0eb8c288 100644
+--- a/app/models/concerns/status/interaction_policy_concern.rb
++++ b/app/models/concerns/status/interaction_policy_concern.rb
+@@ -26,6 +26,10 @@ module Status::InteractionPolicyConcern
+     # Post author is always allowed to quote themselves
+     return :automatic if account_id == other_account.id
+ 
++    # Remote posts without any interaction policy come from software that does
++    # not gate quotes, like Misskey, so anyone may quote them
++    return :automatic if !local? && distributable? && quote_interaction_policy.missing?
++
+     automatic_policy = quote_interaction_policy.automatic
+ 
+     return :automatic if automatic_policy.public?
+-- 
+2.55.0
+
