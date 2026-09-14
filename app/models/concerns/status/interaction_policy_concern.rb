@@ -26,6 +26,10 @@ module Status::InteractionPolicyConcern
     # Post author is always allowed to quote themselves
     return :automatic if account_id == other_account.id
 
+    # Remote posts without any interaction policy come from software that does
+    # not gate quotes, like Misskey, so anyone may quote them
+    return :automatic if !local? && distributable? && quote_interaction_policy.missing?
+
     automatic_policy = quote_interaction_policy.automatic
 
     return :automatic if automatic_policy.public?
