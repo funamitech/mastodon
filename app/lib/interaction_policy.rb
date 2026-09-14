@@ -36,4 +36,8 @@ class InteractionPolicy
     @automatic = SubPolicy.new(@bitmap >> 16)
     @manual = SubPolicy.new(@bitmap & 0xFFFF)
   end
+
+  def missing?
+    @bitmap.zero?
+  end
 end
