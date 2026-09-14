@@ -41,3 +41,10 @@ html[data-user-flavour='glitch']
   > label::before {
   content: none;
 }
+
+// Modern caps a reaction's emoji at 70px, which clips the wide custom emoji
+// Misskey servers are fond of now that the base stylesheet lets them keep
+// their aspect ratio.
+.reactions-bar button .reactions-bar__item__emoji {
+  max-width: none;
+}
