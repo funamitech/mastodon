@@ -1,4 +1,4 @@
-From 739e77ed9399662445d1d017ed8d013b493d2a5b Mon Sep 17 00:00:00 2001
+From cd452d45c6103196e45dfaefcce325836562af5a Mon Sep 17 00:00:00 2001
 From: Noa Himesaka <himesaka@noa.codes>
 Date: Fri, 1 May 2026 18:26:58 +0900
 Subject: [PATCH] feat: remove GitHub Actions CI
@@ -757,7 +757,7 @@ index fea0b4679a..0000000000
 -          category: '/language:${{matrix.language}}'
 diff --git a/.github/workflows/crowdin-download-stable.yml b/.github/workflows/crowdin-download-stable.yml
 deleted file mode 100644
-index 529bf31bb8..0000000000
+index 58f6d8eeb5..0000000000
 --- a/.github/workflows/crowdin-download-stable.yml
 +++ /dev/null
 @@ -1,70 +0,0 @@
@@ -787,7 +787,7 @@ index 529bf31bb8..0000000000
 -
 -      # Download the translation files from Crowdin
 -      - name: crowdin action
--        uses: crowdin/github-action@c7af9bc98b01694653031fef2a0dc6c7888ce9bc # v2
+-        uses: crowdin/github-action@8f01d54f70f1713ee3f09d82c2bbb2daeac28689 # v2
 -        with:
 -          config: crowdin-glitch.yml
 -          upload_sources: false
@@ -833,7 +833,7 @@ index 529bf31bb8..0000000000
 -          labels: i18n
 diff --git a/.github/workflows/crowdin-download.yml b/.github/workflows/crowdin-download.yml
 deleted file mode 100644
-index 4b040821c9..0000000000
+index 467e8fff2e..0000000000
 --- a/.github/workflows/crowdin-download.yml
 +++ /dev/null
 @@ -1,72 +0,0 @@
@@ -865,7 +865,7 @@ index 4b040821c9..0000000000
 -
 -      # Download the translation files from Crowdin
 -      - name: crowdin action
--        uses: crowdin/github-action@c7af9bc98b01694653031fef2a0dc6c7888ce9bc # v2
+-        uses: crowdin/github-action@8f01d54f70f1713ee3f09d82c2bbb2daeac28689 # v2
 -        with:
 -          config: crowdin-glitch.yml
 -          upload_sources: false
@@ -911,7 +911,7 @@ index 4b040821c9..0000000000
 -          labels: i18n
 diff --git a/.github/workflows/crowdin-upload.yml b/.github/workflows/crowdin-upload.yml
 deleted file mode 100644
-index ce20a287af..0000000000
+index 9145532eb9..0000000000
 --- a/.github/workflows/crowdin-upload.yml
 +++ /dev/null
 @@ -1,39 +0,0 @@
@@ -943,7 +943,7 @@ index ce20a287af..0000000000
 -        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
 -
 -      - name: crowdin action
--        uses: crowdin/github-action@c7af9bc98b01694653031fef2a0dc6c7888ce9bc # v2
+-        uses: crowdin/github-action@8f01d54f70f1713ee3f09d82c2bbb2daeac28689 # v2
 -        with:
 -          config: crowdin-glitch.yml
 -          upload_sources: true
