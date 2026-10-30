@@ -1,4 +1,4 @@
-From 9e9fa2334238b51b1b0e042eb350600c5bc064eb Mon Sep 17 00:00:00 2001
+From a66f5e2694d8e7825479ee18bc073659131efc9f Mon Sep 17 00:00:00 2001
 From: Noa Himesaka <himesaka@noa.codes>
 Date: Mon, 14 Sep 2026 01:20:11 +0900
 Subject: [PATCH] feat: fetch emoji reactions of remote posts
@@ -269,7 +269,7 @@ index cd41abdad5..722c9f082b 100644
    end
 diff --git a/app/services/activitypub/fetch_reactions_service.rb b/app/services/activitypub/fetch_reactions_service.rb
 new file mode 100644
-index 0000000000..5fcc48ba73
+index 0000000000..9badef77f9
 --- /dev/null
 +++ b/app/services/activitypub/fetch_reactions_service.rb
 @@ -0,0 +1,133 @@
@@ -307,7 +307,7 @@ index 0000000000..5fcc48ba73
 +  # FEP-c0e0: the note advertises an `emojiReactions` collection of `Like`
 +  # and `EmojiReact` activities
 +  def collection_reactions
-+    note = fetch_resource(@status.uri, true)
++    note = fetch_resource(@status.uri)
 +    return if note.nil? || note['emojiReactions'].blank?
 +
 +    items, = collection_items(note['emojiReactions'], max_pages: 2, max_items: MAX_REACTIONS, reference_uri: @status.uri)
@@ -341,7 +341,7 @@ index 0000000000..5fcc48ba73
 +  end
 +
 +  def process_reaction(item)
-+    json = item.is_a?(String) ? fetch_resource(item, true) : item
++    json = item.is_a?(String) ? fetch_resource(item) : item
 +    return false unless json.is_a?(Hash) && ACTIVITY_TYPES.include?(json['type']) && value_or_id(json['object']) == @status.uri
 +
 +    account = reactor(json)
@@ -384,7 +384,7 @@ index 0000000000..5fcc48ba73
 +    emoji  = CustomEmoji.find_by(shortcode: shortcode, domain: domain)
 +    return emoji if emoji.present? || domain.nil?
 +
-+    tag = emoji_tag(json) || fetch_resource("https://#{domain}/emojis/#{shortcode}", true)
++    tag = emoji_tag(json) || fetch_resource("https://#{domain}/emojis/#{shortcode}")
 +    return unless tag.is_a?(Hash) && tag['type'] == 'Emoji'
 +
 +    parser = ActivityPub::Parser::CustomEmojiParser.new(tag)
@@ -402,7 +402,7 @@ index 0000000000..5fcc48ba73
 +    tag = as_array(json['tag']).find { |item| item['type'] == 'Emoji' }
 +    return tag unless tag.nil? || json['acct'].blank?
 +
-+    activity = fetch_resource(json['id'], true)
++    activity = fetch_resource(json['id'])
 +    as_array(activity['tag']).find { |item| item['type'] == 'Emoji' } if activity.is_a?(Hash)
 +  end
 +end
@@ -436,7 +436,7 @@ index 0000000000..f8ec80413f
 +  end
 +end
 diff --git a/config/routes.rb b/config/routes.rb
-index ee040a3072..5e868efe7c 100644
+index 03f6d9d21d..4f80e0526f 100644
 --- a/config/routes.rb
 +++ b/config/routes.rb
 @@ -120,6 +120,7 @@ Rails.application.routes.draw do
@@ -456,5 +456,5 @@ index ee040a3072..5e868efe7c 100644
      end
    end
 -- 
-2.55.0
+2.56.0
 

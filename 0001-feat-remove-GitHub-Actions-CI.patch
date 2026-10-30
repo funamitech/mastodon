@@ -1,4 +1,4 @@
-From cd452d45c6103196e45dfaefcce325836562af5a Mon Sep 17 00:00:00 2001
+From ca3cf48ee6c732dd86cc92a1b2d0273fef37425d Mon Sep 17 00:00:00 2001
 From: Noa Himesaka <himesaka@noa.codes>
 Date: Fri, 1 May 2026 18:26:58 +0900
 Subject: [PATCH] feat: remove GitHub Actions CI
@@ -16,7 +16,7 @@ Subject: [PATCH] feat: remove GitHub Actions CI
  .github/workflows/crowdin-download-stable.yml |  70 ----
  .github/workflows/crowdin-download.yml        |  72 ----
  .github/workflows/crowdin-upload.yml          |  39 --
- .github/workflows/format-check.yml            |  23 -
+ .github/workflows/format-check.yml            |  23 --
  .github/workflows/lint-css.yml                |  40 --
  .github/workflows/lint-haml.yml               |  44 --
  .github/workflows/lint-js.yml                 |  49 ---
@@ -25,8 +25,8 @@ Subject: [PATCH] feat: remove GitHub Actions CI
  .github/workflows/test-image-build.yml        |  34 --
  .github/workflows/test-js.yml                 |  44 --
  .github/workflows/test-migrations.yml         | 113 -----
- .github/workflows/test-ruby.yml               | 396 ------------------
- 22 files changed, 1652 deletions(-)
+ .github/workflows/test-ruby.yml               | 390 ------------------
+ 22 files changed, 1646 deletions(-)
  delete mode 100644 .github/workflows/build-container-image.yml
  delete mode 100644 .github/workflows/build-nightly.yml
  delete mode 100644 .github/workflows/build-push-pr.yml
@@ -510,7 +510,7 @@ index 32a2d534bd..0000000000
 -    secrets: inherit
 diff --git a/.github/workflows/bundler-audit.yml b/.github/workflows/bundler-audit.yml
 deleted file mode 100644
-index b51f792ec6..0000000000
+index 169def3b02..0000000000
 --- a/.github/workflows/bundler-audit.yml
 +++ /dev/null
 @@ -1,40 +0,0 @@
@@ -548,7 +548,7 @@ index b51f792ec6..0000000000
 -        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
 -
 -      - name: Set up Ruby
--        uses: ruby/setup-ruby@6e5d382445ae5590b7449d8b3bc8cb1c2c27f617 # v1
+-        uses: ruby/setup-ruby@7f797815d8adceb1c412e7abefdd1ab4abc47a5f # v1.335.0
 -        with:
 -          bundler-cache: true
 -
@@ -684,7 +684,7 @@ index 0068fc2d12..0000000000
 -          autoAcceptChanges: 'main' # Auto-accept changes on main branch only
 diff --git a/.github/workflows/codeql.yml b/.github/workflows/codeql.yml
 deleted file mode 100644
-index fea0b4679a..0000000000
+index 18bc659961..0000000000
 --- a/.github/workflows/codeql.yml
 +++ /dev/null
 @@ -1,67 +0,0 @@
@@ -726,7 +726,7 @@ index fea0b4679a..0000000000
 -
 -      # Initializes the CodeQL tools for scanning.
 -      - name: Initialize CodeQL
--        uses: github/codeql-action/init@5595ccaf912efad79be6eef63a5619ff05969be3 # v4
+-        uses: github/codeql-action/init@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4
 -        with:
 -          languages: ${{ matrix.language }}
 -          # If you wish to specify custom queries, you can do so here or in a config file.
@@ -739,7 +739,7 @@ index fea0b4679a..0000000000
 -      # Autobuild attempts to build any compiled languages  (C/C++, C#, Go, or Java).
 -      # If this step fails, then you should remove it and run the build manually (see below)
 -      - name: Autobuild
--        uses: github/codeql-action/autobuild@5595ccaf912efad79be6eef63a5619ff05969be3 # v4
+-        uses: github/codeql-action/autobuild@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4
 -
 -      # ℹ️ Command-line programs to run using the OS shell.
 -      # 📚 See https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsrun
@@ -752,12 +752,12 @@ index fea0b4679a..0000000000
 -      #   ./location_of_script_within_repo/buildscript.sh
 -
 -      - name: Perform CodeQL Analysis
--        uses: github/codeql-action/analyze@5595ccaf912efad79be6eef63a5619ff05969be3 # v4
+-        uses: github/codeql-action/analyze@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4
 -        with:
 -          category: '/language:${{matrix.language}}'
 diff --git a/.github/workflows/crowdin-download-stable.yml b/.github/workflows/crowdin-download-stable.yml
 deleted file mode 100644
-index 58f6d8eeb5..0000000000
+index c5041f8fd8..0000000000
 --- a/.github/workflows/crowdin-download-stable.yml
 +++ /dev/null
 @@ -1,70 +0,0 @@
@@ -814,7 +814,7 @@ index 58f6d8eeb5..0000000000
 -
 -      # Create or update the pull request
 -      - name: Create Pull Request
--        uses: peter-evans/create-pull-request@c0f553fe549906ede9cf27b5156039d195d2ece0 # v8.1.0
+-        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
 -        with:
 -          commit-message: 'New Crowdin translations'
 -          title: 'New Crowdin Translations for ${{ github.base_ref || github.ref_name }} (automated)'
@@ -1031,7 +1031,7 @@ index e69fdc15e8..0000000000
 -        run: yarn lint:css --custom-formatter @csstools/stylelint-formatter-github
 diff --git a/.github/workflows/lint-haml.yml b/.github/workflows/lint-haml.yml
 deleted file mode 100644
-index fdb6cf1dac..0000000000
+index a3ac8a5037..0000000000
 --- a/.github/workflows/lint-haml.yml
 +++ /dev/null
 @@ -1,44 +0,0 @@
@@ -1072,7 +1072,7 @@ index fdb6cf1dac..0000000000
 -        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
 -
 -      - name: Set up Ruby
--        uses: ruby/setup-ruby@6e5d382445ae5590b7449d8b3bc8cb1c2c27f617 # v1
+-        uses: ruby/setup-ruby@7f797815d8adceb1c412e7abefdd1ab4abc47a5f # v1.335.0
 -        with:
 -          bundler-cache: true
 -
@@ -1136,7 +1136,7 @@ index 65c305604c..0000000000
 -        run: yarn typecheck
 diff --git a/.github/workflows/lint-ruby.yml b/.github/workflows/lint-ruby.yml
 deleted file mode 100644
-index 950e502941..0000000000
+index 0c57030baf..0000000000
 --- a/.github/workflows/lint-ruby.yml
 +++ /dev/null
 @@ -1,49 +0,0 @@
@@ -1179,7 +1179,7 @@ index 950e502941..0000000000
 -        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
 -
 -      - name: Set up Ruby
--        uses: ruby/setup-ruby@6e5d382445ae5590b7449d8b3bc8cb1c2c27f617 # v1
+-        uses: ruby/setup-ruby@7f797815d8adceb1c412e7abefdd1ab4abc47a5f # v1.335.0
 -        with:
 -          bundler-cache: true
 -
@@ -1315,7 +1315,7 @@ index 5a3c578899..0000000000
 -        run: yarn test:js
 diff --git a/.github/workflows/test-migrations.yml b/.github/workflows/test-migrations.yml
 deleted file mode 100644
-index 79268f3e60..0000000000
+index 0cb80e0dd7..0000000000
 --- a/.github/workflows/test-migrations.yml
 +++ /dev/null
 @@ -1,113 +0,0 @@
@@ -1425,8 +1425,8 @@ index 79268f3e60..0000000000
 -          bin/rails db:create
 -          SKIP_POST_DEPLOYMENT_MIGRATIONS=true bin/rails tests:migrations:prepare_database
 -
--          # Migrate up to v4.3.0 breakpoint
--          bin/rails db:migrate VERSION=20241007071624
+-          # Migrate up to v4.7.0 breakpoint
+-          bin/rails db:migrate VERSION=20260812154114
 -
 -          # Migrate the rest
 -          SKIP_POST_DEPLOYMENT_MIGRATIONS=true bin/rails db:migrate
@@ -1434,10 +1434,10 @@ index 79268f3e60..0000000000
 -          bin/rails tests:migrations:check_database
 diff --git a/.github/workflows/test-ruby.yml b/.github/workflows/test-ruby.yml
 deleted file mode 100644
-index 9a792be882..0000000000
+index 117d6df56f..0000000000
 --- a/.github/workflows/test-ruby.yml
 +++ /dev/null
-@@ -1,396 +0,0 @@
+@@ -1,390 +0,0 @@
 -name: Ruby Testing
 -
 -on:
@@ -1458,18 +1458,13 @@ index 9a792be882..0000000000
 -
 -jobs:
 -  build:
+-    name: build (production)
 -    runs-on: ubuntu-latest
 -    timeout-minutes: 15
 -
--    strategy:
--      fail-fast: true
--      matrix:
--        mode:
--          - production
--          - test
 -    env:
--      RAILS_ENV: ${{ matrix.mode }}
--      BUNDLE_WITH: ${{ matrix.mode }}
+-      RAILS_ENV: production
+-      BUNDLE_WITH: production
 -      SECRET_KEY_BASE_DUMMY: 1
 -
 -    steps:
@@ -1491,12 +1486,12 @@ index 9a792be882..0000000000
 -            public/packs
 -            public/packs-test
 -            tmp/cache/vite
--          key: ${{ matrix.mode }}-assets-${{ github.head_ref || github.ref_name }}-${{ github.sha }}
+-          key: assets-${{ github.head_ref || github.ref_name }}-${{ github.sha }}
 -          restore-keys: |
--            ${{ matrix.mode }}-assets-${{ github.head_ref || github.ref_name }}-${{ github.sha }}
--            ${{ matrix.mode }}-assets-${{ github.head_ref || github.ref_name }}
--            ${{ matrix.mode }}-assets-main
--            ${{ matrix.mode }}-assets
+-            assets-${{ github.head_ref || github.ref_name }}-${{ github.sha }}
+-            assets-${{ github.head_ref || github.ref_name }}
+-            assets-main
+-            assets
 -
 -      - name: Precompile assets
 -        run: |-
@@ -1507,7 +1502,6 @@ index 9a792be882..0000000000
 -          tar --exclude={"*.br","*.gz"} -zcf artifacts.tar.gz public/assets public/packs*
 -
 -      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
--        if: matrix.mode == 'test'
 -        with:
 -          path: |-
 -            ./artifacts.tar.gz
@@ -1835,5 +1829,5 @@ index 9a792be882..0000000000
 -          name: test-search-logs-${{ matrix.ruby-version }}
 -          path: log/
 -- 
-2.55.0
+2.56.0
 

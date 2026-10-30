@@ -1,4 +1,4 @@
-From 75084916fb6a1e4d8bba801aa774f77a815a921f Mon Sep 17 00:00:00 2001
+From 3a497aea7e516b308ed4fc9d4b53c0472a017bc8 Mon Sep 17 00:00:00 2001
 From: Noa Himesaka <himesaka@noa.codes>
 Date: Mon, 14 Sep 2026 02:42:47 +0900
 Subject: [PATCH] feat: disable remote verification of quotes
@@ -97,7 +97,7 @@ index b0a4a72436..564a2d7e7e 100644
      collection_item = feature_request_from_object
      return unless collection_item.account == @account && collection_item.local?
 diff --git a/app/services/activitypub/verify_quote_service.rb b/app/services/activitypub/verify_quote_service.rb
-index 095e416c70..582cddfe89 100644
+index 27d116f282..582cddfe89 100644
 --- a/app/services/activitypub/verify_quote_service.rb
 +++ b/app/services/activitypub/verify_quote_service.rb
 @@ -1,12 +1,11 @@
@@ -162,7 +162,7 @@ index 095e416c70..582cddfe89 100644
 -
 -  def fetch_approval_object(uri, prefetched_body: nil)
 -    if prefetched_body.nil?
--      fetch_resource(uri, true, @quote.account.followers.local.first, raise_on_error: :temporary)
+-      fetch_resource(uri, on_behalf_of: @quote.account.followers.local.first, raise_on_error: :temporary)
      else
 -      body_to_json(prefetched_body, compare_id: uri)
 +      @quote.accept!(approval_uri: @approval_uri)
@@ -231,5 +231,5 @@ index 920a7b57d0..2c96127776 100644
  
    def attach_tagged_objects!(status)
 -- 
-2.55.0
+2.56.0
 
